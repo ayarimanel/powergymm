@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 import { Text, TextInput } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { MarketplaceProduct, ShopCategory } from '../../types/database';
 import { colors } from '../../theme';
 import { useBackHandler } from '../../navigation/backStack';
@@ -92,7 +92,7 @@ export const ProductFormModal: React.FC<Props> = ({ visible, product, categories
       <Animated.View style={[styles.root, swipe.style]}>
         <View {...swipe.panHandlers} style={styles.header}>
           <Pressable onPress={onClose} accessibilityRole="button" accessibilityLabel="Fermer" style={styles.closeBtn}>
-            <Ionicons name="close" size={26} color={colors.text} />
+            <Icon name="close" size={26} color={colors.text} />
           </Pressable>
           <Text style={styles.title}>{product ? 'Modifier le produit' : 'Nouveau produit'}</Text>
           <View style={{ width: 44 }} />
@@ -123,14 +123,14 @@ export const ProductFormModal: React.FC<Props> = ({ visible, product, categories
                     accessibilityLabel="Retirer cette photo"
                     style={styles.removeBtn}
                   >
-                    <Ionicons name="trash-outline" size={20} color={colors.red.text} />
+                    <Icon name="trash-outline" size={20} color={colors.red.text} />
                   </Pressable>
                 )}
               </View>
             ))}
             {images.length < 5 && (
               <Pressable onPress={() => setImages(prev => [...prev, ''])} accessibilityRole="button" style={styles.addImg}>
-                <Ionicons name="add" size={18} color={colors.text} />
+                <Icon name="add" size={18} color={colors.text} />
                 <Text style={styles.addImgText}>Ajouter une photo</Text>
               </Pressable>
             )}

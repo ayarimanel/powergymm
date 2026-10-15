@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, Linking, Modal, Pressable, ScrollView, StyleSheet, Switch, View, useWindowDimensions } from 'react-native';
 import { Text } from '../../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../../ui/Icon';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FloorSettings } from '../../../types/floor';
 import { FloorSettingsService } from '../../../services/floorSettingsService';
@@ -115,7 +115,7 @@ export const FloorAdminScreen: React.FC<Props> = ({ visible, onClose, gymId, cap
                 accessibilityRole="button"
                 style={({ pressed }) => [styles.share, pressed && { opacity: 0.85 }]}
               >
-                <Ionicons name="logo-whatsapp" size={18} color={colors.white} />
+                <Icon name="logo-whatsapp" size={18} color={colors.white} />
                 <Text style={styles.shareText}>Envoyer le résumé sur WhatsApp</Text>
               </Pressable>
             </Section>
@@ -160,7 +160,7 @@ export const FloorAdminScreen: React.FC<Props> = ({ visible, onClose, gymId, cap
               {gaps.length ? (
                 gaps.map(g => (
                   <View key={`${g.weekday}-${g.hour}`} style={styles.line}>
-                    <Ionicons name="alert-circle-outline" size={18} color={colors.amber.text} />
+                    <Icon name="alert-circle-outline" size={18} color={colors.amber.text} />
                     <Text style={styles.lineText}>{g.text}</Text>
                   </View>
                 ))
@@ -172,7 +172,7 @@ export const FloorAdminScreen: React.FC<Props> = ({ visible, onClose, gymId, cap
             <Section title="Heures creuses">
               {quiet ? (
                 <View style={styles.highlight}>
-                  <Ionicons name="bulb-outline" size={20} color={colors.brandText} />
+                  <Icon name="bulb-outline" size={20} color={colors.brandText} />
                   <Text style={styles.highlightText}>{quiet.text}</Text>
                 </View>
               ) : (
@@ -239,7 +239,7 @@ export const FloorAdminScreen: React.FC<Props> = ({ visible, onClose, gymId, cap
           <>
             {planned[0] && (
               <View style={styles.highlight}>
-                <Ionicons name="calendar-outline" size={20} color={colors.brand} />
+                <Icon name="calendar-outline" size={20} color={colors.brand} />
                 <Text style={styles.highlightText}>
                   <Text style={styles.bold}>{planned[0].count} membre{planned[0].count > 1 ? 's' : ''}</Text> prévoi{planned[0].count > 1 ? 'ent' : 't'} de venir à {hh(planned[0].hour)}
                 </Text>
@@ -282,7 +282,7 @@ export const FloorAdminScreen: React.FC<Props> = ({ visible, onClose, gymId, cap
       <View style={[styles.root, { paddingTop: insets.top }]}>
         <View style={styles.header}>
           <Pressable onPress={onClose} hitSlop={10} accessibilityRole="button" accessibilityLabel="Fermer le tableau de bord">
-            <Ionicons name="close" size={26} color={colors.text} />
+            <Icon name="close" size={26} color={colors.text} />
           </Pressable>
           <Text style={styles.title} accessibilityRole="header">
             Live
@@ -305,7 +305,7 @@ export const FloorAdminScreen: React.FC<Props> = ({ visible, onClose, gymId, cap
             const on = tab === t.id;
             return (
               <Pressable key={t.id} onPress={() => setTab(t.id)} accessibilityRole="tab" accessibilityState={{ selected: on }} style={[styles.tab, on && styles.tabOn]}>
-                <Ionicons name={t.icon as any} size={16} color={on ? colors.onInverse : colors.textSecondary} />
+                <Icon name={t.icon as any} size={16} color={on ? colors.onInverse : colors.textSecondary} />
                 <Text style={[styles.tabText, on && { color: colors.onInverse }]}>{t.label}</Text>
               </Pressable>
             );

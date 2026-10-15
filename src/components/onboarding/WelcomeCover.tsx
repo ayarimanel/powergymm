@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, Image, Platform, Pressable, StatusBar, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { Text } from '../ui/Text';
 import { useT } from '../../i18n';
 import { useReduceMotion } from '../../hooks/useDeviceState';
@@ -101,7 +101,7 @@ export const WelcomeCover: React.FC<Props> = ({ onLogin, onSignup }) => {
           {FEATURES.map(f => (
             <View key={f.icon} style={styles.feature}>
               <View style={styles.featureIcon}>
-                <Ionicons name={f.icon as any} size={22} color={colors.brand} />
+                <Icon name={f.icon as any} size={22} color={colors.brand} />
               </View>
               <Text style={styles.featureText} numberOfLines={2}>
                 {t(f.label)}
@@ -117,7 +117,7 @@ export const WelcomeCover: React.FC<Props> = ({ onLogin, onSignup }) => {
             style={({ pressed }) => [styles.primary, pressed && styles.primaryPressed]}
           >
             <Text style={styles.primaryText}>{t(clubTheme.login.primaryButtonText)}</Text>
-            <Ionicons name="arrow-forward" size={20} color={colors.onBrand} style={styles.primaryArrow} />
+            <Icon name="arrow-forward" size={20} color={colors.onBrand} style={styles.primaryArrow} />
           </Pressable>
           <Pressable
             onPress={onSignup}

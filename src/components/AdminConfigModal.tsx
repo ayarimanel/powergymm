@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Image, Modal, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { Text, TextInput } from './ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from './ui/Icon';
 import { GymProfileConfig } from '../config/gymConfig';
 import { pickImages } from '../services/imagePicker';
 import { useBackHandler } from '../navigation/backStack';
@@ -111,10 +111,10 @@ export const AdminConfigModal: React.FC<Props> = ({ visible, config, onClose, on
       <View style={styles.overlay}>
         <View style={styles.card}>
           <View style={styles.header}>
-            <Ionicons name="settings-outline" size={22} color={colors.text} />
+            <Icon name="settings-outline" size={22} color={colors.text} />
             <Text style={styles.title}>Paramètres du club</Text>
             <Pressable onPress={onClose} hitSlop={10} accessibilityRole="button" accessibilityLabel="Fermer">
-              <Ionicons name="close" size={24} color={colors.textSecondary} />
+              <Icon name="close" size={24} color={colors.textSecondary} />
             </Pressable>
           </View>
 
@@ -122,10 +122,10 @@ export const AdminConfigModal: React.FC<Props> = ({ visible, config, onClose, on
             <Text style={styles.label}>Logo du club</Text>
             <View style={styles.logoRow}>
               <View style={styles.logoBox}>
-                {logoUrl ? <Image source={{ uri: logoUrl }} style={styles.logoImg} /> : <Ionicons name="barbell" size={22} color={colors.brandText} />}
+                {logoUrl ? <Image source={{ uri: logoUrl }} style={styles.logoImg} /> : <Icon name="barbell" size={22} color={colors.brandText} />}
               </View>
               <Pressable onPress={pickLogo} accessibilityRole="button" style={styles.logoBtn}>
-                <Ionicons name="image-outline" size={18} color={colors.text} />
+                <Icon name="image-outline" size={18} color={colors.text} />
                 <Text style={styles.logoBtnText}>{logoUrl ? 'Changer le logo' : 'Ajouter le logo'}</Text>
               </Pressable>
               {!!logoUrl && (
@@ -162,10 +162,10 @@ export const AdminConfigModal: React.FC<Props> = ({ visible, config, onClose, on
                 accessibilityLabel="Mot de passe admin"
               />
               <Pressable onPress={() => setRevealCode(v => !v)} hitSlop={10} accessibilityRole="button" accessibilityLabel={revealCode ? 'Cacher le mot de passe' : 'Afficher le mot de passe'} style={styles.iconBtn}>
-                <Ionicons name={revealCode ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.textSecondary} />
+                <Icon name={revealCode ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.textSecondary} />
               </Pressable>
               <Pressable onPress={() => { setOwnerCode(randomPassword()); setRevealCode(true); }} hitSlop={10} accessibilityRole="button" accessibilityLabel="Générer un mot de passe" style={styles.iconBtn}>
-                <Ionicons name="refresh" size={20} color={colors.textSecondary} />
+                <Icon name="refresh" size={20} color={colors.textSecondary} />
               </Pressable>
             </View>
 
@@ -206,7 +206,7 @@ export const AdminConfigModal: React.FC<Props> = ({ visible, config, onClose, on
               accessibilityLabel="Lien d’avis Google"
             />
             <Pressable onPress={onPreviewReview} accessibilityRole="button" hitSlop={6} style={styles.previewLink}>
-              <Ionicons name="eye-outline" size={16} color={colors.brand} />
+              <Icon name="eye-outline" size={16} color={colors.brand} />
               <Text style={styles.previewText}>Voir la fenêtre des membres</Text>
             </Pressable>
 

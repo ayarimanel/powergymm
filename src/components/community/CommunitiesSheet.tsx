@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { Community, CreatePermission, COMMUNITY_COLORS, COMMUNITY_EMOJIS } from '../../services/communitiesService';
 import { colors } from '../../theme';
 import { haptics } from '../../utils/haptics';
@@ -46,11 +46,11 @@ export const CommunitiesSheet: React.FC<Props> = ({ visible, onClose, communitie
           <Text style={styles.title}>{creating ? 'Nouvelle communauté' : 'Communautés'}</Text>
           {creating ? (
             <Pressable onPress={() => setCreating(false)} hitSlop={10} accessibilityRole="button" accessibilityLabel="Retour">
-              <Ionicons name="chevron-back" size={24} color={colors.textSecondary} />
+              <Icon name="chevron-back" size={24} color={colors.textSecondary} />
             </Pressable>
           ) : (
             <Pressable onPress={close} hitSlop={10} accessibilityRole="button" accessibilityLabel="Fermer">
-              <Ionicons name="close" size={24} color={colors.textSecondary} />
+              <Icon name="close" size={24} color={colors.textSecondary} />
             </Pressable>
           )}
         </View>
@@ -93,7 +93,7 @@ export const CommunitiesSheet: React.FC<Props> = ({ visible, onClose, communitie
                 <View style={styles.picker}>
                   {COMMUNITY_COLORS.map(c => (
                     <Pressable key={c} onPress={() => setColor(c)} style={[styles.colorCell, { backgroundColor: c }, color === c && styles.colorCellOn]}>
-                      {color === c && <Ionicons name="checkmark" size={16} color={colors.white} />}
+                      {color === c && <Icon name="checkmark" size={16} color={colors.white} />}
                     </Pressable>
                   ))}
                 </View>
@@ -107,12 +107,12 @@ export const CommunitiesSheet: React.FC<Props> = ({ visible, onClose, communitie
             <View style={{ gap: 12 }}>
               {permission.allowed ? (
                 <Pressable onPress={() => setCreating(true)} accessibilityRole="button" style={styles.newBtn}>
-                  <Ionicons name="add-circle" size={22} color={colors.brand} />
+                  <Icon name="add-circle" size={22} color={colors.brand} />
                   <Text style={styles.newBtnText}>Créer une communauté</Text>
                 </Pressable>
               ) : (
                 <View style={styles.lockedBox}>
-                  <Ionicons name="lock-closed-outline" size={18} color={colors.textMuted} />
+                  <Icon name="lock-closed-outline" size={18} color={colors.textMuted} />
                   <Text style={styles.lockedText}>{permission.reason}</Text>
                 </View>
               )}
@@ -126,7 +126,7 @@ export const CommunitiesSheet: React.FC<Props> = ({ visible, onClose, communitie
                       <View style={{ flex: 1, minWidth: 0 }}>
                         <View style={styles.nameRow}>
                           <Text style={styles.name} numberOfLines={1}>{c.name}</Text>
-                          {c.official && <Ionicons name="checkmark-circle" size={15} color={colors.brand} />}
+                          {c.official && <Icon name="checkmark-circle" size={15} color={colors.brand} />}
                         </View>
                         <Text style={styles.desc} numberOfLines={2}>{c.description}</Text>
                         <Text style={styles.count}>{c.memberIds.length} membre{c.memberIds.length > 1 ? 's' : ''} · @{c.handle}</Text>

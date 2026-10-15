@@ -13,7 +13,7 @@
 import React, { useMemo, useState } from 'react';
 import { LayoutChangeEvent, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { useT } from '../../i18n';
 import { colors, cardShadow } from '../../theme';
 import { ClubAnalytics, Delta, formatMillimes } from '../../services/analyticsService';
@@ -50,7 +50,7 @@ const DeltaChip: React.FC<{ d: Delta; goodWhenUp?: boolean; label: string }> = (
 
   return (
     <View style={[styles.chip, { backgroundColor: tint.soft }]}>
-      <Ionicons name={up ? 'arrow-up' : 'arrow-down'} size={13} color={tint.text} />
+      <Icon name={up ? 'arrow-up' : 'arrow-down'} size={13} color={tint.text} />
       <Text
         style={[styles.chipText, { color: tint.text }]}
         accessibilityLabel={`${label} : ${up ? 'en hausse' : 'en baisse'} de ${value} pour cent`}

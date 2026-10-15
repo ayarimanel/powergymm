@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { clubTheme, colors, radius } from '../../theme';
 import { Avatar } from '../community/Avatar';
 
@@ -30,7 +30,7 @@ const IconButton: React.FC<{
     accessibilityLabel={label}
     style={({ pressed }) => [styles.iconBtn, pressed && styles.pressed]}
   >
-    <Ionicons name={icon as any} size={24} color={colors.text} />
+    <Icon name={icon as any} size={24} color={colors.text} />
     {!!badge && (
       <View style={styles.badge}>
         <Text style={styles.badgeText}>{badge > 9 ? '9+' : badge}</Text>
@@ -72,7 +72,7 @@ export const HomeHeader: React.FC<Props> = ({
         accessibilityLabel={`Série de ${streak} jours`}
         style={({ pressed }) => [styles.streakPill, pressed && styles.pressed]}
       >
-        <Ionicons name="flame" size={16} color={colors.flame} />
+        <Icon name="flame" size={16} color={colors.flame} />
         <Text style={styles.streakText}>{streak}</Text>
       </Pressable>
       <IconButton

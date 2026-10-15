@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from '../components/ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/ui/Icon';
 import { GenderType, MuscleGroup, TrainingTimeSlot, UserProfile, UserRole } from '../types/database';
 import { ADMIN_USERNAME, AuthService, normUsername, suggestUsername, usernameError } from '../services/authService';
 import { pinError } from '../services/credentials';
@@ -180,7 +180,7 @@ export const OnboardingScreen: React.FC<Props> = ({ onCompleteOnboarding }) => {
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <View style={styles.top}>
           <Pressable onPress={back} accessibilityRole="button" accessibilityLabel="Retour" style={styles.backBtn}>
-            <Ionicons name="chevron-back" size={24} color={colors.text} />
+            <Icon name="chevron-back" size={24} color={colors.text} />
           </Pressable>
           {mode === 'signup' ? (
             <View style={styles.bars}>
@@ -238,7 +238,7 @@ export const OnboardingScreen: React.FC<Props> = ({ onCompleteOnboarding }) => {
               {!!errors.secret && <Text style={styles.error}>{errors.secret}</Text>}
 
               <View style={styles.hint}>
-                <Ionicons name="key-outline" size={16} color={colors.textSecondary} />
+                <Icon name="key-outline" size={16} color={colors.textSecondary} />
                 <Text style={styles.hintText}>{t('Gérant du club ? Identifiant « admin » et ton mot de passe.')}</Text>
               </View>
             </>
@@ -300,7 +300,7 @@ export const OnboardingScreen: React.FC<Props> = ({ onCompleteOnboarding }) => {
                 return (
                   <Pressable key={r.id} onPress={() => { setRole(r.id); setErrors({}); }} accessibilityRole="radio" accessibilityState={{ selected: on }} style={[styles.roleCard, on && styles.roleCardOn]}>
                     <View style={[styles.roleIcon, on && { backgroundColor: colors.brand }]}>
-                      <Ionicons name={r.icon as any} size={24} color={on ? colors.white : colors.textSecondary} />
+                      <Icon name={r.icon as any} size={24} color={on ? colors.white : colors.textSecondary} />
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={styles.roleTitle}>{r.title}</Text>
@@ -311,7 +311,7 @@ export const OnboardingScreen: React.FC<Props> = ({ onCompleteOnboarding }) => {
                 );
               })}
               <View style={styles.hint}>
-                <Ionicons name="key-outline" size={16} color={colors.textSecondary} />
+                <Icon name="key-outline" size={16} color={colors.textSecondary} />
                 <Text style={styles.hintText}>{t('Gérant du club ? Pas besoin de compte : connecte-toi avec l’identifiant « admin ».')}</Text>
               </View>
             </>
@@ -440,7 +440,7 @@ export const OnboardingScreen: React.FC<Props> = ({ onCompleteOnboarding }) => {
             <>
               <Pressable onPress={login} disabled={busy} accessibilityRole="button" style={[styles.cta, busy && { opacity: 0.8 }]}>
                 <Text style={styles.ctaText}>{busy ? 'Connexion…' : 'Se connecter'}</Text>
-                <Ionicons name="log-in-outline" size={20} color={colors.white} />
+                <Icon name="log-in-outline" size={20} color={colors.white} />
               </Pressable>
               <Pressable onPress={() => go('signup')} accessibilityRole="button" style={styles.skip}>
                 <Text style={styles.skipText}>{t('Pas encore de compte ?')} <Text style={{ color: colors.brand }}>{t('Créer un compte')}</Text></Text>
@@ -451,7 +451,7 @@ export const OnboardingScreen: React.FC<Props> = ({ onCompleteOnboarding }) => {
             <>
               <Pressable onPress={next} disabled={busy} accessibilityRole="button" style={[styles.cta, busy && { opacity: 0.8 }]}>
                 <Text style={styles.ctaText}>{step === totalSteps ? 'Commencer' : 'Continuer'}</Text>
-                <Ionicons name={step === totalSteps ? 'checkmark' : 'arrow-forward'} size={20} color={colors.white} />
+                <Icon name={step === totalSteps ? 'checkmark' : 'arrow-forward'} size={20} color={colors.white} />
               </Pressable>
               {step === 3 ? (
                 <Pressable onPress={() => { setGoal(undefined); setMuscles([]); next(); }} accessibilityRole="button" style={styles.skip}>

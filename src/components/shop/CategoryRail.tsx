@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { CATEGORY_META, PROMO_TINT, ProductCategory } from '../../shop/categoryMeta';
 import { colors } from '../../theme';
 import { haptics } from '../../utils/haptics';
@@ -38,7 +38,7 @@ const Bubble: React.FC<{
   return (
     <Pressable onPress={() => { haptics.select(); onPress(); }} accessibilityRole="button" accessibilityLabel={`${label}, ${count} produit${count > 1 ? 's' : ''}`} style={styles.item}>
       <Animated.View style={[styles.circle, { width: SIZE, height: SIZE, borderRadius: SIZE / 2, backgroundColor: soft, borderColor: on ? bar : 'transparent', transform: [{ scale }] }]}>
-        <Ionicons name={icon as any} size={26} color={bar} />
+        <Icon name={icon as any} size={26} color={bar} />
         {count > 0 && (
           <View style={styles.count}>
             <Text style={styles.countText}>{count}</Text>
@@ -59,7 +59,7 @@ const AllBubble: React.FC<{ on: boolean; count: number; onPress: () => void; del
   return (
     <Pressable onPress={() => { haptics.select(); onPress(); }} accessibilityRole="button" accessibilityState={{ selected: on }} style={styles.item}>
       <Animated.View style={[styles.circle, styles.allCircle, on && styles.allCircleOn, { transform: [{ scale }] }]}>
-        <Ionicons name="apps" size={24} color={on ? colors.onInverse : colors.text} />
+        <Icon name="apps" size={24} color={on ? colors.onInverse : colors.text} />
       </Animated.View>
       <Text style={[styles.label, on && { color: colors.text, fontWeight: '800' }]}>Tout</Text>
     </Pressable>

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../components/ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/ui/Icon';
 import { CommunityPost, MemberProfile, UserProfile } from '../types/database';
 import { GymConfigService } from '../config/gymConfig';
 import { CommunityService } from '../services/communityService';
@@ -403,19 +403,19 @@ export const CommunityScreen: React.FC<Props> = ({ user, onOpenAccount }) => {
         {waiting > 0 && (
           <View style={styles.waitPill}><Text style={styles.waitPillText}>{waiting}</Text></View>
         )}
-        <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+        <Icon name="chevron-forward" size={18} color={colors.textMuted} />
       </Pressable>
     );
   };
 
   const createCard = canCreateCommunity(role) && (
     <Pressable onPress={() => setShowCreate(true)} accessibilityRole="button" style={({ pressed }) => [styles.createCard, pressed && { opacity: 0.85 }]}>
-      <View style={styles.createIc}><Ionicons name="add" size={22} color={colors.onBrand} /></View>
+      <View style={styles.createIc}><Icon name="add" size={22} color={colors.onBrand} /></View>
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text style={styles.createTitle}>Créer une communauté</Text>
         <Text style={styles.createSub}>Tu en es le fondateur : tu acceptes ou refuses chaque demande.</Text>
       </View>
-      <Ionicons name="chevron-forward" size={18} color={colors.brand} />
+      <Icon name="chevron-forward" size={18} color={colors.brand} />
     </Pressable>
   );
 
@@ -534,7 +534,7 @@ export const CommunityScreen: React.FC<Props> = ({ user, onOpenAccount }) => {
                       accessibilityLabel={`Consulter ${c.name} en tant que gérant`}
                       style={styles.ovRow}
                     >
-                      <Ionicons name="lock-closed-outline" size={18} color={colors.textSecondary} />
+                      <Icon name="lock-closed-outline" size={18} color={colors.textSecondary} />
                       <Text style={styles.ovName}>{c.name}</Text>
                       <Text style={styles.ovCta}>Consulter</Text>
                     </Pressable>

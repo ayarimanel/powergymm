@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { BottomSheet, SheetScrollView } from '../home/BottomSheet';
 import { PROBLEM_CATEGORIES, PROBLEM_PLACES, ProblemCategory, ProblemReport, agoShort, categoryOf } from '../../services/problemReportService';
 import { pickImages } from '../../services/imagePicker';
@@ -73,7 +73,7 @@ export const ReportProblemSheet: React.FC<Props> = ({ visible, mine, onClose, on
               const on = category === c.id;
               return (
                 <Pressable key={c.id} onPress={() => setCategory(c.id)} accessibilityRole="button" accessibilityState={{ selected: on }} style={[styles.chip, on && styles.chipOn]}>
-                  <Ionicons name={c.icon as any} size={16} color={on ? colors.amber.text : colors.textSecondary} />
+                  <Icon name={c.icon as any} size={16} color={on ? colors.amber.text : colors.textSecondary} />
                   <Text style={[styles.chipText, on && { color: colors.amber.text }]}>{c.label}</Text>
                 </Pressable>
               );
@@ -113,7 +113,7 @@ export const ReportProblemSheet: React.FC<Props> = ({ visible, mine, onClose, on
               </>
             ) : (
               <Pressable onPress={addPhoto} accessibilityRole="button" style={styles.photoBtn}>
-                <Ionicons name="camera-outline" size={18} color={colors.text} />
+                <Icon name="camera-outline" size={18} color={colors.text} />
                 <Text style={styles.photoBtnText}>Ajouter une photo</Text>
               </Pressable>
             )}
@@ -121,7 +121,7 @@ export const ReportProblemSheet: React.FC<Props> = ({ visible, mine, onClose, on
 
           {!!error && <Text style={styles.error}>{error}</Text>}
           <Pressable onPress={send} disabled={busy} accessibilityRole="button" style={({ pressed }) => [styles.send, (pressed || busy) && { opacity: 0.85 }]}>
-            <Ionicons name="send" size={16} color={colors.white} />
+            <Icon name="send" size={16} color={colors.white} />
             <Text style={styles.sendText}>{busy ? 'Envoi…' : 'Envoyer au club'}</Text>
           </Pressable>
 
@@ -130,7 +130,7 @@ export const ReportProblemSheet: React.FC<Props> = ({ visible, mine, onClose, on
               <Text style={[styles.label, { marginTop: 24 }]}>Mes signalements</Text>
               {mine.slice(0, 5).map(r => (
                 <View key={r.id} style={styles.mineRow}>
-                  <Ionicons name={categoryOf(r.category).icon as any} size={18} color={colors.textSecondary} />
+                  <Icon name={categoryOf(r.category).icon as any} size={18} color={colors.textSecondary} />
                   <View style={{ flex: 1, minWidth: 0 }}>
                     <Text style={styles.mineText} numberOfLines={1}>{r.message}</Text>
                     <Text style={styles.mineSub}>{agoShort(r.createdAt)}{r.place ? ` · ${r.place}` : ''}</Text>

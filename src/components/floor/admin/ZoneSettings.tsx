@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../../ui/Icon';
 import { MuscleGroup } from '../../../types/database';
 import { FloorSettings } from '../../../types/floor';
 import { LEVEL_LABEL, gymThresholds, levelFromCount, zoneThresholds } from '../../../floor/crowd';
@@ -93,7 +93,7 @@ export const ZoneSettings: React.FC<Props> = ({ settings, capacity, live, presen
         accessibilityRole="button"
         style={({ pressed }) => [styles.saveBtn, pressed && { opacity: 0.9 }]}
       >
-        <Ionicons name={saved ? 'checkmark' : 'save-outline'} size={18} color={colors.white} />
+        <Icon name={saved ? 'checkmark' : 'save-outline'} size={18} color={colors.white} />
         <Text style={styles.saveText}>{saved ? 'Enregistré' : 'Enregistrer les zones'}</Text>
       </Pressable>
     </View>

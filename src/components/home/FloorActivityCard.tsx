@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Animated, Easing, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { LiveFloorSummary } from '../../services/liveFloorEngine';
 import { card, colors, ink } from '../../theme';
 import { BarChart } from './BarChart';
@@ -101,7 +101,7 @@ const ChartToggle: React.FC<{ mode: ChartMode; onChange: (m: ChartMode) => void 
           accessibilityLabel={`Afficher en ${label.toLowerCase()}`}
           style={[styles.toggleBtn, on && styles.toggleBtnOn]}
         >
-          <Ionicons name={icon} size={15} color={on ? colors.text : colors.textMuted} />
+          <Icon name={icon} size={15} color={on ? colors.text : colors.textMuted} />
           <Text style={[styles.toggleText, on && { color: colors.text }]}>{label}</Text>
         </Pressable>
       );
@@ -163,7 +163,7 @@ export const FloorActivityCard: React.FC<Props> = ({ floor, onOpenMuscles, onSca
             accessibilityLabel="Paramètres du club"
             style={styles.adminBtn}
           >
-            <Ionicons name="settings-outline" size={20} color={colors.textSecondary} />
+            <Icon name="settings-outline" size={20} color={colors.textSecondary} />
           </Pressable>
         )}
         <Pressable
@@ -173,7 +173,7 @@ export const FloorActivityCard: React.FC<Props> = ({ floor, onOpenMuscles, onSca
           accessibilityLabel="Scanner le QR code"
           style={({ pressed }) => [styles.scanBtn, pressed && { backgroundColor: colors.track }]}
         >
-          <Ionicons name="qr-code-outline" size={24} color={colors.text} />
+          <Icon name="qr-code-outline" size={24} color={colors.text} />
         </Pressable>
       </View>
 
@@ -191,7 +191,7 @@ export const FloorActivityCard: React.FC<Props> = ({ floor, onOpenMuscles, onSca
         </View>
       ) : (
         <View style={styles.closedBox}>
-          <Ionicons name="moon-outline" size={22} color={colors.textSecondary} />
+          <Icon name="moon-outline" size={22} color={colors.textSecondary} />
           <View style={{ flex: 1 }}>
             <Text style={styles.closedTitle}>Le club est fermé · ouvre à {pad(openingHour)}</Text>
             <Text style={styles.closedSub}>Voici l’affluence habituelle d’une journée.</Text>
@@ -212,7 +212,7 @@ export const FloorActivityCard: React.FC<Props> = ({ floor, onOpenMuscles, onSca
 
       {best && (
         <View style={styles.bestRow}>
-          <Ionicons name="time-outline" size={18} color={colors[best.level].text} />
+          <Icon name="time-outline" size={18} color={colors[best.level].text} />
           <Text style={styles.bestText}>
             {isOpen ? 'Meilleur moment aujourd’hui' : 'Meilleur moment habituel'} :{' '}
             <Text style={{ fontWeight: '800', color: colors.text }}>
@@ -240,7 +240,7 @@ export const FloorActivityCard: React.FC<Props> = ({ floor, onOpenMuscles, onSca
               </Text>
             </View>
           ))}
-          <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+          <Icon name="chevron-forward" size={18} color={colors.textMuted} />
         </Pressable>
       )}
     </View>

@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { NewsItem, NewsType } from '../../services/clubNewsService';
 import { colors, ink } from '../../theme';
 import { haptics } from '../../utils/haptics';
@@ -195,14 +195,14 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
                   style={({ pressed }) => [styles.itemBtn, pressed && { opacity: 0.85 }]}
                 >
                   <View style={[styles.icon, { backgroundColor: t.solid }]}>
-                    <Ionicons name={t.icon as any} size={18} color={colors.white} />
+                    <Icon name={t.icon as any} size={18} color={colors.white} />
                   </View>
                   <View style={styles.body}>
                     <View style={styles.meta}>
                       <Text style={[styles.tag, { color: t.text }]}>{t.label}</Text>
                       {n.pinned && (
                         <View style={styles.pin}>
-                          <Ionicons name="pin" size={10} color={colors.text} />
+                          <Icon name="pin" size={10} color={colors.text} />
                           <Text style={styles.pinText}>Épinglé</Text>
                         </View>
                       )}
@@ -218,7 +218,7 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
                     )}
                     {isOpen && !!n.when && (
                       <View style={styles.whenRow}>
-                        <Ionicons name="time-outline" size={13} color={colors.textSecondary} />
+                        <Icon name="time-outline" size={13} color={colors.textSecondary} />
                         <Text style={styles.whenText}>{n.when}</Text>
                       </View>
                     )}
@@ -232,7 +232,7 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
                     style={({ pressed }) => [styles.cta, { backgroundColor: t.solid }, pressed && { opacity: 0.85 }]}
                   >
                     <Text style={styles.ctaText}>{n.cta}</Text>
-                    <Ionicons name="arrow-forward" size={15} color={colors.white} />
+                    <Icon name="arrow-forward" size={15} color={colors.white} />
                   </Pressable>
                 )}
               </View>
@@ -255,7 +255,7 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
             {unread.length ? (
               <Text style={styles.countText}>{unread.length}</Text>
             ) : (
-              <Ionicons name="checkmark" size={14} color={colors.brand} />
+              <Icon name="checkmark" size={14} color={colors.brand} />
             )}
           </View>
           <View style={styles.barTxt}>
@@ -268,7 +268,7 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
             ))}
           </View>
           <Animated.View style={{ transform: [{ rotate: chevron }] }}>
-            <Ionicons name="chevron-down" size={18} color={colors.textMuted} />
+            <Icon name="chevron-down" size={18} color={colors.textMuted} />
           </Animated.View>
         </View>
         <View style={styles.grip} />

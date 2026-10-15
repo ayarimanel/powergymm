@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Platform, Pressable, StyleSheet, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { Text } from '../ui/Text';
 import { colors, radius } from '../../theme';
 import { haptics } from '../../utils/haptics';
@@ -106,7 +106,7 @@ export const CrowdFlipCard: React.FC<Props> = ({ renderGym, renderMuscles }) => 
               accessibilityLabel={s.label}
               style={[styles.switchBtn, on && styles.switchBtnOn]}
             >
-              <Ionicons name={s.icon as any} size={15} color={on ? colors.onBrand : colors.textSecondary} />
+              <Icon name={s.icon as any} size={15} color={on ? colors.onBrand : colors.textSecondary} />
               <Text style={[styles.switchText, on && styles.switchTextOn]} numberOfLines={1}>
                 {s.label}
               </Text>
@@ -127,7 +127,7 @@ export const CrowdFlipCard: React.FC<Props> = ({ renderGym, renderMuscles }) => 
         accessibilityRole="button"
         style={({ pressed }) => [styles.flipBtn, pressed && { opacity: 0.8 }]}
       >
-        <Ionicons name="sync-outline" size={16} color={colors.brandText} />
+        <Icon name="sync-outline" size={16} color={colors.brandText} />
         <Text style={styles.flipText}>{side === 'gym' ? 'Voir quels muscles sont pris' : 'Revenir à toute la salle'}</Text>
         {side === 'gym' && !seenBack && (
           <View style={styles.newTag}>

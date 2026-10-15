@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Easing, Modal, PanResponder, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CommunityPost, MemberProfile } from '../../types/database';
 import { timeAgoFr } from '../../services/communityService';
@@ -103,11 +103,11 @@ export const PrStoryViewer: React.FC<Props> = ({ records, profiles, startIndex, 
 
         <View style={styles.header}>
           <View style={styles.pill}>
-            <Ionicons name="trophy" size={14} color={colors.gold.bright} />
+            <Icon name="trophy" size={14} color={colors.gold.bright} />
             <Text style={styles.pillText}>Record</Text>
           </View>
           <Pressable onPress={onClose} hitSlop={12} accessibilityRole="button" accessibilityLabel="Fermer">
-            <Ionicons name="close" size={28} color={colors.gold.bright} />
+            <Icon name="close" size={28} color={colors.gold.bright} />
           </Pressable>
         </View>
 
@@ -129,7 +129,7 @@ export const PrStoryViewer: React.FC<Props> = ({ records, profiles, startIndex, 
 
           {delta != null && delta > 0 && (
             <View style={styles.deltaChip}>
-              <Ionicons name="trending-up" size={16} color={colors.green.text} />
+              <Icon name="trending-up" size={16} color={colors.green.text} />
               <Text style={styles.deltaText}>+{delta} kg vs. précédent ({d.prevWeightKg} kg)</Text>
             </View>
           )}
@@ -137,7 +137,7 @@ export const PrStoryViewer: React.FC<Props> = ({ records, profiles, startIndex, 
           {!!pr.caption && <Text style={styles.caption}>{pr.caption}</Text>}
 
           <View style={styles.statusRow}>
-            <Ionicons name={approved ? 'shield-checkmark' : 'hourglass-outline'} size={18} color={colors.gold.bright} />
+            <Icon name={approved ? 'shield-checkmark' : 'hourglass-outline'} size={18} color={colors.gold.bright} />
             <Text style={styles.statusText}>
               {approved ? `Validé par ${pr.prApproval?.approvedByName ?? 'un coach'}` : 'En attente de validation'}
             </Text>
@@ -145,7 +145,7 @@ export const PrStoryViewer: React.FC<Props> = ({ records, profiles, startIndex, 
 
           <Pressable onPress={() => onOpenPost(pr.id)} accessibilityRole="button" style={styles.openBtn}>
             <Text style={styles.openBtnText}>Voir la publication</Text>
-            <Ionicons name="arrow-forward" size={16} color={colors.gold.bright} />
+            <Icon name="arrow-forward" size={16} color={colors.gold.bright} />
           </Pressable>
         </View>
 

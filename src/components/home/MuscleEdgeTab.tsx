@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { Animated, PanResponder, Platform, StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { colors } from '../../theme';
 import { haptics } from '../../utils/haptics';
 import { claimSwipe } from '../../navigation/swipeGuard';
@@ -55,9 +55,9 @@ export const MuscleEdgeTab: React.FC<Props> = ({ onOpen, collapsed = false }) =>
       accessibilityLabel="Zones en direct : muscles occupés maintenant"
       style={[styles.tab, { transform: [{ translateX: Animated.add(tuck, drag) }] }]}
     >
-      <Ionicons name="body-outline" size={22} color={colors.text} />
+      <Icon name="body-outline" size={22} color={colors.text} />
       <View style={styles.grip} />
-      <Ionicons name="chevron-forward" size={14} color={colors.textMuted} />
+      <Icon name="chevron-forward" size={14} color={colors.textMuted} />
     </Animated.View>
   );
 };

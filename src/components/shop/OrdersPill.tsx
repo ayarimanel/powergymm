@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { ProductReservation } from '../../types/database';
 import { colors } from '../../theme';
 
@@ -28,13 +28,13 @@ export const OrdersPill: React.FC<Props> = ({ reservations, onPress }) => {
   return (
     <Pressable onPress={onPress} accessibilityRole="button" style={({ pressed }) => [styles.card, { borderColor: tint.bar + '40' }, pressed && { opacity: 0.9 }]}>
       <View style={[styles.iconWrap, { backgroundColor: tint.soft }]}>
-        <Ionicons name={isReady ? 'bag-check' : 'time-outline'} size={22} color={tint.text} />
+        <Icon name={isReady ? 'bag-check' : 'time-outline'} size={22} color={tint.text} />
       </View>
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text style={styles.title}>{label}</Text>
         <Text style={styles.sub} numberOfLines={1}>{sub}</Text>
       </View>
-      <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+      <Icon name="chevron-forward" size={18} color={colors.textMuted} />
     </Pressable>
   );
 };

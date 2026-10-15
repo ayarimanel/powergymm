@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { UserProfile } from '../../types/database';
 import { useFloorSnapshot } from '../../floor/useFloorSnapshot';
 import { LEVEL_LABEL } from '../../floor/crowd';

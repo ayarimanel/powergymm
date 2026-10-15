@@ -9,7 +9,7 @@ import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../components/ui/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/ui/Icon';
 import { Lang, LANGUAGES } from '../i18n';
 import { colors, cardShadow } from '../theme';
 import { haptics } from '../utils/haptics';
@@ -25,7 +25,7 @@ export const LanguageScreen: React.FC<Props> = ({ onPick, current, onClose }) =>
   <SafeAreaView style={styles.screen}>
     <View style={styles.body}>
       <View style={styles.badge}>
-        <Ionicons name="language-outline" size={30} color={colors.brandText} />
+        <Icon name="language-outline" size={30} color={colors.brandText} />
       </View>
 
       {/* Both languages, so nobody has to read the other one to choose. */}
@@ -48,7 +48,7 @@ export const LanguageScreen: React.FC<Props> = ({ onPick, current, onClose }) =>
               style={({ pressed }) => [styles.option, on && styles.optionOn, pressed && { opacity: 0.9 }]}
             >
               <Text style={[styles.optionText, on && { color: colors.brandText }]}>{l.native}</Text>
-              {on ? <Ionicons name="checkmark-circle" size={22} color={colors.brandText} /> : null}
+              {on ? <Icon name="checkmark-circle" size={22} color={colors.brandText} /> : null}
             </Pressable>
           );
         })}

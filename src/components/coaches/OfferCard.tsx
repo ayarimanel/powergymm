@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { CoachPricingPlan } from '../../types/database';
 import { fmtTnd, planText } from '../../coaching/offers';
 import { J, tabular } from '../../journal/ui/kit';
@@ -23,7 +23,7 @@ export const OfferCard: React.FC<Props> = ({ offer, selected, onPress, onEdit, o
     <>
       {offer.isPopular && (
         <View style={s.popular}>
-          <Ionicons name="star" size={10} color={colors.white} />
+          <Icon name="star" size={10} color={colors.white} />
           <Text style={s.popularText}>Le plus choisi</Text>
         </View>
       )}
@@ -41,13 +41,13 @@ export const OfferCard: React.FC<Props> = ({ offer, selected, onPress, onEdit, o
         <View style={s.actions}>
           {onEdit && (
             <Pressable onPress={onEdit} accessibilityRole="button" accessibilityLabel={`Modifier ${offer.title}`} hitSlop={6} style={s.action}>
-              <Ionicons name="create-outline" size={16} color={J.fg} />
+              <Icon name="create-outline" size={16} color={J.fg} />
               <Text style={s.actionText}>Modifier</Text>
             </Pressable>
           )}
           {onDelete && (
             <Pressable onPress={onDelete} accessibilityRole="button" accessibilityLabel={`Supprimer ${offer.title}`} hitSlop={6} style={s.action}>
-              <Ionicons name="trash-outline" size={16} color={J.tiredText} />
+              <Icon name="trash-outline" size={16} color={J.tiredText} />
               <Text style={[s.actionText, { color: J.tiredText }]}>Supprimer</Text>
             </Pressable>
           )}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { CoachProfile } from '../../types/database';
 import { isOnFloorNow } from '../../services/coachService';
 import { Avatar } from '../community/Avatar';
@@ -38,7 +38,7 @@ export const OnFloorCoaches: React.FC<OnFloorProps> = ({ coaches, onOpen }) => {
               : 'Ils reviennent selon leurs horaires habituels.'}
           </Text>
         </View>
-        <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
+        <Icon name="chevron-forward" size={20} color={colors.textMuted} />
       </View>
     </Pressable>
   );
@@ -50,7 +50,7 @@ export const ConsoleCard: React.FC<{ todo: number; onOpen: () => void }> = ({ to
   <Pressable onPress={onOpen} accessibilityRole="button" accessibilityLabel={`Console du club, ${todo} à traiter`} style={({ pressed }) => [styles.card, styles.consoleCard, pressed && { opacity: 0.9 }]}>
     <View style={styles.row}>
       <View style={[styles.iconCircle, { backgroundColor: colors.track }]}>
-        <Ionicons name="stats-chart" size={22} color={colors.text} />
+        <Icon name="stats-chart" size={22} color={colors.text} />
       </View>
       <View style={{ flex: 1 }}>
         <Text style={[styles.title, { color: colors.text }]}>Console du club</Text>
@@ -61,7 +61,7 @@ export const ConsoleCard: React.FC<{ todo: number; onOpen: () => void }> = ({ to
           <Text style={styles.badgeText}>{todo} à traiter</Text>
         </View>
       )}
-      <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
+      <Icon name="chevron-forward" size={20} color={colors.textMuted} />
     </View>
   </Pressable>
 );

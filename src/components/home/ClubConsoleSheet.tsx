@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { colors } from '../../theme';
 import { LiveFloorSummary } from '../../services/liveFloorEngine';
 import { ClubMember, ClubService, daysAbsent, daysLeft, renew, waLink } from '../../services/clubService';
@@ -37,7 +37,7 @@ const hh = (h: number) => `${String(h).padStart(2, '0')}h`;
 
 const Kpi: React.FC<{ icon: string; value: number; label: string; alert?: boolean; onPress?: () => void }> = ({ icon, value, label, alert, onPress }) => (
   <Pressable onPress={onPress} disabled={!onPress} accessibilityRole={onPress ? 'button' : undefined} accessibilityLabel={`${label} : ${value}`} style={({ pressed }) => [styles.kpi, alert && value > 0 && styles.kpiAlert, pressed && { opacity: 0.8 }]}>
-    <Ionicons name={icon as any} size={22} color={alert && value > 0 ? colors.amber.text : colors.textSecondary} />
+    <Icon name={icon as any} size={22} color={alert && value > 0 ? colors.amber.text : colors.textSecondary} />
     <Text style={[styles.kpiValue, alert && value > 0 && { color: colors.amber.text }]}>{value}</Text>
     <Text style={styles.kpiLabel}>{label}</Text>
   </Pressable>
@@ -114,7 +114,7 @@ export const ClubConsoleSheet: React.FC<Props> = ({ visible, onClose, floor, mem
               <LineChart points={floor.hourlyData} openingHour={floor.openingHour} closingHour={floor.closingHour} isOpen={floor.isOpen} />
               {insight && (
                 <View style={styles.insight}>
-                  <Ionicons name="bulb-outline" size={20} color={colors.brand} />
+                  <Icon name="bulb-outline" size={20} color={colors.brand} />
                   <Text style={styles.insightText}>
                     Pic vers <Text style={styles.bold}>{hh(insight.busiest.hour)}</Text> ({insight.busiest.percentage} % de la capacité). Creux vers <Text style={styles.bold}>{hh(insight.quiet.hour)}</Text> : idéal pour un cours collectif ou une promo.
                   </Text>
@@ -136,7 +136,7 @@ export const ClubConsoleSheet: React.FC<Props> = ({ visible, onClose, floor, mem
                 accessibilityLabel={`Relancer ${m.name} sur WhatsApp`}
                 style={styles.wa}
               >
-                <Ionicons name="logo-whatsapp" size={18} color={colors.whatsappDark} />
+                <Icon name="logo-whatsapp" size={18} color={colors.whatsappDark} />
                 <Text style={styles.waText}>Relancer</Text>
               </Pressable>
             </Row>
@@ -163,7 +163,7 @@ export const ClubConsoleSheet: React.FC<Props> = ({ visible, onClose, floor, mem
                   accessibilityLabel={`Rappeler ${m.name}`}
                   style={styles.waIcon}
                 >
-                  <Ionicons name="logo-whatsapp" size={20} color={colors.whatsappDark} />
+                  <Icon name="logo-whatsapp" size={20} color={colors.whatsappDark} />
                 </Pressable>
                 {confirmRenew === m.id ? (
                   <Pressable
@@ -191,36 +191,36 @@ export const ClubConsoleSheet: React.FC<Props> = ({ visible, onClose, floor, mem
           {/* Settings */}
           <Text style={styles.h}>Réglages</Text>
           <Pressable onPress={onOpenSettings} accessibilityRole="button" style={styles.setting}>
-            <Ionicons name="time-outline" size={22} color={colors.text} />
+            <Icon name="time-outline" size={22} color={colors.text} />
             <View style={{ flex: 1 }}>
               <Text style={styles.settingTitle}>Nom, horaires et capacité</Text>
               <Text style={styles.settingSub}>{floor ? `${floor.openingHour}:00 – ${floor.closingHour}:00 · ${fmt(floor.maxGymCapacity)} personnes` : ''}</Text>
             </View>
-            <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+            <Icon name="chevron-forward" size={18} color={colors.textMuted} />
           </Pressable>
           <Pressable onPress={onOpenEntryQr} accessibilityRole="button" style={styles.setting}>
-            <Ionicons name="qr-code-outline" size={22} color={colors.text} />
+            <Icon name="qr-code-outline" size={22} color={colors.text} />
             <View style={{ flex: 1 }}>
               <Text style={styles.settingTitle}>QR d’entrée du club</Text>
               <Text style={styles.settingSub}>À imprimer et afficher à l’accueil</Text>
             </View>
-            <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+            <Icon name="chevron-forward" size={18} color={colors.textMuted} />
           </Pressable>
           <Pressable onPress={onOpenInfos} accessibilityRole="button" style={styles.setting}>
-            <Ionicons name="megaphone-outline" size={22} color={colors.text} />
+            <Icon name="megaphone-outline" size={22} color={colors.text} />
             <View style={{ flex: 1 }}>
               <Text style={styles.settingTitle}>Infos du club</Text>
               <Text style={styles.settingSub}>Aïd, Iftar, fermetures, événements</Text>
             </View>
-            <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+            <Icon name="chevron-forward" size={18} color={colors.textMuted} />
           </Pressable>
           <Pressable onPress={onOpenPermissions} accessibilityRole="button" style={styles.setting}>
-            <Ionicons name="key-outline" size={22} color={colors.text} />
+            <Icon name="key-outline" size={22} color={colors.text} />
             <View style={{ flex: 1 }}>
               <Text style={styles.settingTitle}>Permissions</Text>
               <Text style={styles.settingSub}>Donne des droits ponctuels à un membre</Text>
             </View>
-            <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+            <Icon name="chevron-forward" size={18} color={colors.textMuted} />
           </Pressable>
         </SheetScrollView>
       )}

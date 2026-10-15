@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Switch, View } from 'react-native';
 import { Text, TextInput } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { colors } from '../../theme';
 import { KIND_META, KIND_ORDER, ClubStatus, ClubStatusKind } from '../../services/clubStatusService';
 import { BottomSheet, SheetScrollView } from './BottomSheet';
@@ -97,7 +97,7 @@ export const ClubStatusManageSheet: React.FC<ManageProps> = ({ visible, items, o
                     accessibilityState={{ selected: on }}
                     style={[styles.kindChip, on && { backgroundColor: m.bg, borderColor: m.fg }]}
                   >
-                    <Ionicons name={m.icon as any} size={16} color={on ? m.fg : colors.textSecondary} />
+                    <Icon name={m.icon as any} size={16} color={on ? m.fg : colors.textSecondary} />
                     <Text style={[styles.kindChipText, on && { color: m.fg }]}>{m.label}</Text>
                   </Pressable>
                 );
@@ -133,7 +133,7 @@ export const ClubStatusManageSheet: React.FC<ManageProps> = ({ visible, items, o
               maxLength={40}
             />
             <View style={styles.pinRow}>
-              <Ionicons name="pin-outline" size={18} color={colors.textSecondary} />
+              <Icon name="pin-outline" size={18} color={colors.textSecondary} />
               <Text style={styles.pinLabel}>Épingler en haut</Text>
               <Switch value={pinned} onValueChange={setPinned} accessibilityLabel="Épingler en haut" />
             </View>
@@ -156,7 +156,7 @@ export const ClubStatusManageSheet: React.FC<ManageProps> = ({ visible, items, o
               return (
                 <View key={it.id} style={styles.manageRow}>
                   <View style={[styles.itemIcon, { backgroundColor: m.bg, width: 36, height: 36 }]}>
-                    <Ionicons name={m.icon as any} size={18} color={m.fg} />
+                    <Icon name={m.icon as any} size={18} color={m.fg} />
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.manageTitle} numberOfLines={1}>
@@ -168,7 +168,7 @@ export const ClubStatusManageSheet: React.FC<ManageProps> = ({ visible, items, o
                     </Text>
                   </View>
                   <Pressable onPress={() => startEdit(it)} hitSlop={6} accessibilityRole="button" accessibilityLabel="Modifier" style={styles.rowIcon}>
-                    <Ionicons name="create-outline" size={20} color={colors.text} />
+                    <Icon name="create-outline" size={20} color={colors.text} />
                   </Pressable>
                   {deleting === it.id ? (
                     <Pressable
@@ -184,7 +184,7 @@ export const ClubStatusManageSheet: React.FC<ManageProps> = ({ visible, items, o
                     </Pressable>
                   ) : (
                     <Pressable onPress={() => setDeleting(it.id)} hitSlop={6} accessibilityRole="button" accessibilityLabel="Supprimer" style={styles.rowIcon}>
-                      <Ionicons name="trash-outline" size={20} color={colors.red.text} />
+                      <Icon name="trash-outline" size={20} color={colors.red.text} />
                     </Pressable>
                   )}
                 </View>

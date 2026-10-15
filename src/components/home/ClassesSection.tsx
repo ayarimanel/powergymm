@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { card, colors } from '../../theme';
 import { DAYS } from '../../services/coachService';
 import { ClubClass, cancelSession, cancelledNext, isBooked, nextSession, spotsLeft, validTime, whenLabel } from '../../services/classService';
@@ -31,7 +31,7 @@ export const ClassesSection: React.FC<SectionProps> = ({ classes, userId, isOwne
         <Text style={styles.title}>Cours collectifs</Text>
         {isOwner && (
           <Pressable onPress={onManage} accessibilityRole="button" accessibilityLabel="Gérer les cours" style={styles.manage}>
-            <Ionicons name="create-outline" size={18} color={colors.text} />
+            <Icon name="create-outline" size={18} color={colors.text} />
             <Text style={styles.manageText}>Gérer</Text>
           </Pressable>
         )}
@@ -39,7 +39,7 @@ export const ClassesSection: React.FC<SectionProps> = ({ classes, userId, isOwne
 
       {classes.length === 0 ? (
         <Pressable onPress={onManage} accessibilityRole="button" style={styles.emptyOwner}>
-          <Ionicons name="add-circle-outline" size={22} color={colors.textSecondary} />
+          <Icon name="add-circle-outline" size={22} color={colors.textSecondary} />
           <Text style={styles.emptyOwnerText}>Ajoute les cours du club : yoga, HIIT, zumba…</Text>
         </Pressable>
       ) : (
@@ -73,7 +73,7 @@ export const ClassesSection: React.FC<SectionProps> = ({ classes, userId, isOwne
                   accessibilityLabel={booked ? `Annuler ma réservation ${c.title}` : `Réserver ${c.title}`}
                   style={[styles.btn, booked && styles.btnOn, full && styles.btnOff]}
                 >
-                  <Ionicons name={booked ? 'checkmark' : 'add'} size={18} color={booked ? colors.green.text : full ? colors.textMuted : colors.brandText} />
+                  <Icon name={booked ? 'checkmark' : 'add'} size={18} color={booked ? colors.green.text : full ? colors.textMuted : colors.brandText} />
                   <Text style={[styles.btnText, booked && { color: colors.green.text }, full && { color: colors.textMuted }]}>{booked ? 'Réservé' : 'Réserver'}</Text>
                 </Pressable>
               )}
@@ -234,11 +234,11 @@ export const ClassesManageSheet: React.FC<ManageProps> = ({ visible, classes, on
                   </View>
                   {!cancelled && (
                     <Pressable onPress={() => { setCancelling(c.id); setReason(SUGGESTED_REASON); }} hitSlop={6} accessibilityRole="button" accessibilityLabel={`Annuler la prochaine séance de ${c.title}`} style={styles.iconBtn}>
-                      <Ionicons name="alert-circle-outline" size={20} color={colors.amber.text} />
+                      <Icon name="alert-circle-outline" size={20} color={colors.amber.text} />
                     </Pressable>
                   )}
                   <Pressable onPress={() => startEdit(c)} hitSlop={6} accessibilityRole="button" accessibilityLabel="Modifier" style={styles.iconBtn}>
-                    <Ionicons name="create-outline" size={20} color={colors.text} />
+                    <Icon name="create-outline" size={20} color={colors.text} />
                   </Pressable>
                   {deleting === c.id ? (
                     <Pressable onPress={() => { onChange(classes.filter(x => x.id !== c.id)); setDeleting(null); }} accessibilityRole="button" style={styles.confirmDel}>
@@ -246,7 +246,7 @@ export const ClassesManageSheet: React.FC<ManageProps> = ({ visible, classes, on
                     </Pressable>
                   ) : (
                     <Pressable onPress={() => setDeleting(c.id)} hitSlop={6} accessibilityRole="button" accessibilityLabel="Supprimer" style={styles.iconBtn}>
-                      <Ionicons name="trash-outline" size={20} color={colors.red.text} />
+                      <Icon name="trash-outline" size={20} color={colors.red.text} />
                     </Pressable>
                   )}
                 </View>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { colors } from '../../theme';
 
 /** Compact "−  6h  +" number input. */
@@ -21,7 +21,7 @@ export const Stepper: React.FC<{ value: number; min: number; max: number; onChan
       accessibilityLabel={`${label} moins`}
       style={[styles.stepBtn, value <= min && { opacity: 0.35 }]}
     >
-      <Ionicons name="remove" size={16} color={colors.text} />
+      <Icon name="remove" size={16} color={colors.text} />
     </Pressable>
     <Text style={styles.stepValue} accessibilityLabel={`${label} : ${value}${suffix}`}>
       {value}
@@ -34,7 +34,7 @@ export const Stepper: React.FC<{ value: number; min: number; max: number; onChan
       accessibilityLabel={`${label} plus`}
       style={[styles.stepBtn, value >= max && { opacity: 0.35 }]}
     >
-      <Ionicons name="add" size={16} color={colors.text} />
+      <Icon name="add" size={16} color={colors.text} />
     </Pressable>
   </View>
 );

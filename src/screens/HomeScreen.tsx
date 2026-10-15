@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import { Text } from '../components/ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/ui/Icon';
 import { CheckInRecord, CommunityPost, MemberProfile, MuscleGroup, StaffPermissions, UserProfile } from '../types/database';
 import { CheckInService } from '../services/checkInService';
 import { LiveFloorEngine, LiveFloorSummary } from '../services/liveFloorEngine';
@@ -511,7 +511,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
 
       {!online && (
         <View style={styles.offline} accessibilityLiveRegion="polite">
-          <Ionicons name="cloud-offline-outline" size={16} color={colors.amber.text} />
+          <Icon name="cloud-offline-outline" size={16} color={colors.amber.text} />
           <Text style={styles.offlineText}>Hors ligne · dernières données affichées</Text>
         </View>
       )}
@@ -527,19 +527,19 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
 
         {isAdmin && gymConfig && (gymConfig.adminPassword || '0000') === '0000' && (
           <Pressable onPress={() => setShowAdmin(true)} accessibilityRole="button" style={styles.membershipBanner}>
-            <Ionicons name="lock-open-outline" size={20} color={colors.amber.text} />
+            <Icon name="lock-open-outline" size={20} color={colors.amber.text} />
             <Text style={styles.membershipText}>Mot de passe admin par défaut (0000) : change-le pour protéger ton club</Text>
-            <Ionicons name="chevron-forward" size={18} color={colors.amber.text} />
+            <Icon name="chevron-forward" size={18} color={colors.amber.text} />
           </Pressable>
         )}
 
         {gymConfig?.membershipsInApp && membershipLeft !== null && membershipLeft <= 7 && (
           <Pressable onPress={onOpenAccount} accessibilityRole="button" style={styles.membershipBanner}>
-            <Ionicons name="card-outline" size={20} color={colors.amber.text} />
+            <Icon name="card-outline" size={20} color={colors.amber.text} />
             <Text style={styles.membershipText}>
               {membershipLeft < 0 ? 'Ton abonnement a expiré' : membershipLeft === 0 ? 'Ton abonnement expire aujourd’hui' : `Ton abonnement expire dans ${membershipLeft} jour${membershipLeft > 1 ? 's' : ''}`}
             </Text>
-            <Ionicons name="chevron-forward" size={18} color={colors.amber.text} />
+            <Icon name="chevron-forward" size={18} color={colors.amber.text} />
           </Pressable>
         )}
 
@@ -550,12 +550,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
             accessibilityRole="button"
             style={({ pressed }) => [styles.announce, pressed && { opacity: 0.9 }]}
           >
-            <Ionicons name="megaphone" size={20} color={colors.white} />
+            <Icon name="megaphone" size={20} color={colors.white} />
             <View style={{ flex: 1 }}>
               <Text style={styles.announceTitle}>{t('Publier une info du club')}</Text>
               <Text style={styles.announceSub}>{t('Vue par tous les membres, tout de suite')}</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.white} />
+            <Icon name="chevron-forward" size={20} color={colors.white} />
           </Pressable>
         )}
 
@@ -615,12 +615,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
             accessibilityRole="button"
             style={({ pressed }) => [styles.liveBtn, pressed && { opacity: 0.85 }]}
           >
-            <Ionicons name="people-outline" size={18} color={colors.brand} />
+            <Icon name="people-outline" size={18} color={colors.brand} />
             <Text style={styles.liveBtnText}>
               {t('Membres & permissions')} · {clubMembers.length}
             </Text>
             <View style={{ flex: 1 }} />
-            <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+            <Icon name="chevron-forward" size={18} color={colors.textMuted} />
           </Pressable>
         )}
 
@@ -634,10 +634,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
             accessibilityLabel="Ouvrir le tableau de bord Live"
             style={({ pressed }) => [styles.liveBtn, pressed && { opacity: 0.85 }]}
           >
-            <Ionicons name="pulse-outline" size={18} color={colors.brand} />
+            <Icon name="pulse-outline" size={18} color={colors.brand} />
             <Text style={styles.liveBtnText}>Résumé de la semaine & Live</Text>
             <View style={{ flex: 1 }} />
-            <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+            <Icon name="chevron-forward" size={18} color={colors.textMuted} />
           </Pressable>
         )}
 
@@ -650,10 +650,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
             accessibilityRole="button"
             style={({ pressed }) => [styles.liveBtn, pressed && { opacity: 0.85 }]}
           >
-            <Ionicons name="megaphone-outline" size={18} color={colors.brand} />
+            <Icon name="megaphone-outline" size={18} color={colors.brand} />
             <Text style={styles.liveBtnText}>{t('Publier une info du club')}</Text>
             <View style={{ flex: 1 }} />
-            <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+            <Icon name="chevron-forward" size={18} color={colors.textMuted} />
           </Pressable>
         )}
 
@@ -755,7 +755,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
       {askSession && (
         <View style={styles.askWrap} pointerEvents="box-none">
           <View style={styles.ask} accessibilityRole="alert">
-            <Ionicons name="barbell-outline" size={22} color={colors.brand} />
+            <Icon name="barbell-outline" size={22} color={colors.brand} />
             <Text style={styles.askText}>Tu es au club. Commencer ta séance ?</Text>
             <Pressable onPress={() => setAskSession(false)} accessibilityRole="button" hitSlop={8} style={styles.askLater}>
               <Text style={styles.askLaterText}>Plus tard</Text>

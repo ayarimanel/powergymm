@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../../ui/Icon';
 import { Community, MurPost } from '../../../community/murService';
 import { clubTheme, communityTint, colors } from '../../../theme';
 

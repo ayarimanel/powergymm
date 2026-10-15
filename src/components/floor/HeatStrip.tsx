@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { LayoutChangeEvent, PanResponder, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { HourForecast } from '../../floor/crowd';
 import { levelTint } from '../../floor/levelColors';
 import { colors, ink } from '../../theme';
@@ -161,7 +161,7 @@ export const HeatStrip: React.FC<Props> = ({ hourly, nowHour, bestHour, isOpen, 
           return (
             <View key={h.hour} style={[styles.segment, { backgroundColor: levelTint(h.level).bar, opacity: active ? 1 : 0.85 }]}>
               {h.isNow && scrubIndex === null && <View style={styles.nowMarker} />}
-              {isBest && <Ionicons name="star" size={12} color={colors.white} style={styles.star} />}
+              {isBest && <Icon name="star" size={12} color={colors.white} style={styles.star} />}
             </View>
           );
         })}
@@ -183,7 +183,7 @@ export const HeatStrip: React.FC<Props> = ({ hourly, nowHour, bestHour, isOpen, 
           accessibilityLabel={`Me prévenir à ${remindHourLabel}`}
           style={({ pressed }) => [styles.remindPill, pressed && { opacity: 0.85 }]}
         >
-          <Ionicons name="notifications" size={14} color={colors.onInverse} />
+          <Icon name="notifications" size={14} color={colors.onInverse} />
           <Text style={styles.remindText}>Me prévenir · {remindHourLabel}</Text>
         </Pressable>
       )}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { CoachPricingPlan, CoachProfile } from '../../types/database';
 import { daysSummary } from '../../services/coachService';
 import { fmtTnd, planText } from '../../coaching/offers';
@@ -63,15 +63,15 @@ export const BookingSheet: React.FC<Props> = ({ coach, offer, onClose, onWhatsAp
             </View>
 
             <Pressable onPress={() => onWhatsApp(c, o)} accessibilityRole="button" accessibilityLabel="Réserver sur WhatsApp" style={({ pressed }) => [s.wa, pressed && { opacity: 0.9 }]}>
-              <Ionicons name="logo-whatsapp" size={24} color={colors.white} />
+              <Icon name="logo-whatsapp" size={24} color={colors.white} />
               <View style={{ flex: 1 }}>
                 <Text style={s.waTitle}>Réserver sur WhatsApp</Text>
                 <Text style={s.waSub}>Ton message est déjà écrit, il suffit de l’envoyer</Text>
               </View>
-              <Ionicons name="chevron-forward" size={20} color={colors.white} />
+              <Icon name="chevron-forward" size={20} color={colors.white} />
             </Pressable>
             <Pressable onPress={() => onCall(c)} accessibilityRole="button" accessibilityLabel={`Appeler ${c.fullName}`} style={({ pressed }) => [s.call, pressed && { opacity: 0.9 }]}>
-              <Ionicons name="call" size={20} color={J.fg} />
+              <Icon name="call" size={20} color={J.fg} />
               <Text style={s.callText}>Appeler maintenant</Text>
             </Pressable>
 

@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { Image, LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { MemberProfile } from '../../types/database';
 import { ClubClass, bookedCount, isBooked, isWaitlisted, nextAttendeeIds, nextSession } from '../../services/classService';
 import { card, colors } from '../../theme';

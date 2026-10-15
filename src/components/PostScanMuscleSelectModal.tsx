@@ -7,7 +7,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Text } from './ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from './ui/Icon';
 import { useBackHandler } from '../navigation/backStack';
 import { MuscleGroup } from '../types/database';
 import { colors, ink } from '../theme';
@@ -62,7 +62,7 @@ export const PostScanMuscleSelectModal: React.FC<PostScanMuscleSelectModalProps>
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.successIconBadge}>
-              <Ionicons name="checkmark-circle" size={28} color={colors.green.bar} />
+              <Icon name="checkmark-circle" size={28} color={colors.green.bar} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.title}>QR Code Validé ! ✅</Text>
@@ -82,10 +82,10 @@ export const PostScanMuscleSelectModal: React.FC<PostScanMuscleSelectModalProps>
                   activeOpacity={0.8}
                 >
                   <View style={[styles.checkboxSquare, isChecked && styles.checkboxSquareChecked]}>
-                    {isChecked && <Ionicons name="checkmark" size={16} color={colors.white} />}
+                    {isChecked && <Icon name="checkmark" size={16} color={colors.white} />}
                   </View>
 
-                  <Ionicons name={item.icon as any} size={20} color={isChecked ? colors.brandText : colors.textMuted} />
+                  <Icon name={item.icon as any} size={20} color={isChecked ? colors.brandText : colors.textMuted} />
                   <Text style={[styles.checkboxLabel, isChecked && styles.checkboxLabelChecked]}>
                     {item.label}
                   </Text>
@@ -97,7 +97,7 @@ export const PostScanMuscleSelectModal: React.FC<PostScanMuscleSelectModalProps>
           {/* Footer Submit Button */}
           <TouchableOpacity style={styles.confirmBtn} onPress={handleConfirm}>
             <Text style={styles.confirmBtnText}>VALIDER ET OBTENIR MON STREAK 🔥</Text>
-            <Ionicons name="arrow-forward" size={18} color={colors.white} />
+            <Icon name="arrow-forward" size={18} color={colors.white} />
           </TouchableOpacity>
         </View>
       </View>

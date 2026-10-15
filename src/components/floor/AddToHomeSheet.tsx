@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { BottomSheet } from '../home/BottomSheet';
 import { canPromptNatively, isInstagramBrowser, isIos, promptInstall } from '../../floor/pwa';
 import { colors } from '../../theme';
@@ -44,7 +44,7 @@ export const AddToHomeSheet: React.FC<Props> = ({ visible, onClose }) => {
           ) : ios ? (
             <>
               <Step n={1}>
-                Touche <Ionicons name="share-outline" size={15} color={colors.text} /> Partager en bas de Safari
+                Touche <Icon name="share-outline" size={15} color={colors.text} /> Partager en bas de Safari
               </Step>
               <Step n={2}>Choisis « Sur l’écran d’accueil »</Step>
               <Step n={3}>Touche « Ajouter »</Step>
@@ -58,7 +58,7 @@ export const AddToHomeSheet: React.FC<Props> = ({ visible, onClose }) => {
               accessibilityRole="button"
               style={({ pressed }) => [styles.primary, pressed && { opacity: 0.9 }]}
             >
-              <Ionicons name="download-outline" size={18} color={colors.white} />
+              <Icon name="download-outline" size={18} color={colors.white} />
               <Text style={styles.primaryText}>Installer l’app</Text>
             </Pressable>
           ) : (

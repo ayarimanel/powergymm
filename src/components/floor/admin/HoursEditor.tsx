@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Switch, View } from 'react-native';
 import { Text, TextInput } from '../../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../../ui/Icon';
 import { FloorSettings, SpecialDay, WeeklyHours } from '../../../types/floor';
 import { colors } from '../../../theme';
 import { localDateStr } from '../../../floor/crowd';
@@ -76,7 +76,7 @@ export const HoursEditor: React.FC<Props> = ({ settings, onSave }) => {
       })}
 
       <Pressable onPress={() => save()} accessibilityRole="button" style={({ pressed }) => [styles.saveBtn, pressed && { opacity: 0.9 }]}>
-        <Ionicons name={saved ? 'checkmark' : 'save-outline'} size={18} color={colors.white} />
+        <Icon name={saved ? 'checkmark' : 'save-outline'} size={18} color={colors.white} />
         <Text style={styles.saveText}>{saved ? 'Enregistré' : 'Enregistrer les horaires'}</Text>
       </Pressable>
 
@@ -101,7 +101,7 @@ export const HoursEditor: React.FC<Props> = ({ settings, onSave }) => {
             accessibilityLabel={`Supprimer ${s.label} du ${s.date}`}
             hitSlop={8}
           >
-            <Ionicons name="trash-outline" size={20} color={colors.red.text} />
+            <Icon name="trash-outline" size={20} color={colors.red.text} />
           </Pressable>
         </View>
       ))}
@@ -138,7 +138,7 @@ export const HoursEditor: React.FC<Props> = ({ settings, onSave }) => {
           <Stepper label="Fermeture spéciale" value={draft.close} min={draft.open + 1} max={24} onChange={v => setDraft({ ...draft, close: v })} />
         </View>
         <Pressable onPress={addSpecial} accessibilityRole="button" style={({ pressed }) => [styles.addBtn, pressed && { opacity: 0.85 }]}>
-          <Ionicons name="add" size={18} color={colors.text} />
+          <Icon name="add" size={18} color={colors.text} />
           <Text style={styles.addText}>Ajouter le jour spécial</Text>
         </Pressable>
       </View>

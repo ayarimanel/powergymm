@@ -5,7 +5,7 @@
 import React from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { SocialLinks, usableSocials } from '../../community/socials';
 import { colors } from '../../theme';
 
@@ -23,7 +23,7 @@ export const SocialRow: React.FC<{ socials?: SocialLinks }> = ({ socials }) => {
           accessibilityLabel={`${network.label} : ${handle}`}
           style={({ pressed }) => [styles.chip, pressed && { opacity: 0.8 }]}
         >
-          <Ionicons name={network.icon as any} size={16} color={network.color} />
+          <Icon name={network.icon as any} size={16} color={network.color} />
           <Text style={styles.handle} numberOfLines={1}>
             {handle}
           </Text>

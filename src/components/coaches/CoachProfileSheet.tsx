@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { CoachPricingPlan, CoachProfile } from '../../types/database';
 import { DAYS, isOnFloorNow } from '../../services/coachService';
 import { fmtTnd, offersPersonal, plansOf } from '../../coaching/offers';
@@ -63,19 +63,19 @@ export const CoachProfileSheet: React.FC<Props> = ({ coach, isMine, isOwner, onC
 
                 <View style={s.nameRow}>
                   <Text style={s.name} accessibilityRole="header">{c.fullName}</Text>
-                  {!pending && <Ionicons name="shield-checkmark" size={20} color={J.goldBright} accessibilityLabel="Coach validé par le club" />}
+                  {!pending && <Icon name="shield-checkmark" size={20} color={J.goldBright} accessibilityLabel="Coach validé par le club" />}
                 </View>
                 {!!c.headline && <Text style={s.headline}>{c.headline}</Text>}
                 {c.yearsExperience > 0 && (
                   <View style={s.exp}>
-                    <Ionicons name="trophy-outline" size={15} color={J.muted} />
+                    <Icon name="trophy-outline" size={15} color={J.muted} />
                     <Text style={s.expText}>{c.yearsExperience} an{c.yearsExperience > 1 ? 's' : ''} d’expérience</Text>
                   </View>
                 )}
 
                 {pending && (
                   <View style={s.pending}>
-                    <Ionicons name="hourglass-outline" size={18} color={J.gold} />
+                    <Icon name="hourglass-outline" size={18} color={J.gold} />
                     <Text style={s.pendingText}>En attente de validation par le club.</Text>
                   </View>
                 )}
@@ -107,7 +107,7 @@ export const CoachProfileSheet: React.FC<Props> = ({ coach, isMine, isOwner, onC
 
                 {c.onFloor && (
                   <View style={s.floor}>
-                    <Ionicons name="walk-outline" size={20} color={J.okText} />
+                    <Icon name="walk-outline" size={20} color={J.okText} />
                     <Text style={s.floorText}>
                       <Text style={{ fontWeight: '800' }}>Coach plateau : </Text>
                       présent dans la salle pour corriger et guider les membres, gratuitement.
@@ -167,7 +167,7 @@ export const CoachProfileSheet: React.FC<Props> = ({ coach, isMine, isOwner, onC
                     </View>
                     {!!c.availabilityHours && (
                       <View style={s.hours}>
-                        <Ionicons name="time-outline" size={16} color={J.muted} />
+                        <Icon name="time-outline" size={16} color={J.muted} />
                         <Text style={s.hoursText}>{c.availabilityHours}</Text>
                       </View>
                     )}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { UserProfile } from '../../types/database';
 import { MurPost } from '../../community/murService';
 import { colors } from '../../theme';
@@ -80,7 +80,7 @@ export const CommentsSheet: React.FC<Props> = ({ post, me, canModerate, onClose,
               </Pressable>
             ) : (
               <Pressable onPress={() => setConfirmAll(true)} accessibilityRole="button" hitSlop={6} style={styles.clearBtn}>
-                <Ionicons name="trash-outline" size={15} color={colors.red.text} />
+                <Icon name="trash-outline" size={15} color={colors.red.text} />
                 <Text style={styles.clearText}>Tout effacer</Text>
               </Pressable>
             ))}
@@ -99,7 +99,7 @@ export const CommentsSheet: React.FC<Props> = ({ post, me, canModerate, onClose,
 
               {comments.length === 0 && (
                 <View style={styles.empty}>
-                  <Ionicons name="chatbubbles-outline" size={40} color={colors.textMuted} />
+                  <Icon name="chatbubbles-outline" size={40} color={colors.textMuted} />
                   <Text style={styles.emptyTitle}>{isQuestion ? 'Pas encore de réponse' : 'Pas encore de commentaire'}</Text>
                   <Text style={styles.emptySub}>{isQuestion ? 'Aide ce membre : ta réponse compte.' : 'Sois le premier à réagir.'}</Text>
                 </View>
@@ -127,7 +127,7 @@ export const CommentsSheet: React.FC<Props> = ({ post, me, canModerate, onClose,
                         accessibilityLabel="J’aime ce commentaire"
                         style={styles.commentLikeBtn}
                       >
-                        <Ionicons name={liked ? 'heart' : 'heart-outline'} size={15} color={liked ? colors.red.bar : colors.textMuted} />
+                        <Icon name={liked ? 'heart' : 'heart-outline'} size={15} color={liked ? colors.red.bar : colors.textMuted} />
                         <Text style={[styles.commentLikeText, liked && { color: colors.red.text }]}>{c.likes.length > 0 ? c.likes.length : 'J’aime'}</Text>
                       </Pressable>
                     </View>
@@ -151,7 +151,7 @@ export const CommentsSheet: React.FC<Props> = ({ post, me, canModerate, onClose,
                           accessibilityLabel={mine ? 'Supprimer mon commentaire' : 'Supprimer ce commentaire'}
                           style={styles.deleteBtn}
                         >
-                          <Ionicons name="trash-outline" size={16} color={colors.textMuted} />
+                          <Icon name="trash-outline" size={16} color={colors.textMuted} />
                         </Pressable>
                       ))}
                   </View>
@@ -172,7 +172,7 @@ export const CommentsSheet: React.FC<Props> = ({ post, me, canModerate, onClose,
                 accessibilityLabel="Ton message"
               />
               <Pressable onPress={send} disabled={!text.trim()} accessibilityRole="button" accessibilityLabel="Envoyer" style={[styles.send, !text.trim() && styles.sendOff]}>
-                <Ionicons name="send" size={18} color={colors.white} />
+                <Icon name="send" size={18} color={colors.white} />
               </Pressable>
             </View>
           </KeyboardAvoidingView>

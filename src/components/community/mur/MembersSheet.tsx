@@ -11,7 +11,7 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from '../../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../../ui/Icon';
 import { Community, standingIn } from '../../../community/murService';
 import { ClubRole, MemStatus, canBan, canSetStatus, canTransferFounder, canUnban } from '../../../community/permissions';
 import { MemberProfile } from '../../../types/database';
@@ -135,7 +135,7 @@ export const MembersSheet: React.FC<Props> = ({
                     </Text>
                     {label ? <Text style={[styles.rank, r.status === 'banned' && { color: colors.red.text }]}>{label}</Text> : null}
                   </View>
-                  {anyAction ? <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={18} color={colors.textMuted} /> : null}
+                  {anyAction ? <Icon name={open ? 'chevron-up' : 'chevron-down'} size={18} color={colors.textMuted} /> : null}
                 </Pressable>
 
                 {open && (

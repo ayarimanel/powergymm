@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { PostCategory } from '../../types/database';
 import { Community } from '../../services/communitiesService';
 import { colors, ink } from '../../theme';
@@ -167,7 +167,7 @@ export const ComposerSheet: React.FC<Props> = ({ visible, initialCategory = 'wor
                     accessibilityState={{ selected: on }}
                     style={[styles.type, on && (t.id === 'pr' ? styles.typeOnGold : styles.typeOn)]}
                   >
-                    <Ionicons name={t.icon as any} size={18} color={on ? (t.id === 'pr' ? colors.gold.ink : colors.onInverse) : colors.textSecondary} />
+                    <Icon name={t.icon as any} size={18} color={on ? (t.id === 'pr' ? colors.gold.ink : colors.onInverse) : colors.textSecondary} />
                     <Text style={[styles.typeText, on && { color: t.id === 'pr' ? colors.gold.ink : colors.onInverse }]}>{t.label}</Text>
                   </Pressable>
                 );
@@ -191,7 +191,7 @@ export const ComposerSheet: React.FC<Props> = ({ visible, initialCategory = 'wor
                   </View>
                 </View>
                 <View style={styles.note}>
-                  <Ionicons name="shield-checkmark-outline" size={18} color={colors.gold.text} />
+                  <Icon name="shield-checkmark-outline" size={18} color={colors.gold.text} />
                   <Text style={styles.noteText}>
                     Un coach validera ton record et il recevra le badge doré. Ajoute une photo comme preuve pour être validé plus vite.
                   </Text>
@@ -241,13 +241,13 @@ export const ComposerSheet: React.FC<Props> = ({ visible, initialCategory = 'wor
                         accessibilityLabel="Retirer cette photo"
                         style={styles.thumbX}
                       >
-                        <Ionicons name="close" size={14} color={colors.white} />
+                        <Icon name="close" size={14} color={colors.white} />
                       </Pressable>
                     </View>
                   ))}
                   {images.length < MAX_PHOTOS && (
                     <Pressable onPress={addPhotos} disabled={busy} accessibilityRole="button" accessibilityLabel="Ajouter des photos" style={styles.addPhoto}>
-                      <Ionicons name="camera-outline" size={26} color={colors.textSecondary} />
+                      <Icon name="camera-outline" size={26} color={colors.textSecondary} />
                       <Text style={styles.addPhotoText}>{busy ? '…' : 'Ajouter'}</Text>
                     </Pressable>
                   )}
@@ -260,7 +260,7 @@ export const ComposerSheet: React.FC<Props> = ({ visible, initialCategory = 'wor
 
           <View style={styles.footer}>
             <Pressable onPress={publish} accessibilityRole="button" style={styles.publishBtn}>
-              <Ionicons name={category === 'pr' ? 'trophy' : 'send'} size={18} color={colors.white} />
+              <Icon name={category === 'pr' ? 'trophy' : 'send'} size={18} color={colors.white} />
               <Text style={styles.publishText}>{category === 'pr' ? 'Envoyer pour validation' : 'Publier'}</Text>
             </Pressable>
           </View>

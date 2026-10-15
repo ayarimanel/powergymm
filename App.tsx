@@ -2,7 +2,7 @@ import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from 're
 import { View, StyleSheet, Pressable, StatusBar, ActivityIndicator, Animated, Easing, Platform, PanResponder } from 'react-native';
 import { Text } from './src/components/ui/Text';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from './src/components/ui/Icon';
 import { UserProfile } from './src/types/database';
 import { AuthService } from './src/services/authService';
 import { withFreshPermissions } from './src/services/permissionsService';
@@ -420,7 +420,7 @@ function TabButton({ tab, label, active, onPress }: { tab: (typeof TABS)[number]
     >
       <Animated.View style={[styles.tabMark, { opacity: on, transform: [{ scaleX: on }] }]} />
       <Animated.View style={{ transform: [{ scale: press }, { translateY: on.interpolate({ inputRange: [0, 1], outputRange: [0, -1] }) }] }}>
-        <Ionicons name={(active ? tab.iconActive : tab.icon) as any} size={23} color={active ? colors.tabActive : colors.tabInactive} />
+        <Icon name={(active ? tab.iconActive : tab.icon) as any} size={23} color={active ? colors.tabActive : colors.tabInactive} />
       </Animated.View>
       <Text style={[styles.tabLabel, active && styles.tabLabelActive]} numberOfLines={1}>
         {label}

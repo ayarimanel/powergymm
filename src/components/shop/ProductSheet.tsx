@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { MarketplaceProduct } from '../../types/database';
 import { colors } from '../../theme';
 import { discountPct, formatPrice } from '../../services/shopService';
@@ -98,7 +98,7 @@ export const ProductSheet: React.FC<Props> = ({ product, isOwner, onClose, onRes
                 </View>
 
                 <View style={[styles.stockPill, { backgroundColor: p.inStock ? colors.green.soft : colors.red.soft }]}>
-                  <Ionicons
+                  <Icon
                     name={p.inStock ? 'checkmark-circle' : 'close-circle'}
                     size={16}
                     color={p.inStock ? colors.green.text : colors.red.text}
@@ -112,7 +112,7 @@ export const ProductSheet: React.FC<Props> = ({ product, isOwner, onClose, onRes
 
                 {!isOwner && p.inStock && (
                   <View style={styles.pickupNote}>
-                    <Ionicons name="storefront-outline" size={18} color={colors.textSecondary} />
+                    <Icon name="storefront-outline" size={18} color={colors.textSecondary} />
                     <Text style={styles.pickupText}>Réserve maintenant, paie et retire à l’accueil du club.</Text>
                   </View>
                 )}
@@ -128,11 +128,11 @@ export const ProductSheet: React.FC<Props> = ({ product, isOwner, onClose, onRes
                     accessibilityRole="button"
                     style={[styles.deleteBtn, confirmDelete && styles.deleteBtnArmed]}
                   >
-                    <Ionicons name="trash-outline" size={20} color={confirmDelete ? colors.white : colors.red.text} />
+                    <Icon name="trash-outline" size={20} color={confirmDelete ? colors.white : colors.red.text} />
                     {confirmDelete && <Text style={styles.deleteArmedText}>Confirmer</Text>}
                   </Pressable>
                   <Pressable onPress={() => onEdit(p)} accessibilityRole="button" style={styles.editBtn}>
-                    <Ionicons name="create-outline" size={20} color={colors.onInverse} />
+                    <Icon name="create-outline" size={20} color={colors.onInverse} />
                     <Text style={[styles.footerBtnText, { color: colors.onInverse }]}>Modifier le produit</Text>
                   </Pressable>
                 </View>
@@ -147,7 +147,7 @@ export const ProductSheet: React.FC<Props> = ({ product, isOwner, onClose, onRes
                         accessibilityLabel="Diminuer la quantité"
                         style={styles.stepBtn}
                       >
-                        <Ionicons name="remove" size={20} color={colors.text} />
+                        <Icon name="remove" size={20} color={colors.text} />
                       </Pressable>
                       <Text style={styles.qty}>{qty}</Text>
                       <Pressable
@@ -157,7 +157,7 @@ export const ProductSheet: React.FC<Props> = ({ product, isOwner, onClose, onRes
                         accessibilityLabel="Augmenter la quantité"
                         style={styles.stepBtn}
                       >
-                        <Ionicons name="add" size={20} color={colors.text} />
+                        <Icon name="add" size={20} color={colors.text} />
                       </Pressable>
                     </View>
                   )}

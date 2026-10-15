@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { Animated, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { colors } from '../../theme';
 import { CollapsibleFab } from '../CollapsibleFab';
 
@@ -24,7 +24,7 @@ const ReportButton: React.FC<{ onPress: () => void; badge?: number; label: strin
   return (
     <Animated.View style={[styles.reportWrap, { transform: [{ scale: press }] }]}>
       <Pressable onPress={onPress} onPressIn={() => to(0.92)} onPressOut={() => to(1)} accessibilityRole="button" accessibilityLabel={badge ? `${label}, ${badge} en attente` : label} style={styles.report}>
-        <Ionicons name="megaphone-outline" size={22} color={colors.amber.text} />
+        <Icon name="megaphone-outline" size={22} color={colors.amber.text} />
       </Pressable>
       {!!badge && (
         <View style={styles.badge} pointerEvents="none">
@@ -46,7 +46,7 @@ export const ScanFab: React.FC<Props> = ({ checkedInToday, onPress, collapsed, o
       collapsed={collapsed}
       onPress={onPress}
       accessibilityLabel="Présence validée aujourd’hui"
-      trailing={<Ionicons name="flame" size={18} color={colors.flamePale} />}
+      trailing={<Icon name="flame" size={18} color={colors.flamePale} />}
     />
   ) : (
     <CollapsibleFab inline icon="qr-code" label="Scan" collapsed={collapsed} onPress={onPress} accessibilityLabel="Scanner le QR code" />

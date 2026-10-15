@@ -12,7 +12,7 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Switch, View } from 'react-native';
 import { Text, TextInput } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { ClubMember, daysAbsent } from '../../services/clubService';
 import { ClubBan } from '../../services/memberAdminService';
 import { StaffPermissions, UserProfile } from '../../types/database';
@@ -134,7 +134,7 @@ export const MembersAdminSheet: React.FC<Props> = ({
                           : t('Dernière venue il y a {n} j', { n: daysAbsent(m) })}
                     </Text>
                   </View>
-                  <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={18} color={colors.textMuted} />
+                  <Icon name={open ? 'chevron-up' : 'chevron-down'} size={18} color={colors.textMuted} />
                 </Pressable>
 
                 {open && (

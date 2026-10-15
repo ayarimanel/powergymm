@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { CommunityPost, MemberProfile } from '../../types/database';
 import { colors } from '../../theme';
 import { isPR, postImages } from '../../services/communityService';
@@ -38,7 +38,7 @@ const Tile: React.FC<{ post: CommunityPost; onPress: () => void }> = ({ post, on
         <ProductImage uri={img} style={StyleSheet.absoluteFill as any} iconSize={24} />
       ) : pr ? (
         <View style={[styles.tileFill, { backgroundColor: colors.gold.bg }]}>
-          <Ionicons name="trophy" size={20} color={colors.gold.deep} />
+          <Icon name="trophy" size={20} color={colors.gold.deep} />
           <Text style={[styles.tileBig, { color: colors.gold.text }]}>{pr.weightKg} kg</Text>
           <Text style={[styles.tileSmall, { color: colors.gold.deep }]} numberOfLines={1}>
             {pr.exercise}
@@ -46,7 +46,7 @@ const Tile: React.FC<{ post: CommunityPost; onPress: () => void }> = ({ post, on
         </View>
       ) : post.category === 'question' ? (
         <View style={[styles.tileFill, { backgroundColor: colors.brandSoft }]}>
-          <Ionicons name="help-circle" size={22} color={colors.brandDark} />
+          <Icon name="help-circle" size={22} color={colors.brandDark} />
           <Text style={[styles.tileSmall, { color: colors.brandDark }]} numberOfLines={3}>
             {post.caption}
           </Text>
@@ -60,12 +60,12 @@ const Tile: React.FC<{ post: CommunityPost; onPress: () => void }> = ({ post, on
       )}
       {pr && img && (
         <View style={styles.tileGold}>
-          <Ionicons name="trophy" size={12} color={colors.gold.text} />
+          <Icon name="trophy" size={12} color={colors.gold.text} />
         </View>
       )}
       {postImages(post).length > 1 && (
         <View style={styles.tileMulti}>
-          <Ionicons name="copy" size={12} color={colors.white} />
+          <Icon name="copy" size={12} color={colors.white} />
         </View>
       )}
     </Pressable>
@@ -119,7 +119,7 @@ export const ProfileSheet: React.FC<ProfileProps> = ({ userId, isMe, profiles, p
 
             {isMe && (
               <Pressable onPress={onEdit} accessibilityRole="button" style={styles.editBtn}>
-                <Ionicons name="create-outline" size={18} color={colors.text} />
+                <Icon name="create-outline" size={18} color={colors.text} />
                 <Text style={styles.editText}>Modifier le profil</Text>
               </Pressable>
             )}
@@ -130,7 +130,7 @@ export const ProfileSheet: React.FC<ProfileProps> = ({ userId, isMe, profiles, p
                 <SheetScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
                   {validated.map(p => (
                     <View key={p.id} style={styles.medalChip}>
-                      <Ionicons name="shield-checkmark" size={16} color={colors.gold.ink} />
+                      <Icon name="shield-checkmark" size={16} color={colors.gold.ink} />
                       <Text style={styles.medalText}>
                         {p.prDetails!.exercise} · {p.prDetails!.weightKg} kg
                       </Text>
@@ -143,7 +143,7 @@ export const ProfileSheet: React.FC<ProfileProps> = ({ userId, isMe, profiles, p
             <Text style={styles.section}>Publications</Text>
             {mine.length === 0 ? (
               <View style={styles.empty}>
-                <Ionicons name="images-outline" size={40} color={colors.textMuted} />
+                <Icon name="images-outline" size={40} color={colors.textMuted} />
                 <Text style={styles.emptyText}>Aucune publication pour l’instant</Text>
               </View>
             ) : (

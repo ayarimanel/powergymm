@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { CommunityPost, MemberProfile } from '../../types/database';
 import { colors } from '../../theme';
 import { ActivityEvent, isPR, postImages, timeAgoFr } from '../../services/communityService';
@@ -69,12 +69,12 @@ const Thumb: React.FC<{ post?: CommunityPost }> = ({ post }) => {
   if (isPR(post))
     return (
       <View style={[styles.thumb, { backgroundColor: colors.gold.soft, alignItems: 'center', justifyContent: 'center' }]}>
-        <Ionicons name="trophy" size={20} color={colors.gold.deep} />
+        <Icon name="trophy" size={20} color={colors.gold.deep} />
       </View>
     );
   return (
     <View style={[styles.thumb, { backgroundColor: colors.track, alignItems: 'center', justifyContent: 'center' }]}>
-      <Ionicons name={post.category === 'question' ? 'help-circle-outline' : 'chatbubble-ellipses-outline'} size={20} color={colors.textMuted} />
+      <Icon name={post.category === 'question' ? 'help-circle-outline' : 'chatbubble-ellipses-outline'} size={20} color={colors.textMuted} />
     </View>
   );
 };
@@ -134,7 +134,7 @@ export const ActivitySheet: React.FC<Props> = ({ visible, onClose, events, seenA
         <View>
           <Avatar name={actor} url={profiles[actorId]?.avatarUrl} size={44} />
           <View style={[styles.typeBadge, { backgroundColor: badge.bg }]}>
-            <Ionicons name={badge.icon as any} size={11} color={colors.white} />
+            <Icon name={badge.icon as any} size={11} color={colors.white} />
           </View>
         </View>
         <View style={{ flex: 1 }}>
@@ -164,7 +164,7 @@ export const ActivitySheet: React.FC<Props> = ({ visible, onClose, events, seenA
         <SheetScrollView contentContainerStyle={{ paddingBottom: 32 + extraBottom }} showsVerticalScrollIndicator={false}>
           {rows.length === 0 && (
             <View style={styles.empty}>
-              <Ionicons name="heart-outline" size={46} color={colors.textMuted} />
+              <Icon name="heart-outline" size={46} color={colors.textMuted} />
               <Text style={styles.emptyTitle}>Pas encore d’activité</Text>
               <Text style={styles.emptySub}>Publie sur le Mur : les j’aime, commentaires et validations de records apparaîtront ici.</Text>
             </View>

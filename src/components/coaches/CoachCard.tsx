@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { CoachProfile } from '../../types/database';
 import { daysSummary, isOnFloorNow } from '../../services/coachService';
 import { fmtTnd, fromPrice, offersPersonal } from '../../coaching/offers';
@@ -37,7 +37,7 @@ export const CoachCard: React.FC<Props> = ({ coach: c, isMine, onPress, onApprov
         <View style={{ flex: 1, minWidth: 0 }}>
           <View style={s.nameRow}>
             <Text style={s.name} numberOfLines={1}>{c.fullName}</Text>
-            {!pending && <Ionicons name="shield-checkmark" size={16} color={J.goldBright} />}
+            {!pending && <Icon name="shield-checkmark" size={16} color={J.goldBright} />}
             {isMine && <Text style={s.me}>Toi</Text>}
           </View>
           {!!c.headline && <Text style={s.headline} numberOfLines={1}>{c.headline}</Text>}
@@ -48,7 +48,7 @@ export const CoachCard: React.FC<Props> = ({ coach: c, isMine, onPress, onApprov
             {!personal && c.onFloor && !live && <Pill tone="never" label="Coach plateau" />}
           </View>
         </View>
-        <Ionicons name="chevron-forward" size={18} color={J.muted} />
+        <Icon name="chevron-forward" size={18} color={J.muted} />
       </View>
 
       {c.specialties.length > 0 && (
@@ -69,7 +69,7 @@ export const CoachCard: React.FC<Props> = ({ coach: c, isMine, onPress, onApprov
           </>
         ) : (
           <Text style={s.schedule} numberOfLines={1}>
-            <Ionicons name="time-outline" size={13} color={J.muted} /> {schedule || 'Horaires à venir'}
+            <Icon name="time-outline" size={13} color={J.muted} /> {schedule || 'Horaires à venir'}
           </Text>
         )}
       </View>

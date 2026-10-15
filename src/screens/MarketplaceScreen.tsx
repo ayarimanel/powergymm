@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from '../components/ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/ui/Icon';
 import { MarketplaceProduct, ProductReservation, ReservationStatus, ShopCategory, UserProfile } from '../types/database';
 import { GymConfigService } from '../config/gymConfig';
 import { ShopService, isActive } from '../services/shopService';
@@ -37,7 +37,7 @@ const KpiTile: React.FC<{ icon: string; value: number; label: string; tint?: { b
     accessibilityLabel={`${label} : ${value}`}
     style={[styles.kpi, tint && value > 0 && { backgroundColor: tint.soft }]}
   >
-    <Ionicons name={icon as any} size={18} color={tint && value > 0 ? tint.text : colors.textSecondary} />
+    <Icon name={icon as any} size={18} color={tint && value > 0 ? tint.text : colors.textSecondary} />
     <Text style={[styles.kpiValue, tint && value > 0 && { color: tint.text }]}>{value}</Text>
     <Text style={styles.kpiLabel}>{label}</Text>
   </Pressable>
@@ -160,14 +160,14 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.logo}>
-          <Ionicons name="bag-handle" size={16} color={colors.brandText} />
+          <Icon name="bag-handle" size={16} color={colors.brandText} />
         </View>
         <View style={{ flex: 1, minWidth: 0 }}>
           <Text style={styles.title} numberOfLines={1}>Boutique</Text>
           {!!gymName && <Text style={styles.subtitle} numberOfLines={1}>{gymName}</Text>}
         </View>
         <Pressable onPress={() => setShowSearch(v => !v)} accessibilityRole="button" accessibilityLabel="Rechercher" style={styles.headerBtn}>
-          <Ionicons name={showSearch ? 'close' : 'search-outline'} size={22} color={colors.text} />
+          <Icon name={showSearch ? 'close' : 'search-outline'} size={22} color={colors.text} />
         </Pressable>
         <Pressable
           onPress={() => setShowOrders(true)}
@@ -175,7 +175,7 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
           accessibilityLabel={canManage ? 'Commandes' : 'Mes réservations'}
           style={styles.headerBtn}
         >
-          <Ionicons name={canManage ? 'clipboard-outline' : 'bag-check-outline'} size={22} color={colors.text} />
+          <Icon name={canManage ? 'clipboard-outline' : 'bag-check-outline'} size={22} color={colors.text} />
           {badgeCount > 0 && (
             <View style={styles.badge}><Text style={styles.badgeText}>{badgeCount > 9 ? '9+' : badgeCount}</Text></View>
           )}
@@ -184,7 +184,7 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
 
       {showSearch && (
         <View style={styles.searchWrap}>
-          <Ionicons name="search-outline" size={18} color={colors.textMuted} />
+          <Icon name="search-outline" size={18} color={colors.textMuted} />
           <TextInput
             style={styles.searchInput}
             value={query}
@@ -196,7 +196,7 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
           />
           {!!query && (
             <Pressable onPress={() => setQuery('')} hitSlop={10} accessibilityRole="button" accessibilityLabel="Effacer la recherche">
-              <Ionicons name="close-circle" size={18} color={colors.textMuted} />
+              <Icon name="close-circle" size={18} color={colors.textMuted} />
             </Pressable>
           )}
         </View>
@@ -232,12 +232,12 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
         <View style={styles.sectionRow}>
           <View style={styles.sectionTitleWrap}>
             {activeCategoryTint && <View style={[styles.sectionDot, { backgroundColor: activeCategoryTint.bar }]} />}
-            {filter === 'promo' && <Ionicons name="pricetag" size={14} color={colors.red.text} />}
+            {filter === 'promo' && <Icon name="pricetag" size={14} color={colors.red.text} />}
             <Text style={styles.sectionTitle}>{activeSectionTitle}</Text>
             <Text style={styles.sectionCount}>· {filtered.length}</Text>
           </View>
           <Pressable onPress={() => setSort(NEXT_SORT[sort])} accessibilityRole="button" accessibilityLabel={`Trier : ${SORT_LABEL[sort]}`} style={styles.sortBtn}>
-            <Ionicons name="swap-vertical" size={14} color={colors.textSecondary} />
+            <Icon name="swap-vertical" size={14} color={colors.textSecondary} />
             <Text style={styles.sortText}>{SORT_LABEL[sort]}</Text>
           </Pressable>
         </View>
@@ -269,7 +269,7 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
         {products && filtered.length === 0 && (
           <View style={styles.empty}>
             <View style={styles.emptyIcon}>
-              <Ionicons name="basket-outline" size={32} color={colors.textMuted} />
+              <Icon name="basket-outline" size={32} color={colors.textMuted} />
             </View>
             <Text style={styles.emptyTitle}>Aucun produit trouvé</Text>
             <Text style={styles.emptySub}>Essaie un autre mot-clé ou une autre catégorie.</Text>
@@ -289,7 +289,7 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
           accessibilityLabel="Ajouter un produit"
           style={({ pressed }) => [styles.fab, pressed && { transform: [{ scale: 0.96 }] }]}
         >
-          <Ionicons name="add" size={22} color={colors.white} />
+          <Icon name="add" size={22} color={colors.white} />
           <Text style={styles.fabText}>Produit</Text>
         </Pressable>
       )}

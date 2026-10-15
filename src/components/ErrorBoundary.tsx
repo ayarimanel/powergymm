@@ -10,7 +10,7 @@
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from './ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from './ui/Icon';
 import { colors } from '../theme';
 // Class component: no hooks, so it reads the module-level language.
 import { t } from '../i18n';
@@ -53,7 +53,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
       <View style={styles.screen}>
         <ScrollView contentContainerStyle={styles.body}>
           <View style={styles.icon}>
-            <Ionicons name="warning-outline" size={28} color={colors.amber.text} />
+            <Icon name="warning-outline" size={28} color={colors.amber.text} />
           </View>
 
           <Text style={styles.title}>{t('Quelque chose s’est mal passé')}</Text>

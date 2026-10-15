@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { CommunityPost, MemberProfile, UserProfile } from '../../types/database';
 import { card, colors, ink } from '../../theme';
 import { postImages, timeAgoFr } from '../../services/communityService';
@@ -62,7 +62,7 @@ const HeartButton: React.FC<{ liked: boolean; count: number; label: string; onPr
       style={({ pressed }) => [styles.actionBtn, pressed && { opacity: 0.6 }]}
     >
       <Animated.View style={{ transform: [{ scale }] }}>
-        <Ionicons name={liked ? 'heart' : 'heart-outline'} size={24} color={liked ? colors.red.bar : colors.text} />
+        <Icon name={liked ? 'heart' : 'heart-outline'} size={24} color={liked ? colors.red.bar : colors.text} />
       </Animated.View>
       <Text style={[styles.actionText, liked && { color: colors.red.text }]}>{text ?? count}</Text>
     </Pressable>
@@ -137,7 +137,7 @@ const MediaCarousel: React.FC<{ images: string[]; onDoubleTap: () => void }> = (
         pointerEvents="none"
         style={[styles.bigHeart, { opacity: heart, transform: [{ scale: heart.interpolate({ inputRange: [0, 1], outputRange: [0.4, 1.1] }) }] }]}
       >
-        <Ionicons name="heart" size={96} color={colors.white} />
+        <Icon name="heart" size={96} color={colors.white} />
       </Animated.View>
 
       {images.length > 1 && (
@@ -175,10 +175,10 @@ const RecordCard: React.FC<PostCardProps> = ({ post, profiles, me, liked, canApp
       <View style={styles.goldTop}>
         {/* medal */}
         <View style={[styles.medal, !approved && styles.medalPending]}>
-          <Ionicons name="trophy" size={22} color={approved ? colors.gold.ink : colors.gold.deep} />
+          <Icon name="trophy" size={22} color={approved ? colors.gold.ink : colors.gold.deep} />
           {approved && (
             <View style={styles.medalCheck}>
-              <Ionicons name="checkmark" size={11} color={colors.white} />
+              <Icon name="checkmark" size={11} color={colors.white} />
             </View>
           )}
         </View>
@@ -209,18 +209,18 @@ const RecordCard: React.FC<PostCardProps> = ({ post, profiles, me, liked, canApp
       <View style={styles.goldChips}>
         {approved ? (
           <View style={styles.sealChip}>
-            <Ionicons name="shield-checkmark" size={15} color={colors.gold.text} />
+            <Icon name="shield-checkmark" size={15} color={colors.gold.text} />
             <Text style={styles.sealText}>Validé par {post.prApproval?.approvedByName ?? 'un coach'}</Text>
           </View>
         ) : (
           <View style={styles.pendingChip}>
-            <Ionicons name="hourglass-outline" size={14} color={colors.gold.text} />
+            <Icon name="hourglass-outline" size={14} color={colors.gold.text} />
             <Text style={styles.pendingText}>En attente de validation</Text>
           </View>
         )}
         {delta > 0 && (
           <View style={styles.deltaChip}>
-            <Ionicons name="trending-up" size={14} color={colors.green.text} />
+            <Icon name="trending-up" size={14} color={colors.green.text} />
             <Text style={styles.deltaText}>+{delta} kg</Text>
           </View>
         )}
@@ -242,14 +242,14 @@ const RecordCard: React.FC<PostCardProps> = ({ post, profiles, me, liked, canApp
           accessibilityLabel="Féliciter"
           style={({ pressed }) => [styles.congrats, liked && styles.congratsOn, pressed && { opacity: 0.8 }]}
         >
-          <Ionicons name={liked ? 'heart' : 'heart-outline'} size={18} color={liked ? colors.gold.ink : colors.gold.text} />
+          <Icon name={liked ? 'heart' : 'heart-outline'} size={18} color={liked ? colors.gold.ink : colors.gold.text} />
           <Text style={[styles.congratsText, liked && { color: colors.gold.ink }]}>
             {liked ? 'Félicité' : 'Féliciter'} · {post.likesCount}
           </Text>
         </Pressable>
 
         <Pressable onPress={() => onOpenComments(post)} accessibilityRole="button" accessibilityLabel="Commentaires" style={styles.goldIconBtn}>
-          <Ionicons name="chatbubble-outline" size={20} color={colors.gold.text} />
+          <Icon name="chatbubble-outline" size={20} color={colors.gold.text} />
           <Text style={styles.goldIconText}>{comments}</Text>
         </Pressable>
 
@@ -262,13 +262,13 @@ const RecordCard: React.FC<PostCardProps> = ({ post, profiles, me, liked, canApp
                 <Text style={styles.smallGhostText}>Annuler</Text>
               </Pressable>
               <Pressable onPress={() => onApprove(post)} accessibilityRole="button" style={styles.validateBtn}>
-                <Ionicons name="checkmark" size={16} color={colors.gold.ink} />
+                <Icon name="checkmark" size={16} color={colors.gold.ink} />
                 <Text style={styles.validateText}>Confirmer</Text>
               </Pressable>
             </View>
           ) : (
             <Pressable onPress={() => setConfirming(true)} accessibilityRole="button" style={styles.validateBtn}>
-              <Ionicons name="shield-checkmark-outline" size={16} color={colors.gold.ink} />
+              <Icon name="shield-checkmark-outline" size={16} color={colors.gold.ink} />
               <Text style={styles.validateText}>Valider</Text>
             </Pressable>
           ))}
@@ -310,7 +310,7 @@ export const PostCard: React.FC<PostCardProps> = props => {
     </View>
   ) : (
     <Pressable onPress={() => setMenuOpen(o => !o)} accessibilityRole="button" accessibilityLabel="Plus d’options" style={styles.iconBtn}>
-      <Ionicons name="ellipsis-horizontal" size={20} color={colors.textMuted} />
+      <Icon name="ellipsis-horizontal" size={20} color={colors.textMuted} />
     </Pressable>
   );
 
@@ -329,19 +329,19 @@ export const PostCard: React.FC<PostCardProps> = props => {
         {menuOpen && isMine && (
           <View style={styles.menuPanel}>
             <Pressable onPress={() => { setMenuOpen(false); setDraft(post.caption); setEditing(true); }} accessibilityRole="button" style={styles.menuItem}>
-              <Ionicons name="create-outline" size={20} color={colors.text} />
+              <Icon name="create-outline" size={20} color={colors.text} />
               <Text style={styles.menuText}>Modifier</Text>
             </Pressable>
             <Pressable onPress={() => { setMenuOpen(false); props.onToggleComments(post); }} accessibilityRole="button" style={styles.menuItem}>
-              <Ionicons name={post.commentsDisabled ? 'chatbubbles-outline' : 'chatbubble-ellipses-outline'} size={20} color={colors.text} />
+              <Icon name={post.commentsDisabled ? 'chatbubbles-outline' : 'chatbubble-ellipses-outline'} size={20} color={colors.text} />
               <Text style={styles.menuText}>{post.commentsDisabled ? 'Réactiver les commentaires' : 'Désactiver les commentaires'}</Text>
             </Pressable>
             <Pressable onPress={() => { setMenuOpen(false); props.onToggleLikesHidden(post); }} accessibilityRole="button" style={styles.menuItem}>
-              <Ionicons name={post.likesHidden ? 'heart-outline' : 'eye-off-outline'} size={20} color={colors.text} />
+              <Icon name={post.likesHidden ? 'heart-outline' : 'eye-off-outline'} size={20} color={colors.text} />
               <Text style={styles.menuText}>{post.likesHidden ? 'Afficher le nombre de likes' : 'Masquer le nombre de likes'}</Text>
             </Pressable>
             <Pressable onPress={() => { setMenuOpen(false); setConfirming(true); }} accessibilityRole="button" style={styles.menuItem}>
-              <Ionicons name="trash-outline" size={20} color={colors.red.text} />
+              <Icon name="trash-outline" size={20} color={colors.red.text} />
               <Text style={[styles.menuText, { color: colors.red.text }]}>Supprimer</Text>
             </Pressable>
           </View>
@@ -350,16 +350,16 @@ export const PostCard: React.FC<PostCardProps> = props => {
         {menuOpen && !isMine && (
           <View style={styles.menuPanel}>
             <Pressable onPress={() => { setMenuOpen(false); props.onHide(post); }} accessibilityRole="button" style={styles.menuItem}>
-              <Ionicons name="eye-off-outline" size={20} color={colors.text} />
+              <Icon name="eye-off-outline" size={20} color={colors.text} />
               <Text style={styles.menuText}>Masquer cette publication</Text>
             </Pressable>
             <Pressable onPress={() => { setMenuOpen(false); props.onReport(post); }} disabled={props.reported} accessibilityRole="button" style={styles.menuItem}>
-              <Ionicons name="flag-outline" size={20} color={props.reported ? colors.textMuted : colors.red.text} />
+              <Icon name="flag-outline" size={20} color={props.reported ? colors.textMuted : colors.red.text} />
               <Text style={[styles.menuText, { color: props.reported ? colors.textMuted : colors.red.text }]}>{props.reported ? 'Déjà signalée au club' : 'Signaler au club'}</Text>
             </Pressable>
             {canModerate && (
               <Pressable onPress={() => { setMenuOpen(false); setConfirming(true); }} accessibilityRole="button" style={styles.menuItem}>
-                <Ionicons name="trash-outline" size={20} color={colors.red.text} />
+                <Icon name="trash-outline" size={20} color={colors.red.text} />
                 <Text style={[styles.menuText, { color: colors.red.text }]}>Supprimer (modération)</Text>
               </Pressable>
             )}
@@ -383,17 +383,17 @@ export const PostCard: React.FC<PostCardProps> = props => {
         {isQuestion && (
           <View style={styles.qRow}>
             <View style={styles.qPill}>
-              <Ionicons name="help-circle" size={16} color={colors.brandDark} />
+              <Icon name="help-circle" size={16} color={colors.brandDark} />
               <Text style={styles.qPillText}>Question</Text>
             </View>
             {post.resolved ? (
               <View style={[styles.qPill, { backgroundColor: colors.green.soft }]}>
-                <Ionicons name="checkmark-circle" size={16} color={colors.green.text} />
+                <Icon name="checkmark-circle" size={16} color={colors.green.text} />
                 <Text style={[styles.qPillText, { color: colors.green.text }]}>Résolu</Text>
               </View>
             ) : coachAnswered ? (
               <View style={[styles.qPill, { backgroundColor: colors.gold.soft }]}>
-                <Ionicons name="school-outline" size={16} color={colors.gold.text} />
+                <Icon name="school-outline" size={16} color={colors.gold.text} />
                 <Text style={[styles.qPillText, { color: colors.gold.text }]}>Répondu par un coach</Text>
               </View>
             ) : null}
@@ -411,7 +411,7 @@ export const PostCard: React.FC<PostCardProps> = props => {
           <HeartButton liked={liked} count={post.likesCount} label="J’aime" onPress={onLike} text={post.likesHidden && !isMine ? 'J’aime' : undefined} />
           {post.commentsDisabled && !isMine ? (
             <View style={styles.actionBtn}>
-              <Ionicons name="chatbubble-outline" size={23} color={colors.textMuted} />
+              <Icon name="chatbubble-outline" size={23} color={colors.textMuted} />
               <Text style={[styles.actionText, { color: colors.textMuted }]}>Désactivés</Text>
             </View>
           ) : (
@@ -421,7 +421,7 @@ export const PostCard: React.FC<PostCardProps> = props => {
               accessibilityLabel="Commentaires"
               style={({ pressed }) => [styles.actionBtn, pressed && { opacity: 0.6 }]}
             >
-              <Ionicons name="chatbubble-outline" size={23} color={colors.text} />
+              <Icon name="chatbubble-outline" size={23} color={colors.text} />
               <Text style={styles.actionText}>{comments.length}</Text>
             </Pressable>
           )}
@@ -438,7 +438,7 @@ export const PostCard: React.FC<PostCardProps> = props => {
           <View style={styles.qFooter}>
             {!(post.commentsDisabled && !isMine) && (
               <Pressable onPress={() => onOpenComments(post)} accessibilityRole="button" style={styles.answerBtn}>
-                <Ionicons name="chatbubbles-outline" size={18} color={colors.text} />
+                <Icon name="chatbubbles-outline" size={18} color={colors.text} />
                 <Text style={styles.answerText}>{comments.length ? `Voir les réponses (${comments.length})` : 'Répondre'}</Text>
               </Pressable>
             )}

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Image, Pressable, StyleSheet, Switch, View } from 'react-native';
 import { Text, TextInput } from '../ui/Text';
 import QRCode from 'react-native-qrcode-svg';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { GenderType, SocialLinks, TrainingTimeSlot, UserProfile } from '../../types/database';
 import { GymProfileConfig } from '../../config/gymConfig';
 import { ClubMember, daysLeft } from '../../services/clubService';
@@ -163,7 +163,7 @@ export const AccountSheet: React.FC<Props> = ({ visible, onClose, user, config, 
                   <Text style={styles.roleText}>{ROLE_LABEL[user.role]}</Text>
                 </View>
                 <Pressable onPress={choosePhoto} accessibilityRole="button" style={styles.outlineBtn}>
-                  <Ionicons name="camera-outline" size={18} color={colors.text} />
+                  <Icon name="camera-outline" size={18} color={colors.text} />
                   <Text style={styles.outlineText}>{avatar ? 'Changer la photo' : 'Ajouter une photo'}</Text>
                 </Pressable>
                 {!!avatar && (
@@ -187,7 +187,7 @@ export const AccountSheet: React.FC<Props> = ({ visible, onClose, user, config, 
             <Text style={styles.note}>{t('Visibles par les autres membres quand ils ouvrent ton profil. Laisse vide pour n’en montrer aucun.')}</Text>
             {SOCIAL_NETWORKS.map(n => (
               <View key={n.key} style={styles.socialRow}>
-                <Ionicons name={n.icon as any} size={20} color={n.color} />
+                <Icon name={n.icon as any} size={20} color={n.color} />
                 <TextInput
                   style={[styles.input, { flex: 1 }]}
                   value={socials[n.key] ?? ''}
@@ -249,7 +249,7 @@ export const AccountSheet: React.FC<Props> = ({ visible, onClose, user, config, 
             </View>
 
             <Pressable onPress={save} accessibilityRole="button" style={[styles.saveBtn, saved && { backgroundColor: colors.green.bar }]}>
-              <Ionicons name={saved ? 'checkmark-circle' : 'save-outline'} size={20} color={colors.white} />
+              <Icon name={saved ? 'checkmark-circle' : 'save-outline'} size={20} color={colors.white} />
               <Text style={styles.saveText}>{saved ? 'Enregistré' : 'Enregistrer'}</Text>
             </Pressable>
 
@@ -309,7 +309,7 @@ export const AccountSheet: React.FC<Props> = ({ visible, onClose, user, config, 
                 <View style={styles.chips}>
                   {PERMISSION_LABELS.filter(p => user.permissions?.[p.key]).map(p => (
                     <View key={p.key} style={styles.permChip}>
-                      <Ionicons name="checkmark-circle" size={16} color={colors.green.text} />
+                      <Icon name="checkmark-circle" size={16} color={colors.green.text} />
                       <Text style={styles.permChipText}>{p.label}</Text>
                     </View>
                   ))}
@@ -324,7 +324,7 @@ export const AccountSheet: React.FC<Props> = ({ visible, onClose, user, config, 
                 <View style={styles.qrBox}>
                   <View style={styles.qrBrand}>
                     <View style={styles.qrLogo}>
-                      {config.logoUrl ? <Image source={{ uri: config.logoUrl }} style={StyleSheet.absoluteFill} /> : <Ionicons name="barbell" size={16} color={colors.brandText} />}
+                      {config.logoUrl ? <Image source={{ uri: config.logoUrl }} style={StyleSheet.absoluteFill} /> : <Icon name="barbell" size={16} color={colors.brandText} />}
                     </View>
                     <Text style={styles.qrName} numberOfLines={1}>{config.name}</Text>
                   </View>
@@ -344,7 +344,7 @@ export const AccountSheet: React.FC<Props> = ({ visible, onClose, user, config, 
                   accessibilityRole="button"
                   style={[styles.ghost, confirm === 'code' && { backgroundColor: colors.text }]}
                 >
-                  <Ionicons name="refresh" size={18} color={confirm === 'code' ? colors.onInverse : colors.text} />
+                  <Icon name="refresh" size={18} color={confirm === 'code' ? colors.onInverse : colors.text} />
                   <Text style={[styles.ghostText, confirm === 'code' && { color: colors.onInverse }]}>{confirm === 'code' ? 'Confirmer : les anciens QR ne marcheront plus' : 'Générer un nouveau code'}</Text>
                 </Pressable>
               </Section>
@@ -353,7 +353,7 @@ export const AccountSheet: React.FC<Props> = ({ visible, onClose, user, config, 
             {/* Account */}
             <Section title="Compte">
               <View style={styles.idRow}>
-                <Ionicons name="person-circle-outline" size={22} color={colors.textSecondary} />
+                <Icon name="person-circle-outline" size={22} color={colors.textSecondary} />
                 <View style={{ flex: 1 }}>
                   <Text style={styles.idTitle}>{user.role === 'owner' ? 'Identifiant : admin' : user.username ? `Identifiant : @${user.username}` : 'Identifiant créé à la déconnexion'}</Text>
                   <Text style={styles.note}>
@@ -366,13 +366,13 @@ export const AccountSheet: React.FC<Props> = ({ visible, onClose, user, config, 
                 </View>
               </View>
               <Pressable onPress={() => (confirm === 'logout' ? onLogout() : setConfirm('logout'))} accessibilityRole="button" style={[styles.ghost, confirm === 'logout' && { backgroundColor: colors.text }]}>
-                <Ionicons name="log-out-outline" size={20} color={confirm === 'logout' ? colors.onInverse : colors.text} />
+                <Icon name="log-out-outline" size={20} color={confirm === 'logout' ? colors.onInverse : colors.text} />
                 <Text style={[styles.ghostText, confirm === 'logout' && { color: colors.onInverse }]}>
                   {confirm === 'logout' ? (canSignInAgain || user.role === 'owner' ? 'Confirmer la déconnexion' : 'Se déconnecter quand même (accès perdu)') : 'Se déconnecter'}
                 </Text>
               </Pressable>
               <Pressable onPress={() => (confirm === 'wipe' ? onWipe() : setConfirm('wipe'))} accessibilityRole="button" style={[styles.ghost, { borderColor: colors.red.bar }, confirm === 'wipe' && { backgroundColor: colors.red.bar }]}>
-                <Ionicons name="trash-outline" size={20} color={confirm === 'wipe' ? colors.white : colors.red.text} />
+                <Icon name="trash-outline" size={20} color={confirm === 'wipe' ? colors.white : colors.red.text} />
                 <Text style={[styles.ghostText, { color: confirm === 'wipe' ? colors.white : colors.red.text }]}>{confirm === 'wipe' ? 'Confirmer : tout effacer sur ce téléphone' : 'Effacer toutes mes données'}</Text>
               </Pressable>
               <Text style={styles.note}>Les données sont enregistrées sur ce téléphone.</Text>

@@ -8,7 +8,7 @@
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Switch, View } from 'react-native';
 import { Text, TextInput } from '../../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../../ui/Icon';
 import { Community } from '../../../community/murService';
 import { CommunityType } from '../../../community/permissions';
 import { CommunityColor, colors, communityTint } from '../../../theme';
@@ -152,7 +152,7 @@ export const CreateCommunitySheet: React.FC<Props> = ({ visible, takenIds, found
               accessibilityState={{ selected: on }}
               style={[styles.option, on && styles.optionOn]}
             >
-              <Ionicons
+              <Icon
                 name={on ? 'radio-button-on' : 'radio-button-off'}
                 size={20}
                 color={on ? colors.brandText : colors.textMuted}
@@ -195,7 +195,7 @@ export const CreateCommunitySheet: React.FC<Props> = ({ visible, takenIds, found
                 accessibilityState={{ selected: on }}
                 style={[styles.swatch, { backgroundColor: t.bar }, on && styles.swatchOn]}
               >
-                {on ? <Ionicons name="checkmark" size={16} color={colors.white} /> : null}
+                {on ? <Icon name="checkmark" size={16} color={colors.white} /> : null}
               </Pressable>
             );
           })}

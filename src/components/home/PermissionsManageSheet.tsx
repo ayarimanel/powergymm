@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Switch, View } from 'react-native';
 import { Text, TextInput } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { colors } from '../../theme';
 import { ClubMember } from '../../services/clubService';
 import { StaffPermissions, UserProfile } from '../../types/database';
@@ -47,7 +47,7 @@ export const PermissionsManageSheet: React.FC<Props> = ({ visible, onClose, memb
       {() => (
         <View style={{ flex: 1 }}>
           <View style={styles.searchWrap}>
-            <Ionicons name="search-outline" size={18} color={colors.textMuted} />
+            <Icon name="search-outline" size={18} color={colors.textMuted} />
             <TextInput
               style={styles.searchInput}
               value={query}
@@ -81,7 +81,7 @@ export const PermissionsManageSheet: React.FC<Props> = ({ visible, onClose, memb
                         {active.length > 0 ? active.join(' · ') : 'Aucun droit particulier'}
                       </Text>
                     </View>
-                    <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={18} color={colors.textMuted} />
+                    <Icon name={open ? 'chevron-up' : 'chevron-down'} size={18} color={colors.textMuted} />
                   </Pressable>
 
                   {open &&

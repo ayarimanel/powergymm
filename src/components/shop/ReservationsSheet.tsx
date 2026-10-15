@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { ProductReservation, ReservationStatus } from '../../types/database';
 import { colors } from '../../theme';
 import { RESERVATION_LABEL, formatPrice, isActive } from '../../services/shopService';
@@ -95,7 +95,7 @@ export const ReservationsSheet: React.FC<Props> = ({ visible, onClose, mode, res
         <SheetScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 32 + extraBottom }}>
           {list.length === 0 && (
             <View style={styles.empty}>
-              <Ionicons name="bag-check-outline" size={44} color={colors.textMuted} />
+              <Icon name="bag-check-outline" size={44} color={colors.textMuted} />
               <Text style={styles.emptyTitle}>
                 {tab === 'active' ? (isOwner ? 'Aucune commande à traiter' : 'Aucune réservation en cours') : 'Rien dans l’historique'}
               </Text>

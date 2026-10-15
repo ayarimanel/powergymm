@@ -8,7 +8,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../components/ui/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/ui/Icon';
 import { CardShell, QuestionCard } from '../components/onboarding/BubbleCard';
 import { colors } from '../theme';
 import { haptics } from '../utils/haptics';
@@ -376,7 +376,7 @@ export const HabitsQuestionnaire: React.FC<Props> = ({ firstName, userId, rules,
             accessibilityRole="button"
             style={styles.suggest}
           >
-            <Ionicons name="people-outline" size={18} color={colors.brand} />
+            <Icon name="people-outline" size={18} color={colors.brand} />
             <Text style={styles.suggestText}>Rejoindre la communauté Débutants</Text>
           </Pressable>
         ) : null}

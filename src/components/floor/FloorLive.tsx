@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Easing, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { FloorSnapshot } from '../../floor/useFloorSnapshot';
 import { WeekForecast } from '../../floor/useWeekForecast';
 import { LEVEL_LABEL } from '../../floor/crowd';
@@ -53,13 +53,13 @@ const PulseDot: React.FC<{ color: string }> = ({ color }) => {
 /** Owner setting "affluence réservée aux membres": live crowd unlocks after a first scan at the entrance. */
 export const FloorLocked: React.FC<{ gymName: string; onScan: () => void }> = ({ gymName, onScan }) => (
   <View style={[styles.card, styles.closed]}>
-    <Ionicons name="lock-closed-outline" size={26} color={colors.textSecondary} />
+    <Icon name="lock-closed-outline" size={26} color={colors.textSecondary} />
     <Text style={styles.closedTitle}>Affluence réservée aux membres</Text>
     <Text style={[styles.closedSub, { textAlign: 'center' }]}>
       Scanne le QR à l’entrée {gymName ? `de ${gymName} ` : ''}une première fois : tu verras ensuite en direct quand c’est calme, zone par zone.
     </Text>
     <Pressable onPress={onScan} accessibilityRole="button" style={({ pressed }) => [styles.unlock, pressed && { opacity: 0.85 }]}>
-      <Ionicons name="qr-code-outline" size={16} color={colors.white} />
+      <Icon name="qr-code-outline" size={16} color={colors.white} />
       <Text style={styles.unlockText}>Scanner le QR d’entrée</Text>
     </Pressable>
   </View>
@@ -151,7 +151,7 @@ export const FloorLive: React.FC<Props> = ({ snapshot, week, alertOn, onToggleAl
         accessibilityRole="button"
         style={({ pressed }) => [styles.alertBtn, alertOn ? styles.alertBtnOn : styles.alertBtnGhost, pressed && { opacity: 0.85 }]}
       >
-        <Ionicons name={alertOn ? 'notifications' : 'notifications-outline'} size={15} color={alertOn ? colors.green.text : colors.brand} />
+        <Icon name={alertOn ? 'notifications' : 'notifications-outline'} size={15} color={alertOn ? colors.green.text : colors.brand} />
         <Text style={[styles.alertText, { color: alertOn ? colors.green.text : colors.brand }]}>{alertOn ? 'Alerte activée' : "M'alerter si calme"}</Text>
       </Pressable>
     </View>
@@ -160,7 +160,7 @@ export const FloorLive: React.FC<Props> = ({ snapshot, week, alertOn, onToggleAl
   if (!snapshot.isOpen) {
     return (
       <View style={[styles.card, styles.closed]}>
-        <Ionicons name="moon-outline" size={26} color={colors.textSecondary} />
+        <Icon name="moon-outline" size={26} color={colors.textSecondary} />
         <Text style={styles.closedTitle}>Fermé · ouvre à {snapshot.openingHour}h</Text>
         {snapshot.tomorrow?.bestHour != null && (
           <Text style={styles.closedSub}>Demain, plus calme vers {snapshot.tomorrow.bestHour}h</Text>
@@ -217,7 +217,7 @@ export const FloorLive: React.FC<Props> = ({ snapshot, week, alertOn, onToggleAl
 
       {checkedIn && (
         <Pressable onPress={onScanOut} accessibilityRole="button" style={({ pressed }) => [styles.scanOut, pressed && { opacity: 0.85 }]}>
-          <Ionicons name="log-out-outline" size={15} color={colors.text} />
+          <Icon name="log-out-outline" size={15} color={colors.text} />
           <Text style={styles.scanOutText}>Tu es là — terminer ma séance</Text>
         </Pressable>
       )}

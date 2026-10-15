@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Image, Linking, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { BottomSheet, SheetScrollView } from '../home/BottomSheet';
 import { ProblemReport, agoShort, categoryOf } from '../../services/problemReportService';
 import { colors } from '../../theme';
@@ -61,7 +61,7 @@ export const ReportsAdminSheet: React.FC<Props> = ({ visible, reports, phoneOf, 
         <SheetScrollView contentContainerStyle={styles.body}>
           {list.length === 0 && (
             <View style={styles.empty}>
-              <Ionicons name={tab === 'open' ? 'checkmark-done-circle-outline' : 'time-outline'} size={40} color={colors.textMuted} />
+              <Icon name={tab === 'open' ? 'checkmark-done-circle-outline' : 'time-outline'} size={40} color={colors.textMuted} />
               <Text style={styles.emptyText}>{tab === 'open' ? 'Rien à régler. Tout fonctionne 👌' : 'Aucun problème réglé pour l’instant.'}</Text>
             </View>
           )}
@@ -72,7 +72,7 @@ export const ReportsAdminSheet: React.FC<Props> = ({ visible, reports, phoneOf, 
               <View key={r.id} style={styles.card}>
                 <View style={styles.head}>
                   <View style={[styles.icon, { backgroundColor: r.status === 'open' ? colors.amber.soft : colors.green.soft }]}>
-                    <Ionicons name={cat.icon as any} size={20} color={r.status === 'open' ? colors.amber.text : colors.green.text} />
+                    <Icon name={cat.icon as any} size={20} color={r.status === 'open' ? colors.amber.text : colors.green.text} />
                   </View>
                   <View style={{ flex: 1, minWidth: 0 }}>
                     <Text style={styles.cat}>{cat.label}{r.place ? ` · ${r.place}` : ''}</Text>
@@ -89,7 +89,7 @@ export const ReportsAdminSheet: React.FC<Props> = ({ visible, reports, phoneOf, 
                 <View style={styles.actions}>
                   {r.status === 'open' ? (
                     <Pressable onPress={() => onSetStatus(r.id, 'fixed')} accessibilityRole="button" style={[styles.btn, styles.btnPrimary]}>
-                      <Ionicons name="checkmark" size={16} color={colors.white} />
+                      <Icon name="checkmark" size={16} color={colors.white} />
                       <Text style={[styles.btnText, { color: colors.white }]}>Marquer comme réglé</Text>
                     </Pressable>
                   ) : (
@@ -112,7 +112,7 @@ export const ReportsAdminSheet: React.FC<Props> = ({ visible, reports, phoneOf, 
                       accessibilityLabel={`Remercier ${r.userName} sur WhatsApp`}
                       style={styles.btn}
                     >
-                      <Ionicons name="logo-whatsapp" size={16} color={colors.whatsappDark} />
+                      <Icon name="logo-whatsapp" size={16} color={colors.whatsappDark} />
                       <Text style={styles.btnText}>Remercier</Text>
                     </Pressable>
                   )}
@@ -123,7 +123,7 @@ export const ReportsAdminSheet: React.FC<Props> = ({ visible, reports, phoneOf, 
                     </Pressable>
                   ) : (
                     <Pressable onPress={() => setConfirmDelete(r.id)} accessibilityRole="button" accessibilityLabel="Supprimer" hitSlop={8} style={styles.iconBtn}>
-                      <Ionicons name="trash-outline" size={18} color={colors.red.text} />
+                      <Icon name="trash-outline" size={18} color={colors.red.text} />
                     </Pressable>
                   )}
                 </View>

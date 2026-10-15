@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { colors } from '../../theme';
 import { WEEK_LABELS } from '../../services/floorViewModel';
 import { WeeklyStreak } from '../../floor/weeklyStreak';
@@ -20,7 +20,7 @@ export const WeekStrip: React.FC<{ dots: boolean[]; todayIdx: number }> = ({ dot
     {WEEK_LABELS.map((label, i) => (
       <View key={i} style={styles.dayCol}>
         <View style={[styles.dot, dots[i] && styles.dotOn, i === todayIdx && !dots[i] && styles.dotToday]}>
-          {dots[i] && <Ionicons name="flame" size={14} color={colors.white} />}
+          {dots[i] && <Icon name="flame" size={14} color={colors.white} />}
         </View>
         <Text style={[styles.dayLabel, i === todayIdx && styles.dayLabelToday]}>{label}</Text>
       </View>
@@ -50,7 +50,7 @@ export const StreakSheet: React.FC<Props> = ({ visible, onClose, streak, onChang
           <View style={styles.statsRow}>
             <View style={styles.stat}>
               <View style={styles.statValueRow}>
-                <Ionicons name="flame" size={26} color={colors.flame} />
+                <Icon name="flame" size={26} color={colors.flame} />
                 <Text style={styles.statValue}>{streak.current}</Text>
               </View>
               <Text style={styles.statLabel}>{weekWord(streak.current)} de suite</Text>
@@ -78,7 +78,7 @@ export const StreakSheet: React.FC<Props> = ({ visible, onClose, streak, onChang
           </View>
 
           <View style={styles.row}>
-            <Ionicons name="snow-outline" size={22} color={colors.brandDark} />
+            <Icon name="snow-outline" size={22} color={colors.brandDark} />
             <View style={{ flex: 1 }}>
               <Text style={styles.rowTitle}>
                 {streak.freezesLeftThisMonth > 0 ? '1 joker dispo ce mois-ci' : 'Joker utilisé ce mois-ci'}

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { MarketplaceProduct } from '../../types/database';
 import { discountPct, formatPrice } from '../../services/shopService';
 import { colors } from '../../theme';
@@ -43,7 +43,7 @@ export const PromoHero: React.FC<Props> = ({ products, onPress }) => {
     <View style={styles.wrap}>
       <View style={styles.tagRow}>
         <View style={styles.tag}>
-          <Ionicons name="flash" size={12} color={colors.red.text} />
+          <Icon name="flash" size={12} color={colors.red.text} />
           <Text style={styles.tagText}>PROMO DU MOMENT</Text>
         </View>
         {products.length > 1 && (
@@ -71,13 +71,13 @@ export const PromoHero: React.FC<Props> = ({ products, onPress }) => {
             </View>
             {saved > 0 && (
               <View style={styles.savedRow}>
-                <Ionicons name="checkmark-circle" size={13} color={colors.green.text} />
+                <Icon name="checkmark-circle" size={13} color={colors.green.text} />
                 <Text style={styles.savedText}>Tu économises {formatPrice(saved)}</Text>
               </View>
             )}
           </View>
 
-          <Ionicons name="chevron-forward" size={22} color={colors.textMuted} />
+          <Icon name="chevron-forward" size={22} color={colors.textMuted} />
         </Animated.View>
       </Pressable>
     </View>

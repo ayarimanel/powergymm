@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Modal, Pressable, StyleSheet, Vibration, View } from 'react-native';
 import { Text, TextInput } from './ui/Text';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from './ui/Icon';
 import { useBackHandler } from '../navigation/backStack';
 import { useSwipeToDismiss } from './useSwipeToDismiss';
 import { useReduceMotion } from '../hooks/useDeviceState';
@@ -124,12 +124,12 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ visible, onClose
         {/* Top bar */}
         <View style={styles.topBar}>
           <Pressable onPress={onClose} accessibilityRole="button" accessibilityLabel="Fermer le scanner" style={styles.roundBtn}>
-            <Ionicons name="close" size={26} color={colors.white} />
+            <Icon name="close" size={26} color={colors.white} />
           </Pressable>
           <Text style={styles.topTitle}>Valider ma présence</Text>
           {cameraReady ? (
             <Pressable onPress={() => setTorch(t => !t)} accessibilityRole="switch" accessibilityState={{ checked: torch }} accessibilityLabel="Lampe torche" style={[styles.roundBtn, torch && styles.roundBtnOn]}>
-              <Ionicons name={torch ? 'flashlight' : 'flashlight-outline'} size={22} color={torch ? colors.night : colors.white} />
+              <Icon name={torch ? 'flashlight' : 'flashlight-outline'} size={22} color={torch ? colors.night : colors.white} />
             </Pressable>
           ) : (
             <View style={styles.roundSpacer} />
@@ -165,13 +165,13 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ visible, onClose
             <>
               <Animated.View style={[styles.frame, { borderColor: frameColor, backgroundColor: frameBg }]}>
                 {state === 'scanning' && !reduceMotion && cameraReady && <Animated.View style={[styles.scanLine, { transform: [{ translateY }] }]} />}
-                {state === 'scanning' && !cameraReady && <Ionicons name={cameraDenied ? 'videocam-off-outline' : 'qr-code-outline'} size={64} color="rgba(255,255,255,0.4)" />}
+                {state === 'scanning' && !cameraReady && <Icon name={cameraDenied ? 'videocam-off-outline' : 'qr-code-outline'} size={64} color="rgba(255,255,255,0.4)" />}
                 {state === 'success' && (
                   <Animated.View style={{ transform: [{ scale: check }], opacity: check }}>
-                    <Ionicons name="checkmark-circle" size={96} color={colors.green.bar} />
+                    <Icon name="checkmark-circle" size={96} color={colors.green.bar} />
                   </Animated.View>
                 )}
-                {state === 'invalid' && <Ionicons name="alert-circle-outline" size={64} color={colors.nightDanger} />}
+                {state === 'invalid' && <Icon name="alert-circle-outline" size={64} color={colors.nightDanger} />}
               </Animated.View>
 
               {state === 'scanning' && !cameraDenied && <Text style={styles.hint}>{cameraReady ? 'Place le QR code de l’accueil dans le cadre' : 'Autorise la caméra pour scanner'}</Text>}
@@ -187,7 +187,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ visible, onClose
                   <Text style={styles.errorTitle}>QR invalide</Text>
                   <Text style={styles.errorBody}>Ce code n’est pas celui de l’accueil du club. Réessaie devant le QR de la réception.</Text>
                   <Pressable onPress={retry} accessibilityRole="button" style={styles.retryBtn}>
-                    <Ionicons name="refresh" size={18} color={colors.text} />
+                    <Icon name="refresh" size={18} color={colors.text} />
                     <Text style={styles.retryText}>Réessayer</Text>
                   </Pressable>
                 </View>
@@ -199,7 +199,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ visible, onClose
         {/* Fallback */}
         {state !== 'success' && (
           <Pressable onPress={() => { setManual(m => !m); retry(); }} accessibilityRole="button" style={styles.switchMode}>
-            <Ionicons name={manual ? 'qr-code-outline' : 'keypad-outline'} size={18} color={colors.disabled} />
+            <Icon name={manual ? 'qr-code-outline' : 'keypad-outline'} size={18} color={colors.disabled} />
             <Text style={styles.switchModeText}>{manual ? 'Scanner le QR code' : 'Saisir le code à la place'}</Text>
           </Pressable>
         )}

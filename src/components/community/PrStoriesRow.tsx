@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { CommunityPost, MemberProfile } from '../../types/database';
 import { colors } from '../../theme';
@@ -39,7 +39,7 @@ export const PrStoriesRow: React.FC<Props> = ({ records, profiles, onOpen }) => 
   return (
     <View>
       <View style={styles.head}>
-        <Ionicons name="trophy" size={16} color={colors.gold.deep} />
+        <Icon name="trophy" size={16} color={colors.gold.deep} />
         <Text style={styles.title}>Records du club</Text>
       </View>
       <ScrollView horizontal onTouchStart={claimSwipe} showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -16 }} contentContainerStyle={styles.row}>
@@ -60,7 +60,7 @@ export const PrStoriesRow: React.FC<Props> = ({ records, profiles, onOpen }) => 
                   <Avatar name={r.userName} url={p?.avatarUrl} size={SIZE - 14} />
                 </View>
                 <View style={[styles.badge, approved ? styles.badgeGold : styles.badgePending]}>
-                  <Ionicons name={approved ? 'shield-checkmark' : 'hourglass'} size={11} color={colors.white} />
+                  <Icon name={approved ? 'shield-checkmark' : 'hourglass'} size={11} color={colors.white} />
                 </View>
               </View>
               <Text style={styles.weight} numberOfLines={1}>{r.prDetails!.weightKg} kg</Text>

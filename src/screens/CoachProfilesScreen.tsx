@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { Text } from '../components/ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../components/ui/Icon';
 import { CoachPricingPlan, CoachProfile, UserProfile } from '../types/database';
 import { AuthService } from '../services/authService';
 import { GymConfigService } from '../config/gymConfig';
@@ -138,13 +138,13 @@ export const CoachProfilesScreen: React.FC<Props> = ({ user, onUpdateUser }) => 
         ) : (
           <Pressable onPress={() => openEdit(null, 'new')} accessibilityRole="button" style={s.create}>
             <View style={s.createIc}>
-              <Ionicons name="ribbon" size={22} color={colors.white} />
+              <Icon name="ribbon" size={22} color={colors.white} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={s.createTitle}>Crée ton profil coach</Text>
               <Text style={s.createSub}>Ta photo, ta description, ton plan et ton prix : les membres te réservent sur WhatsApp.</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={J.gold} />
+            <Icon name="chevron-forward" size={20} color={J.gold} />
           </Pressable>
         ))}
 
@@ -198,7 +198,7 @@ export const CoachProfilesScreen: React.FC<Props> = ({ user, onUpdateUser }) => 
 
         {coaches && list.length === 0 && (
           <View style={s.empty}>
-            <Ionicons name="ribbon-outline" size={40} color={J.muted} />
+            <Icon name="ribbon-outline" size={40} color={J.muted} />
             <Text style={s.emptyTitle}>{filter === 'all' ? 'Aucun coach pour l’instant' : 'Aucun coach dans cette catégorie'}</Text>
             {isOwner && filter === 'all' && <Text style={k.sub}>Ajoute le premier coach du club.</Text>}
           </View>
@@ -209,7 +209,7 @@ export const CoachProfilesScreen: React.FC<Props> = ({ user, onUpdateUser }) => 
 
       {isOwner && (
         <Pressable onPress={() => openEdit(null, 'new')} accessibilityRole="button" accessibilityLabel="Ajouter un coach" style={({ pressed }) => [s.fab, pressed && { transform: [{ scale: 0.96 }] }]}>
-          <Ionicons name="add" size={22} color={colors.white} />
+          <Icon name="add" size={22} color={colors.white} />
           <Text style={s.fabText}>Coach</Text>
         </Pressable>
       )}
@@ -281,7 +281,7 @@ const CoachSpace: React.FC<{
 
       {pending && (
         <View style={s.pendingNote}>
-          <Ionicons name="hourglass-outline" size={16} color={J.gold} />
+          <Icon name="hourglass-outline" size={16} color={J.gold} />
           <Text style={s.pendingText}>Le club doit valider ton profil avant que les membres le voient. Prépare ton plan en attendant.</Text>
         </View>
       )}
@@ -308,7 +308,7 @@ const CoachSpace: React.FC<{
 
       <Pressable onPress={onOffers} accessibilityRole="button" style={({ pressed }) => [s.offersBox, pressed && { opacity: 0.9 }]}>
         <View style={s.offersIc}>
-          <Ionicons name="pricetags" size={20} color={J.accent} />
+          <Icon name="pricetags" size={20} color={J.accent} />
         </View>
         <View style={{ flex: 1, minWidth: 0 }}>
           <Text style={s.toggleTitle}>Mes plans</Text>
@@ -319,7 +319,7 @@ const CoachSpace: React.FC<{
 
       <Pressable onPress={onEdit} accessibilityRole="button" style={({ pressed }) => [s.offersBox, s.profileBox, pressed && { opacity: 0.9 }]}>
         <View style={s.offersIc}>
-          <Ionicons name="person-circle-outline" size={22} color={J.fg} />
+          <Icon name="person-circle-outline" size={22} color={J.fg} />
         </View>
         <View style={{ flex: 1, minWidth: 0 }}>
           <Text style={s.toggleTitle}>Mon profil</Text>

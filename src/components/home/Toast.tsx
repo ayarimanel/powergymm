@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { colors } from '../../theme';
 
 interface Props {
@@ -31,7 +31,7 @@ export const Toast: React.FC<Props> = ({ message, onHide }) => {
       accessibilityLiveRegion="polite"
       style={[styles.toast, { opacity }]}
     >
-      <Ionicons name="checkmark-circle" size={18} color={colors.nightSuccess} />
+      <Icon name="checkmark-circle" size={18} color={colors.nightSuccess} />
       <Text style={styles.text}>{message}</Text>
     </Animated.View>
   );

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Switch, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { MarketplaceProduct } from '../../types/database';
 import { card, colors } from '../../theme';
 import { discountPct, formatPrice } from '../../services/shopService';
@@ -36,7 +36,7 @@ export const ProductCard: React.FC<Props> = ({ product: p, isOwner, onPress, onE
 
           {/* Category pill (subtle, per-category color) */}
           <View style={[styles.catPill, { backgroundColor: meta.tint.soft }]}>
-            <Ionicons name={meta.icon as any} size={11} color={meta.tint.bar} />
+            <Icon name={meta.icon as any} size={11} color={meta.tint.bar} />
             <Text style={[styles.catPillText, { color: meta.tint.text }]}>{meta.short}</Text>
           </View>
 
@@ -49,7 +49,7 @@ export const ProductCard: React.FC<Props> = ({ product: p, isOwner, onPress, onE
           {!p.inStock && (
             <View style={styles.soldOutVeil}>
               <View style={styles.soldOutPill}>
-                <Ionicons name="close-circle" size={14} color={colors.white} />
+                <Icon name="close-circle" size={14} color={colors.white} />
                 <Text style={styles.soldOutText}>Rupture</Text>
               </View>
             </View>
@@ -57,7 +57,7 @@ export const ProductCard: React.FC<Props> = ({ product: p, isOwner, onPress, onE
 
           {p.inStock && p.lowStock && (
             <View style={styles.lowStock}>
-              <Ionicons name="flame" size={12} color={colors.amber.text} />
+              <Icon name="flame" size={12} color={colors.amber.text} />
               <Text style={styles.lowStockText}>Presque plus</Text>
             </View>
           )}
@@ -83,7 +83,7 @@ export const ProductCard: React.FC<Props> = ({ product: p, isOwner, onPress, onE
           accessibilityLabel={`Modifier ${p.name}`}
           style={styles.editBtn}
         >
-          <Ionicons name="create-outline" size={18} color={colors.text} />
+          <Icon name="create-outline" size={18} color={colors.text} />
         </Pressable>
       )}
       {isOwner && (

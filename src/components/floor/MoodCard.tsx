@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { MuscleGroup } from '../../types/database';
 import { FloorSnapshot } from '../../floor/useFloorSnapshot';
 import { HourForecast, LEVEL_LABEL } from '../../floor/crowd';
@@ -60,7 +60,7 @@ export const MoodCard: React.FC<Props> = ({ snapshot, focusMuscle, focusLabel, f
   if (!snapshot.isOpen) {
     return (
       <View style={[styles.card, styles.closedCard]}>
-        <Ionicons name="moon-outline" size={26} color={colors.textSecondary} />
+        <Icon name="moon-outline" size={26} color={colors.textSecondary} />
         <Text style={styles.closedTitle}>Fermé · ouvre à {hh(snapshot.openingHour)}</Text>
         {snapshot.tomorrow?.bestHour != null && (
           <Text style={styles.closedSub}>
@@ -117,7 +117,7 @@ export const MoodCard: React.FC<Props> = ({ snapshot, focusMuscle, focusLabel, f
         {line}
         {checkedIn && (
           <Pressable onPress={onScanOut} accessibilityRole="button" accessibilityLabel="Terminer ma séance" style={styles.scanOutBtn}>
-            <Ionicons name="log-out-outline" size={14} color={colors.text} />
+            <Icon name="log-out-outline" size={14} color={colors.text} />
             <Text style={styles.scanOutText}>Sortie</Text>
           </Pressable>
         )}

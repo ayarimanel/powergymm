@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { Community } from '../../services/communitiesService';
 import { colors } from '../../theme';
 import { haptics } from '../../utils/haptics';
@@ -27,7 +27,7 @@ export const CommunitiesBar: React.FC<Props> = ({ communities, activeId, onSelec
         accessibilityState={{ selected: fypOn }}
         style={[styles.chip, fypOn && styles.fypOn]}
       >
-        <Ionicons name="sparkles" size={14} color={fypOn ? colors.white : colors.brand} />
+        <Icon name="sparkles" size={14} color={fypOn ? colors.white : colors.brand} />
         <Text style={[styles.chipText, fypOn && styles.chipTextOnDark]}>Pour toi</Text>
       </Pressable>
 
@@ -43,13 +43,13 @@ export const CommunitiesBar: React.FC<Props> = ({ communities, activeId, onSelec
           >
             <Text style={styles.emoji}>{c.emoji}</Text>
             <Text style={[styles.chipText, on && styles.chipTextOnDark]} numberOfLines={1}>{c.name}</Text>
-            {c.official && <Ionicons name="checkmark-circle" size={13} color={on ? colors.white : colors.brand} />}
+            {c.official && <Icon name="checkmark-circle" size={13} color={on ? colors.white : colors.brand} />}
           </Pressable>
         );
       })}
 
       <Pressable onPress={onDiscover} accessibilityRole="button" accessibilityLabel="Découvrir les communautés" style={[styles.chip, styles.discover]}>
-        <Ionicons name="add" size={16} color={colors.textSecondary} />
+        <Icon name="add" size={16} color={colors.textSecondary} />
         <Text style={styles.chipText}>Découvrir</Text>
       </Pressable>
     </ScrollView>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Switch, View } from 'react-native';
 import { Text, TextInput } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { CoachProfile, TransformationItem, UserProfile } from '../../types/database';
 import { fromPrice, offersPersonal } from '../../coaching/offers';
 import { colors, ink } from '../../theme';
@@ -185,7 +185,7 @@ export const CoachEditSheet: React.FC<Props> = ({ visible, mode, coach, me, isOw
           <SheetScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
             {mode === 'new' && !isOwner && (
               <View style={styles.banner}>
-                <Ionicons name="shield-checkmark-outline" size={20} color={colors.gold.text} />
+                <Icon name="shield-checkmark-outline" size={20} color={colors.gold.text} />
                 <Text style={styles.bannerText}>Ton profil sera validé par le propriétaire du club avant d’apparaître pour les membres.</Text>
               </View>
             )}
@@ -194,14 +194,14 @@ export const CoachEditSheet: React.FC<Props> = ({ visible, mode, coach, me, isOw
             <Pressable onPress={() => pick(setBanner)} accessibilityRole="button" accessibilityLabel="Changer la couverture" style={styles.coverPick}>
               <ProductImage uri={banner} style={StyleSheet.absoluteFill as any} iconSize={32} />
               <View style={styles.coverBadge}>
-                <Ionicons name="camera-outline" size={16} color={colors.white} />
+                <Icon name="camera-outline" size={16} color={colors.white} />
                 <Text style={styles.coverBadgeText}>{banner ? 'Changer la couverture' : 'Ajouter une couverture'}</Text>
               </View>
             </Pressable>
             <View style={styles.avatarRow}>
               <Avatar name={name || 'Coach'} url={avatar} size={72} />
               <Pressable onPress={() => pick(setAvatar, true)} accessibilityRole="button" style={styles.outlineBtn}>
-                <Ionicons name="camera-outline" size={18} color={colors.text} />
+                <Icon name="camera-outline" size={18} color={colors.text} />
                 <Text style={styles.outlineText}>{avatar ? 'Changer la photo' : 'Ajouter la photo'}</Text>
               </Pressable>
               {!!avatar && (
@@ -229,7 +229,7 @@ export const CoachEditSheet: React.FC<Props> = ({ visible, mode, coach, me, isOw
               <View style={{ flexDirection: 'row', gap: 8 }}>
                 <TextInput style={[styles.input, { flex: 1 }]} value={specInput} onChangeText={setSpecInput} placeholder="Ex : Prise de masse" placeholderTextColor={colors.textMuted} onSubmitEditing={addSpec} returnKeyType="done" />
                 <Pressable onPress={addSpec} accessibilityRole="button" accessibilityLabel="Ajouter" style={styles.addBtn}>
-                  <Ionicons name="add" size={22} color={colors.onInverse} />
+                  <Icon name="add" size={22} color={colors.onInverse} />
                 </Pressable>
               </View>
               {specialties.length > 0 && (
@@ -237,7 +237,7 @@ export const CoachEditSheet: React.FC<Props> = ({ visible, mode, coach, me, isOw
                   {specialties.map(v => (
                     <Pressable key={v} onPress={() => setSpecialties(specialties.filter(x => x !== v))} accessibilityRole="button" accessibilityLabel={`Retirer ${v}`} style={styles.tag}>
                       <Text style={styles.tagText}>{v}</Text>
-                      <Ionicons name="close" size={14} color={colors.textSecondary} />
+                      <Icon name="close" size={14} color={colors.textSecondary} />
                     </Pressable>
                   ))}
                 </View>
@@ -257,7 +257,7 @@ export const CoachEditSheet: React.FC<Props> = ({ visible, mode, coach, me, isOw
             {!!errors.kind && <Text style={styles.error}>{errors.kind}</Text>}
             {personal && (
               <View style={styles.offersNote}>
-                <Ionicons name="pricetags-outline" size={18} color={colors.brandText} />
+                <Icon name="pricetags-outline" size={18} color={colors.brandText} />
                 <Text style={styles.offersNoteText}>
                   {coach?.pricingPlans?.length
                     ? 'Ton plan et ton prix se modifient dans « Mes plans ».'
@@ -306,7 +306,7 @@ export const CoachEditSheet: React.FC<Props> = ({ visible, mode, coach, me, isOw
                   </Text>
                 </View>
                 <Pressable onPress={() => removeTransformation(i)} hitSlop={6} accessibilityRole="button" accessibilityLabel={`Retirer la transformation de ${t.clientName}`} style={styles.rowIconBtn}>
-                  <Ionicons name="trash-outline" size={18} color={colors.red.text} />
+                  <Icon name="trash-outline" size={18} color={colors.red.text} />
                 </Pressable>
               </View>
             ))}
@@ -333,14 +333,14 @@ export const CoachEditSheet: React.FC<Props> = ({ visible, mode, coach, me, isOw
               </View>
               {!!transError && <Text style={styles.error}>{transError}</Text>}
               <Pressable onPress={addTransformation} accessibilityRole="button" style={styles.subAddBtn}>
-                <Ionicons name="add" size={18} color={colors.text} />
+                <Icon name="add" size={18} color={colors.text} />
                 <Text style={styles.subAddText}>Ajouter cette transformation</Text>
               </Pressable>
             </View>
 
             {isOwner && coach && onRemove && (
               <Pressable onPress={() => (confirmRemove ? onRemove(coach) : setConfirmRemove(true))} accessibilityRole="button" style={[styles.removeBtn, confirmRemove && { backgroundColor: colors.red.bar }]}>
-                <Ionicons name="trash-outline" size={18} color={confirmRemove ? colors.white : colors.red.text} />
+                <Icon name="trash-outline" size={18} color={confirmRemove ? colors.white : colors.red.text} />
                 <Text style={[styles.removeText, confirmRemove && { color: colors.white }]}>{confirmRemove ? 'Confirmer le retrait du club' : 'Retirer ce coach du club'}</Text>
               </Pressable>
             )}

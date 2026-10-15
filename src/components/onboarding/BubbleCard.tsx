@@ -9,7 +9,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { colors, cardShadow } from '../../theme';
 import { useReduceMotion } from '../../hooks/useDeviceState';
 import { haptics } from '../../utils/haptics';
@@ -105,7 +105,7 @@ export const CardShell: React.FC<ShellProps> = ({ step, total, direction, cardKe
     <View style={styles.shell}>
       <View style={styles.topBar}>
         <Pressable onPress={onBack} disabled={!onBack} accessibilityRole="button" accessibilityLabel="Retour" style={styles.topBtn}>
-          {onBack ? <Ionicons name="arrow-back" size={22} color={colors.textSecondary} /> : null}
+          {onBack ? <Icon name="arrow-back" size={22} color={colors.textSecondary} /> : null}
         </Pressable>
 
         <View style={styles.dots} accessibilityLabel={total ? `Question ${step} sur ${total}` : undefined}>

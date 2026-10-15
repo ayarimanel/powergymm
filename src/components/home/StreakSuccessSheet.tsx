@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Easing, Modal, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Text, AnimatedText } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { colors } from '../../theme';
 import { WEEK_LABELS, isMilestone, weekDots } from '../../services/floorViewModel';
 import { useBackHandler } from '../../navigation/backStack';
@@ -190,7 +190,7 @@ export const StreakSuccessSheet: React.FC<Props> = ({ visible, oldStreak, newStr
                   />
                 ))}
               <Animated.View style={{ transform: [{ scale: flameScale }] }}>
-                <Ionicons name="flame" size={milestone ? 96 : 80} color={colors.flame} />
+                <Icon name="flame" size={milestone ? 96 : 80} color={colors.flame} />
               </Animated.View>
             </View>
 
@@ -227,7 +227,7 @@ export const StreakSuccessSheet: React.FC<Props> = ({ visible, oldStreak, newStr
                   { opacity: badge, transform: [{ scale: badge.interpolate({ inputRange: [0, 1], outputRange: [0.4, 1] }) }] },
                 ]}
               >
-                <Ionicons name="trophy" size={18} color={colors.amber.text} />
+                <Icon name="trophy" size={18} color={colors.amber.text} />
                 <Text style={styles.badgeText}>Badge {newStreak} jours débloqué</Text>
               </Animated.View>
             )}
@@ -239,7 +239,7 @@ export const StreakSuccessSheet: React.FC<Props> = ({ visible, oldStreak, newStr
                 return (
                   <View key={i} style={styles.dayCol}>
                     <View style={[styles.dot, dots[i] && !isToday && styles.dotOn]}>
-                      {dots[i] && !isToday && <Ionicons name="flame" size={14} color={colors.white} />}
+                      {dots[i] && !isToday && <Icon name="flame" size={14} color={colors.white} />}
                       {isToday && (
                         <Animated.View
                           style={[
@@ -249,7 +249,7 @@ export const StreakSuccessSheet: React.FC<Props> = ({ visible, oldStreak, newStr
                             { transform: [{ scale: pop.interpolate({ inputRange: [0, 1], outputRange: [0, 1] }) }] },
                           ]}
                         >
-                          <Ionicons name="flame" size={14} color={colors.white} />
+                          <Icon name="flame" size={14} color={colors.white} />
                         </Animated.View>
                       )}
                     </View>

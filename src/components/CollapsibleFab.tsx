@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Easing, NativeScrollEvent, NativeSyntheticEvent, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from './ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon, IconName } from './ui/Icon';
 import { colors } from '../theme';
 
 const nativeDriver = Platform.OS !== 'web';
@@ -27,7 +27,7 @@ export const useCollapseOnScroll = (threshold = 10) => {
 };
 
 interface Props {
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: IconName;
   label: string;
   onPress: () => void;
   collapsed?: boolean;
@@ -60,7 +60,7 @@ export const CollapsibleFab: React.FC<Props> = ({ icon, label, onPress, collapse
         accessibilityLabel={accessibilityLabel ?? label}
         style={[styles.fab, { backgroundColor: color }]}
       >
-        <Ionicons name={icon} size={22} color={colors.white} />
+        <Icon name={icon} size={22} color={colors.white} />
         <Animated.View
           style={{
             overflow: 'hidden',

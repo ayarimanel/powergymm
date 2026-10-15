@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../ui/Icon';
 import { MuscleOccupancy } from '../../types/database';
 import { colors } from '../../theme';
 import { MUSCLE_ICON, ZONE_LEVEL_LABEL, zoneLevel } from '../../services/floorViewModel';
@@ -60,7 +60,7 @@ export const MuscleLiveSheet: React.FC<Props> = ({ visible, onClose, zones }) =>
                 accessibilityLabel={`${z.label}, ${z.percentage} pour cent, ${ZONE_LEVEL_LABEL[level]}`}
               >
                 <View style={[styles.iconWrap, { backgroundColor: c.soft }]}>
-                  <Ionicons name={MUSCLE_ICON[z.muscleGroup] as any} size={20} color={c.text} />
+                  <Icon name={MUSCLE_ICON[z.muscleGroup] as any} size={20} color={c.text} />
                 </View>
 
                 <View style={styles.mid}>

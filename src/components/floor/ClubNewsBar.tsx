@@ -3,7 +3,7 @@ import {
   Animated,
   Easing,
   LayoutAnimation,
-  Modal,
+  LayoutChangeEvent,
   PanResponder,
   Platform,
   Pressable,
@@ -11,11 +11,10 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '../ui/Text';
 import { Icon } from '../ui/Icon';
 import { NewsItem, NewsType } from '../../services/clubNewsService';
-import { brandAlpha, colors, fonts, radius } from '../../theme';
+import { brandAlpha, colors, fonts, ink, radius } from '../../theme';
 import { haptics } from '../../utils/haptics';
 import { useReduceMotion } from '../../hooks/useDeviceState';
 import { useBackHandler } from '../../navigation/backStack';
@@ -44,18 +43,22 @@ interface Props {
 }
 
 /**
- * Red news card pinned under the Accueil header. Tap it (or pull it down) to open the
- * "Infos du club" page with every announcement; back, the back button or Escape closes it.
+ * Red news card pinned under the Accueil header. Pull it down (or tap it) and "Infos du club"
+ * slides down from the top with every announcement; push it up, tap it again, tap the dimmed
+ * background, back or Escape closes it.
  * Must be rendered as an absolute overlay over the Floor content area (it fills its parent).
  */
 export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
   const reduceMotion = useReduceMotion();
   const offset = useRef(new Animated.Value(0)).current;
-  const insets = useSafeAreaInsets();
   const [open, setOpen] = useState(false);
+  const [panelH, setPanelH] = useState(0);
+  const [areaH, setAreaH] = useState(0);
   const [expanded, setExpanded] = useState<string | null>(null);
 
   const openRef = useRef(false);
+  const panelHRef = useRef(0);
+  const dragBase = useRef(0);
 
   const unread = items.filter(n => !n.read);
   const latest = unread[0] ?? items[0];
@@ -65,8 +68,12 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
     setOpen(next);
     if (!next) setExpanded(null);
     if (next !== open) haptics.select();
-    // The card settles back in place; the page itself slides in as a full screen.
-    Animated.spring(offset, { toValue: 0, useNativeDriver: nativeDriver, speed: 20, bounciness: 6 }).start();
+    Animated.timing(offset, {
+      toValue: next ? panelHRef.current : 0,
+      duration: reduceMotion ? 120 : 340,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: nativeDriver,
+    }).start();
   };
   const setPanelRef = useRef(setPanel);
   setPanelRef.current = setPanel;
@@ -79,14 +86,18 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
       onPanResponderGrant: () => {
         claimSwipe();
         offset.stopAnimation();
+        dragBase.current = openRef.current ? panelHRef.current : 0;
       },
-      // The card follows the finger a little, then opens the page.
+      // The list follows the finger, then settles open or closed.
       onPanResponderMove: (_, g) => {
-        offset.setValue(Math.max(0, Math.min(28, g.dy * 0.5)));
+        offset.setValue(Math.max(0, Math.min(panelHRef.current, dragBase.current + g.dy)));
       },
       onPanResponderRelease: (_, g) => {
-        if (Math.abs(g.dy) <= 4 || g.dy > 40 || g.vy > 0.5) return setPanelRef.current(true);
-        setPanelRef.current(false);
+        const wasOpen = openRef.current;
+        if (Math.abs(g.dy) <= 4) return setPanelRef.current(!wasOpen);
+        if (g.vy > 0.5) return setPanelRef.current(true);
+        if (g.vy < -0.5) return setPanelRef.current(false);
+        setPanelRef.current(wasOpen ? g.dy > -50 : g.dy > 50);
       },
       onPanResponderTerminate: () => setPanelRef.current(openRef.current),
     })
@@ -104,7 +115,7 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
   // One gentle nudge on arrival when there is something new, so members learn the bar pulls down.
   const hasUnread = unread.length > 0;
   useEffect(() => {
-    if (!hasUnread || reduceMotion) return;
+    if (!hasUnread || reduceMotion || !panelH) return;
     const t = setTimeout(() => {
       if (openRef.current) return;
       Animated.sequence([
@@ -114,7 +125,14 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
     }, 1200);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasUnread, reduceMotion]);
+  }, [hasUnread, reduceMotion, panelH > 0]);
+
+  const onPanelLayout = (e: LayoutChangeEvent) => {
+    const h = Math.round(e.nativeEvent.layout.height);
+    panelHRef.current = h;
+    setPanelH(h);
+    if (openRef.current) offset.setValue(h);
+  };
 
   const markRead = (ids: string[]) => {
     if (ids.length) onRead(ids);
@@ -133,53 +151,42 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
 
   if (!items.length) return null;
 
-  const barSmall = unread.length
-    ? `${unread.length} ${unread.length === 1 ? 'nouvelle info' : 'nouvelles infos'} du club`
-    : 'Infos du club';
+  const h = Math.max(1, panelH);
+  const scrimOpacity = offset.interpolate({ inputRange: [0, 220], outputRange: [0, 1], extrapolate: 'clamp' });
+  const panelY = offset.interpolate({ inputRange: [0, h], outputRange: [-h, 0], extrapolate: 'clamp' });
+  const chevron = offset.interpolate({ inputRange: [0, h], outputRange: ['0deg', '180deg'], extrapolate: 'clamp' });
+
+  const barSmall = open
+    ? 'Infos du club'
+    : unread.length
+      ? `${unread.length} ${unread.length === 1 ? 'nouvelle info' : 'nouvelles infos'} du club`
+      : 'Infos du club';
+  const barTitle = open ? 'Glisse vers le haut pour fermer' : latest?.title;
 
   return (
-    <View style={styles.area} pointerEvents="box-none">
-      <Animated.View
-        {...pan.panHandlers}
-        accessible
-        accessibilityRole="button"
-        accessibilityLabel={`${barSmall}, ouvrir`}
-        onAccessibilityTap={() => setPanel(true)}
-        style={[styles.bar, { transform: [{ translateY: offset }] }]}
-      >
-        <View style={styles.barRow}>
-          <View style={[styles.count, !unread.length && styles.countZero]}>
-            <Icon name={unread.length ? 'megaphone-outline' : 'checkmark'} size={20} color={unread.length ? colors.white : colors.brandText} />
-          </View>
-          <View style={styles.barTxt}>
-            <Text style={styles.barSmall} numberOfLines={1}>{barSmall}</Text>
-            <Text style={styles.barTitle} numberOfLines={1}>{latest?.title}</Text>
-          </View>
-          <Icon name="chevron-forward" size={20} color={colors.brandText} />
-        </View>
+    <View style={styles.area} pointerEvents="box-none" onLayout={e => setAreaH(e.nativeEvent.layout.height)}>
+      <Animated.View style={[StyleSheet.absoluteFill, styles.scrim, { opacity: scrimOpacity }]} pointerEvents={open ? 'auto' : 'none'}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={() => setPanel(false)} accessibilityLabel="Fermer les infos du club" />
       </Animated.View>
 
-      {/* "Infos du club": a full page (design-ref Infos). */}
-      <Modal visible={open} animationType={reduceMotion ? 'fade' : 'slide'} onRequestClose={() => setPanel(false)} statusBarTranslucent>
-        <View style={[styles.page, { paddingTop: insets.top + 8 }]}>
-          <View style={styles.pageTop}>
-            <Pressable onPress={() => setPanel(false)} accessibilityRole="button" accessibilityLabel="Fermer les infos du club" style={styles.back}>
-              <Icon name="chevron-back" size={24} color={colors.text} />
+      {/* "Infos du club": slides down from the top, the red card follows under it as its handle. */}
+      <Animated.View
+        onLayout={onPanelLayout}
+        pointerEvents={open ? 'auto' : 'none'}
+        importantForAccessibility={open ? 'auto' : 'no-hide-descendants'}
+        accessibilityElementsHidden={!open}
+        style={[styles.panel, { maxHeight: areaH ? areaH - NEWS_BAR_HEIGHT - 24 : 480, opacity: panelH ? 1 : 0, transform: [{ translateY: panelY }] }]}
+      >
+        <View style={styles.panelHead}>
+          <Title variant="display" size={34} numberOfLines={1} style={{ flexShrink: 0 }}>{unread.length ? `${unread.length} ${unread.length === 1 ? 'nouvelle' : 'nouvelles'}` : 'À jour'}</Title>
+          {unread.length > 0 && (
+            <Pressable onPress={() => markRead(unread.map(n => n.id))} hitSlop={8} accessibilityRole="button" style={{ flexShrink: 1 }}>
+              <Text style={styles.link}>Tout marquer comme lu</Text>
             </Pressable>
-            <Title variant="section" style={styles.pageTitle}>Infos du club</Title>
-            <View style={styles.backSpacer} />
-          </View>
+          )}
+        </View>
 
-          <ScrollView style={styles.list} contentContainerStyle={[styles.listContent, { paddingBottom: 32 + insets.bottom }]} showsVerticalScrollIndicator={false}>
-            <View style={styles.panelHead}>
-              <Title variant="display" size={34} numberOfLines={1} style={{ flexShrink: 0 }}>{unread.length ? `${unread.length} ${unread.length === 1 ? 'nouvelle' : 'nouvelles'}` : 'À jour'}</Title>
-              {unread.length > 0 && (
-                <Pressable onPress={() => markRead(unread.map(n => n.id))} hitSlop={8} accessibilityRole="button" style={{ flexShrink: 1 }}>
-                  <Text style={styles.link}>Tout marquer comme lu</Text>
-                </Pressable>
-              )}
-            </View>
-
+        <ScrollView style={styles.list} contentContainerStyle={styles.listContent} nestedScrollEnabled showsVerticalScrollIndicator={false}>
           {items.map(n => {
             const t = NEWS_TYPES[n.type];
             const isOpen = expanded === n.id;
@@ -231,24 +238,56 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
               </View>
             );
           })}
-          </ScrollView>
+        </ScrollView>
+      </Animated.View>
+
+      <Animated.View
+        {...pan.panHandlers}
+        accessible
+        accessibilityRole="button"
+        accessibilityState={{ expanded: open }}
+        accessibilityLabel={open ? 'Fermer les infos du club' : `${barSmall}, ouvrir`}
+        onAccessibilityTap={() => setPanel(!open)}
+        style={[styles.bar, open && styles.barOpen, { transform: [{ translateY: offset }] }]}
+      >
+        <View style={styles.barRow}>
+          <View style={[styles.count, !unread.length && styles.countZero]}>
+            <Icon name={unread.length ? 'megaphone-outline' : 'checkmark'} size={20} color={unread.length ? colors.white : colors.brandText} />
+          </View>
+          <View style={styles.barTxt}>
+            <Text style={styles.barSmall} numberOfLines={1}>{barSmall}</Text>
+            <Text style={styles.barTitle} numberOfLines={1}>{barTitle}</Text>
+          </View>
+          <Animated.View style={{ transform: [{ rotate: chevron }] }}>
+            <Icon name="chevron-down" size={22} color={colors.brandText} />
+          </Animated.View>
         </View>
-      </Modal>
+      </Animated.View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   area: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden', zIndex: 30 },
-  page: { flex: 1, backgroundColor: colors.page },
-  pageTop: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, height: 60 },
-  back: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center' },
-  backSpacer: { width: 44 },
-  pageTitle: { flex: 1, textAlign: 'center', fontSize: 22 },
-  panelHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12, paddingTop: 12, paddingBottom: 6 },
+  scrim: { backgroundColor: ink(0.6) },
+  panel: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    paddingTop: 14,
+    paddingBottom: 16,
+    backgroundColor: colors.page,
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
+    borderWidth: 1,
+    borderTopWidth: 0,
+    borderColor: colors.border,
+  },
+  panelHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12, paddingHorizontal: 20, paddingBottom: 14 },
   link: { fontSize: 13, fontWeight: '700', color: colors.brand, paddingBottom: 6, textAlign: 'right' },
-  list: { flex: 1 },
-  listContent: { gap: 14, paddingHorizontal: 20 },
+  list: { flexGrow: 0, flexShrink: 1 },
+  listContent: { gap: 12, paddingHorizontal: 16 },
 
   item: { borderRadius: radius.cardLg, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
   itemPinned: { backgroundColor: colors.brandTint, borderColor: colors.brand },
@@ -291,6 +330,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     ...(Platform.OS === 'web' ? ({ cursor: 'grab', userSelect: 'none', touchAction: 'none' } as object) : null),
   },
+  barOpen: { backgroundColor: colors.card, borderColor: colors.border },
   barRow: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   count: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center' },
   countZero: { backgroundColor: colors.brandTint },

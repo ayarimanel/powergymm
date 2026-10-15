@@ -6,12 +6,15 @@
  * yours without understanding the other.
  */
 import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../components/ui/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Icon } from '../components/ui/Icon';
+import { Title } from '../components/ui/Title';
+import { Wordmark } from '../components/ui/Wordmark';
+import { Button } from '../components/ui/Button';
 import { Lang, LANGUAGES } from '../i18n';
-import { colors, cardShadow } from '../theme';
+import { colors } from '../theme';
 import { haptics } from '../utils/haptics';
 
 interface Props {
@@ -23,14 +26,15 @@ interface Props {
 
 export const LanguageScreen: React.FC<Props> = ({ onPick, current, onClose }) => (
   <SafeAreaView style={styles.screen}>
-    <View style={styles.body}>
-      <View style={styles.badge}>
-        <Icon name="language-outline" size={30} color={colors.brandText} />
-      </View>
+    <ScrollView contentContainerStyle={styles.body} bounces={false}>
+      <Wordmark />
 
       {/* Both languages, so nobody has to read the other one to choose. */}
-      <Text style={styles.title}>Choisis ta langue</Text>
-      <Text style={styles.titleEn}>Choose your language</Text>
+      <View style={styles.head}>
+        <Title variant="display" size={52}>Choisis</Title>
+        <Title variant="display" size={52} color={colors.brand} accessibilityRole="none">ta langue</Title>
+        <Text style={styles.titleEn}>Choose your language</Text>
+      </View>
 
       <View style={styles.options}>
         {LANGUAGES.map(l => {
@@ -47,8 +51,11 @@ export const LanguageScreen: React.FC<Props> = ({ onPick, current, onClose }) =>
               accessibilityLabel={l.native}
               style={({ pressed }) => [styles.option, on && styles.optionOn, pressed && { opacity: 0.9 }]}
             >
-              <Text style={[styles.optionText, on && { color: colors.brandText }]}>{l.native}</Text>
-              {on ? <Icon name="checkmark-circle" size={22} color={colors.brandText} /> : null}
+              <View style={[styles.code, on && styles.codeOn]}>
+                <Text style={[styles.codeText, on && { color: colors.white }]}>{l.id.toUpperCase()}</Text>
+              </View>
+              <Text style={[styles.optionText, on && { color: colors.onInverse }]}>{l.native}</Text>
+              {on ? <Icon name="checkmark" size={24} color={colors.brand} /> : null}
             </Pressable>
           );
         })}
@@ -59,49 +66,36 @@ export const LanguageScreen: React.FC<Props> = ({ onPick, current, onClose }) =>
         You can change it any time in Settings.
       </Text>
 
-      {onClose ? (
-        <Pressable onPress={onClose} accessibilityRole="button" style={styles.close}>
-          <Text style={styles.closeText}>OK</Text>
-        </Pressable>
-      ) : null}
-    </View>
+      {onClose ? <Button label="OK" onPress={onClose} style={styles.close} /> : null}
+    </ScrollView>
   </SafeAreaView>
 );
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg },
-  body: { flex: 1, justifyContent: 'center', padding: 24, gap: 8 },
-  badge: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: colors.brandSoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-    alignSelf: 'center',
-    marginBottom: 12,
-  },
-  title: { fontSize: 24, fontWeight: '800', color: colors.text, textAlign: 'center' },
-  titleEn: { fontSize: 18, fontWeight: '700', color: colors.textMuted, textAlign: 'center', marginBottom: 10 },
+  screen: { flex: 1, backgroundColor: colors.page },
+  body: { flexGrow: 1, paddingHorizontal: 24, paddingTop: 36, paddingBottom: 32 },
+  head: { marginTop: 96 },
+  titleEn: { marginTop: 14, fontSize: 15, fontWeight: '500', lineHeight: 22, color: colors.textSecondary },
 
-  options: { gap: 12, marginTop: 14 },
+  options: { gap: 14, marginTop: 40 },
   option: {
-    minHeight: 64,
-    borderRadius: 18,
-    borderWidth: 2,
+    height: 68,
+    borderRadius: 20,
+    borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: colors.card,
+    backgroundColor: colors.bg,
     paddingHorizontal: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    ...cardShadow,
+    gap: 16,
   },
-  optionOn: { borderColor: colors.brand, backgroundColor: colors.brandSoft },
-  optionText: { fontSize: 18, fontWeight: '800', color: colors.text },
+  optionOn: { borderColor: colors.text, backgroundColor: colors.text },
+  code: { width: 40, height: 40, borderRadius: 12, backgroundColor: colors.track, alignItems: 'center', justifyContent: 'center' },
+  codeOn: { backgroundColor: colors.onInverse },
+  codeText: { fontSize: 13, fontWeight: '800', color: colors.text },
+  optionText: { flex: 1, fontSize: 17, fontWeight: '800', color: colors.text },
 
-  note: { marginTop: 22, fontSize: 13, color: colors.textMuted, textAlign: 'center', lineHeight: 20 },
+  note: { marginTop: 24, fontSize: 13, fontWeight: '500', color: colors.textMuted, lineHeight: 20 },
 
-  close: { marginTop: 20, minHeight: 50, borderRadius: 25, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center' },
-  closeText: { color: colors.white, fontSize: 16, fontWeight: '800' },
+  close: { marginTop: 'auto' },
 });

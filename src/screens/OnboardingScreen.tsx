@@ -263,7 +263,7 @@ export const OnboardingScreen: React.FC<Props> = ({ onCompleteOnboarding }) => {
                 keyboardType={isAdminLogin ? 'default' : 'number-pad'}
                 autoCapitalize="none"
                 autoCorrect={false}
-                placeholder={isAdminLogin ? '••••' : '+216 20 123 456'}
+                placeholder={isAdminLogin ? '••••' : '••••••'}
                 accessibilityLabel={isAdminLogin ? 'Mot de passe' : 'Code secret'}
                 onSubmitEditing={login}
                 returnKeyType="go"

@@ -16,6 +16,10 @@ interface Props {
   avatarName: string;
   avatarUrl?: string;
   onOpenProfile: () => void;
+  /** "Signaler un problème" (member) or the reports page with its count (admin). */
+  onReport?: () => void;
+  reportBadge?: number;
+  reportLabel?: string;
 }
 
 const IconButton: React.FC<{
@@ -49,6 +53,9 @@ export const HomeHeader: React.FC<Props> = ({
   avatarName,
   avatarUrl,
   onOpenProfile,
+  onReport,
+  reportBadge,
+  reportLabel = 'Signaler un problème',
 }) => (
   <View style={styles.header}>
     <View style={styles.center}>
@@ -75,6 +82,14 @@ export const HomeHeader: React.FC<Props> = ({
         <Icon name="flame" size={16} color={colors.flame} />
         <Text style={styles.streakText}>{streak}</Text>
       </Pressable>
+      {onReport && (
+        <IconButton
+          icon="megaphone-outline"
+          label={reportBadge ? `${reportLabel}, ${reportBadge} en attente` : reportLabel}
+          onPress={onReport}
+          badge={reportBadge}
+        />
+      )}
       <IconButton
         icon="heart-outline"
         label={unreadNotices ? `Activité, ${unreadNotices} nouveaux` : 'Activité'}

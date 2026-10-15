@@ -53,7 +53,7 @@ import { ReportProblemSheet } from '../components/floor/ReportProblemSheet';
 import { ReportsAdminSheet } from '../components/floor/ReportsAdminSheet';
 import { ReviewPrompt } from '../components/floor/ReviewPrompt';
 import { journalSummary, muscleRecovery, suggestMuscle } from '../journal/journalLogic';
-import { ScanFab } from '../components/home/ScanFab';
+import { useScanRequests } from '../navigation/scanEvents';
 import { useCollapseOnScroll } from '../components/CollapsibleFab';
 import { Toast } from '../components/home/Toast';
 import { QrScannerModal } from '../components/QrScannerModal';
@@ -462,6 +462,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
     setShowScanner(true);
   };
 
+  // The navbar's Scan button (App) runs this same openScanner.
+  useScanRequests(openScanner);
+
   const onScanSuccess = () => {
     setShowScanner(false);
     setShowMusclePick(true);
@@ -507,6 +510,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
         avatarName={user.fullName}
         avatarUrl={user.avatarUrl}
         onOpenProfile={onOpenAccount}
+        onReport={() => {
+          if (isAdmin) {
+            ProblemReportService.getAll().then(setReports);
+            ClubService.getMembers().then(setClubMembers);
+            setShowReportsAdmin(true);
+          } else setShowReport(true);
+        }}
+        reportBadge={isAdmin ? openReports.length : undefined}
+        reportLabel={isAdmin ? 'Problèmes signalés' : 'Signaler un problème'}
       />
 
       {!online && (
@@ -670,26 +682,25 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
             />
           </View>
         )}
+
+        {/* Coachs left the navbar: it opens from here (Prompt 10 turns this into the mockup's coaches card). */}
+        <Pressable
+          onPress={() => onNavigate('coaches')}
+          accessibilityRole="button"
+          style={({ pressed }) => [styles.liveBtn, pressed && { opacity: 0.85 }]}
+        >
+          <Icon name="people-outline" size={18} color={colors.brand} />
+          <Text style={styles.liveBtnText}>Les coachs du club</Text>
+          <View style={{ flex: 1 }} />
+          <Icon name="chevron-forward" size={18} color={colors.textMuted} />
+        </Pressable>
       </ScrollView>
 
       <ClubNewsBar items={news} onAction={handleNewsAction} onRead={markNewsRead} />
       </View>
 
       <Toast message={toast} onHide={() => setToast(null)} />
-      <ScanFab
-        checkedInToday={checkedInToday}
-        onPress={openScanner}
-        collapsed={fabCollapsed}
-        onReport={() => {
-          if (isAdmin) {
-            ProblemReportService.getAll().then(setReports);
-            ClubService.getMembers().then(setClubMembers);
-            setShowReportsAdmin(true);
-          } else setShowReport(true);
-        }}
-        reportBadge={isAdmin ? openReports.length : undefined}
-        reportLabel={isAdmin ? 'Problèmes signalés' : 'Signaler un problème'}
-      />
+      {/* Scan now lives in the floating navbar (App): it calls openScanner through useScanRequests. */}
 
       <ReportProblemSheet visible={showReport} mine={myReports} onClose={() => setShowReport(false)} onSend={sendReport} />
       {isAdmin && (

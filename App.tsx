@@ -2,7 +2,8 @@ import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from 're
 import { View, StyleSheet, Pressable, StatusBar, ActivityIndicator, Animated, Easing, Platform, PanResponder } from 'react-native';
 import { Text } from './src/components/ui/Text';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Icon } from './src/components/ui/Icon';
+import { FloatingTabBar } from './src/components/ui/FloatingTabBar';
+import { IconName } from './src/components/ui/Icon';
 import { UserProfile } from './src/types/database';
 import { AuthService } from './src/services/authService';
 import { withFreshPermissions } from './src/services/permissionsService';
@@ -28,9 +29,11 @@ import { AccountSheet } from './src/components/account/AccountSheet';
 import { useReduceMotion } from './src/hooks/useDeviceState';
 import { goBack, useBackHandler } from './src/navigation/backStack';
 import { emitTabReselect } from './src/navigation/tabEvents';
+import { requestScan } from './src/navigation/scanEvents';
+import { todayStr } from './src/services/floorViewModel';
 import { claimSwipe, startSwipe, startsInHorizontalScroller, swipeClaimed } from './src/navigation/swipeGuard';
 import { haptics } from './src/utils/haptics';
-import { colors, radius, clubTheme } from './src/theme';
+import { colors, clubTheme } from './src/theme';
 import { useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold, Manrope_700Bold, Manrope_800ExtraBold } from '@expo-google-fonts/manrope';
 import {
   BarlowCondensed_600SemiBold,
@@ -46,13 +49,21 @@ const nativeDriver = Platform.OS !== 'web';
 // Activity (likes/comments) opens from the heart in the Floor header; admin messages live in "Infos du club".
 type ActiveTab = 'floor' | 'shop' | 'community' | 'coaches' | 'machines';
 
-const TABS: { id: ActiveTab; label: string; icon: string; iconActive: string }[] = [
+const TABS: { id: ActiveTab; label: string; icon: IconName; iconActive: IconName }[] = [
   { id: 'floor', label: 'Accueil', icon: 'home-outline', iconActive: 'home' },
   { id: 'shop', label: 'Boutique', icon: 'bag-handle-outline', iconActive: 'bag-handle' },
   { id: 'machines', label: 'Entraînement', icon: 'barbell-outline', iconActive: 'barbell' },
   { id: 'coaches', label: 'Coachs', icon: 'person-outline', iconActive: 'person' },
   { id: 'community', label: 'Communauté', icon: 'chatbubbles-outline', iconActive: 'chatbubbles' },
 ];
+
+/**
+ * The floating bar, in order (Scan sits in the middle, between the 2nd and 3rd), and the
+ * order of the swipes between sections. Coachs is not in the members' bar: it opens from
+ * Accueil. The owner has no Entraînement, so Coachs takes its place and Scan stays centred.
+ */
+const BAR_MEMBER: ActiveTab[] = ['floor', 'machines', 'shop', 'community'];
+const BAR_OWNER: ActiveTab[] = ['floor', 'coaches', 'shop', 'community'];
 
 export default function App() {
   return (
@@ -103,6 +114,7 @@ function AppInner() {
    */
   const isOwner = userProfile?.role === 'owner';
   const tabs = useMemo(() => (isOwner ? TABS.filter(x => x.id !== 'machines') : TABS), [isOwner]);
+  const barTabs = useMemo(() => (isOwner ? BAR_OWNER : BAR_MEMBER).map(id => TABS.find(x => x.id === id)!), [isOwner]);
   const [currentTab, setCurrentTab] = useState<ActiveTab>('floor');
   const [wallFocus, setWallFocus] = useState<string | null>(null); // Wall post to open (from a notification)
   const [journalStart, setJournalStart] = useState(0); // bumped to start a session (after a check-in)
@@ -150,8 +162,8 @@ function AppInner() {
    * The latest tab/handler are read from refs, because PanResponder is built once
    * and would otherwise close over the values from the first render.
    */
-  const swipeState = useRef({ tabs, currentTab, openTab });
-  swipeState.current = { tabs, currentTab, openTab };
+  const swipeState = useRef({ tabs: barTabs, currentTab, openTab });
+  swipeState.current = { tabs: barTabs, currentTab, openTab };
 
   const edgeSwipe = useRef(
     PanResponder.create({
@@ -178,7 +190,7 @@ function AppInner() {
         const { tabs: list, currentTab: tab, openTab: open } = swipeState.current;
         const i = list.findIndex(x => x.id === tab);
         if (i < 0) return;
-        // Finger to the left → next section (Accueil → Boutique); to the right → the one before.
+        // Finger to the left → next section (Accueil → Entraînement); to the right → the one before.
         const next = g.dx < 0 ? list[i + 1] : list[i - 1];
         if (next) open(next.id);
       },
@@ -194,7 +206,7 @@ function AppInner() {
   // heavy first render can't eat the animation (or flash the screen in place first).
   useLayoutEffect(() => {
     if (prevTab.current === currentTab) return;
-    const order = tabs.map(t => t.id);
+    const order = barTabs.map(t => t.id);
     direction.current = order.indexOf(currentTab) >= order.indexOf(prevTab.current) ? 1 : -1;
     prevTab.current = currentTab;
     enter.setValue(0);
@@ -363,12 +375,20 @@ function AppInner() {
         </>
       </Animated.View>
 
-      {/* Bottom navigation: 5 tabs, 48px touch targets, the club's red marks the active one */}
-      <View style={[styles.tabBar, { paddingBottom: Math.max(6, insets.bottom) }]}>
-        {tabs.map(tab => (
-          <TabButton key={tab.id} tab={tab} label={t(tab.label)} active={currentTab === tab.id} onPress={() => openTab(tab.id)} />
-        ))}
-      </View>
+      {/* Floating navbar: 4 sections + Scan in the middle. Scan runs Accueil's scan flow (same as the old Scan button). */}
+      <FloatingTabBar
+        left={barTabs.slice(0, 2).map(x => ({ id: x.id, label: t(x.label), icon: x.icon }))}
+        right={barTabs.slice(2).map(x => ({ id: x.id, label: t(x.label), icon: x.icon }))}
+        active={currentTab}
+        onTab={id => openTab(id as ActiveTab)}
+        onScan={() => {
+          if (currentTab !== 'floor') openTab('floor');
+          requestScan();
+        }}
+        scanLabel="Scanner le QR code"
+        checkedIn={userProfile.lastCheckInDate === todayStr()}
+        bottomInset={insets.bottom}
+      />
 
       <AccountSheet
         visible={showAccount}
@@ -391,41 +411,6 @@ function AppInner() {
         }}
       />
     </View>
-  );
-}
-
-/**
- * One tab. The active one gets the club's red and a short red bar on the top edge,
- * the vertical stroke of the Power Gym logo; the icon gives a small bounce when pressed.
- */
-function TabButton({ tab, label, active, onPress }: { tab: (typeof TABS)[number]; label: string; active: boolean; onPress: () => void }) {
-  const on = useRef(new Animated.Value(active ? 1 : 0)).current;
-  const press = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    Animated.spring(on, { toValue: active ? 1 : 0, useNativeDriver: nativeDriver, speed: 18, bounciness: 8 }).start();
-  }, [active, on]);
-
-  const pressTo = (v: number) => Animated.spring(press, { toValue: v, useNativeDriver: nativeDriver, speed: 40, bounciness: 10 }).start();
-
-  return (
-    <Pressable
-      style={styles.tabItem}
-      onPress={onPress}
-      onPressIn={() => pressTo(0.86)}
-      onPressOut={() => pressTo(1)}
-      accessibilityRole="tab"
-      accessibilityState={{ selected: active }}
-      accessibilityLabel={label}
-    >
-      <Animated.View style={[styles.tabMark, { opacity: on, transform: [{ scaleX: on }] }]} />
-      <Animated.View style={{ transform: [{ scale: press }, { translateY: on.interpolate({ inputRange: [0, 1], outputRange: [0, -1] }) }] }}>
-        <Icon name={(active ? tab.iconActive : tab.icon) as any} size={23} color={active ? colors.tabActive : colors.tabInactive} />
-      </Animated.View>
-      <Text style={[styles.tabLabel, active && styles.tabLabelActive]} numberOfLines={1}>
-        {label}
-      </Text>
-    </Pressable>
   );
 }
 
@@ -453,37 +438,4 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   backText: { fontSize: 16, fontWeight: '700', color: colors.text },
-  tabBar: {
-    flexDirection: 'row',
-    backgroundColor: colors.card,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.border,
-    paddingTop: 2,
-    paddingHorizontal: 2,
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 12,
-    elevation: 12,
-  },
-  tabItem: {
-    flex: 1,
-    minWidth: 0,
-    minHeight: 54,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 3,
-    paddingTop: 6,
-  },
-  tabMark: {
-    position: 'absolute',
-    top: 0,
-    width: 22,
-    height: 3,
-    borderBottomLeftRadius: radius.sm,
-    borderBottomRightRadius: radius.sm,
-    backgroundColor: colors.tabActive,
-  },
-  tabLabel: { color: colors.tabInactive, fontSize: 10.5, fontWeight: '600', letterSpacing: -0.1 },
-  tabLabelActive: { color: colors.tabActive, fontWeight: '800' },
 });

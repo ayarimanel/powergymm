@@ -1,9 +1,10 @@
 import React from 'react';
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
 import { Icon } from '../ui/Icon';
 import { clubTheme, colors, radius } from '../../theme';
 import { Avatar } from '../community/Avatar';
+import { Wordmark } from '../ui/Wordmark';
 
 interface Props {
   gymName: string;
@@ -59,16 +60,8 @@ export const HomeHeader: React.FC<Props> = ({
 }) => (
   <View style={styles.header}>
     <View style={styles.center}>
-      {/* The club's full logo is its name: no text next to it. */}
-      <Image
-        source={clubTheme.logoOnDark}
-        style={styles.logo}
-        resizeMode="contain"
-        accessible
-        accessibilityRole="image"
-        accessibilityLabel={gymName}
-        accessibilityIgnoresInvertColors
-      />
+      {/* The club's text logo (clubTheme.wordmark). */}
+      <Wordmark size={24} />
     </View>
 
     <View style={styles.right}>
@@ -91,13 +84,15 @@ export const HomeHeader: React.FC<Props> = ({
         />
       )}
       <IconButton
-        icon="heart-outline"
+        icon="notifications-outline"
         label={unreadNotices ? `Activité, ${unreadNotices} nouveaux` : 'Activité'}
         onPress={onOpenNotices}
         badge={unreadNotices}
       />
       <Pressable onPress={onOpenProfile} accessibilityRole="button" accessibilityLabel="Paramètres" style={styles.avatarBtn}>
-        <Avatar name={avatarName} url={avatarUrl} size={34} />
+        <View style={styles.avatarRing}>
+          <Avatar name={avatarName} url={avatarUrl} size={36} />
+        </View>
       </Pressable>
     </View>
   </View>
@@ -105,36 +100,34 @@ export const HomeHeader: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
   header: {
-    height: 68,
+    height: 72,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
+    paddingHorizontal: 16,
     backgroundColor: colors.header,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
   },
-  iconBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22 },
-  avatarBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
-  pressed: { backgroundColor: colors.card },
-  center: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: 8, minWidth: 0, paddingLeft: 6 },
-  logo: { height: 52, width: Math.round(52 * clubTheme.logoAspect) },
-  right: { flexDirection: 'row', alignItems: 'center' },
+  iconBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: colors.bg },
+  avatarBtn: { width: 46, height: 46, alignItems: 'center', justifyContent: 'center' },
+  avatarRing: { width: 46, height: 46, borderRadius: 23, borderWidth: 1.5, borderColor: colors.brand, alignItems: 'center', justifyContent: 'center' },
+  pressed: { opacity: 0.75 },
+  center: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: 8, minWidth: 0 },
+  right: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   streakPill: {
-    height: 32,
-    minWidth: 48,
-    paddingHorizontal: 10,
+    height: 44,
+    minWidth: 60,
+    paddingHorizontal: 14,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 4,
+    gap: 6,
     borderRadius: radius.pill,
-    backgroundColor: colors.flameSoft,
+    backgroundColor: colors.bg,
   },
-  streakText: { fontSize: 14, fontWeight: '800', color: colors.flameText },
+  streakText: { fontSize: 15, fontWeight: '800', color: colors.text },
   badge: {
     position: 'absolute',
-    top: 4,
-    right: 3,
+    top: 6,
+    right: 6,
     minWidth: 18,
     height: 18,
     paddingHorizontal: 4,
@@ -143,7 +136,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: colors.header,
+    borderColor: colors.bg,
   },
   badgeText: { color: colors.white, fontSize: 11, fontWeight: '800' },
 });

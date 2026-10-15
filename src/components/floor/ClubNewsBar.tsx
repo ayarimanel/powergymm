@@ -14,14 +14,15 @@ import {
 import { Text } from '../ui/Text';
 import { Icon } from '../ui/Icon';
 import { NewsItem, NewsType } from '../../services/clubNewsService';
-import { colors, ink } from '../../theme';
+import { brandAlpha, colors, ink } from '../../theme';
 import { haptics } from '../../utils/haptics';
 import { useReduceMotion } from '../../hooks/useDeviceState';
 import { useBackHandler } from '../../navigation/backStack';
 import { claimSwipe } from '../../navigation/swipeGuard';
 
 const nativeDriver = Platform.OS !== 'web';
-export const NEWS_BAR_HEIGHT = 56;
+/** Space the pinned news card takes at the top of Accueil (card + its top margin). */
+export const NEWS_BAR_HEIGHT = 82;
 
 export const NEWS_TYPES: Record<NewsType, { label: string; icon: string; solid: string; soft: string; text: string }> = {
   info: { label: 'Info', icon: 'information-circle', solid: colors.brand, soft: colors.brandSoft, text: colors.brandText },
@@ -152,7 +153,7 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
   const barSmall = open
     ? 'Infos du club'
     : unread.length
-      ? `${unread.length === 1 ? 'Nouvelle info' : 'Nouvelles infos'} du club`
+      ? `${unread.length} ${unread.length === 1 ? 'nouvelle info' : 'nouvelles infos'} du club`
       : 'Infos du club';
   const barTitle = open ? 'Glisse vers le haut pour fermer' : latest?.title;
 
@@ -252,26 +253,16 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
       >
         <View style={styles.barRow}>
           <View style={[styles.count, !unread.length && styles.countZero]}>
-            {unread.length ? (
-              <Text style={styles.countText}>{unread.length}</Text>
-            ) : (
-              <Icon name="checkmark" size={14} color={colors.brand} />
-            )}
+            <Icon name={unread.length ? 'megaphone-outline' : 'checkmark'} size={20} color={unread.length ? colors.white : colors.brandText} />
           </View>
           <View style={styles.barTxt}>
             <Text style={styles.barSmall} numberOfLines={1}>{barSmall}</Text>
             <Text style={styles.barTitle} numberOfLines={1}>{barTitle}</Text>
           </View>
-          <View style={styles.dots}>
-            {unread.slice(0, 4).map(n => (
-              <View key={n.id} style={[styles.dot, { backgroundColor: NEWS_TYPES[n.type].solid }]} />
-            ))}
-          </View>
           <Animated.View style={{ transform: [{ rotate: chevron }] }}>
-            <Icon name="chevron-down" size={18} color={colors.textMuted} />
+            <Icon name="chevron-down" size={20} color={colors.brandText} />
           </Animated.View>
         </View>
-        <View style={styles.grip} />
       </Animated.View>
     </View>
   );
@@ -325,36 +316,28 @@ const styles = StyleSheet.create({
   },
   ctaText: { color: colors.white, fontSize: 13, fontWeight: '800' },
 
+  // Pinned red card under the header (design-ref Main "N nouvelles infos du club"). Pull or tap to open the list.
   bar: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: NEWS_BAR_HEIGHT,
+    top: 8,
+    left: 16,
+    right: 16,
+    height: NEWS_BAR_HEIGHT - 8,
     justifyContent: 'center',
-    gap: 5,
-    paddingTop: 6,
-    paddingBottom: 4,
-    paddingHorizontal: 14,
-    backgroundColor: colors.card,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-    shadowColor: colors.text,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
+    paddingHorizontal: 16,
+    backgroundColor: colors.brandSoft,
+    borderWidth: 1,
+    borderColor: brandAlpha(0.35),
+    borderRadius: 24,
     ...(Platform.OS === 'web' ? ({ cursor: 'grab', userSelect: 'none', touchAction: 'none' } as object) : null),
   },
-  barRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  count: { minWidth: 24, height: 24, borderRadius: 12, paddingHorizontal: 7, backgroundColor: colors.red.bar, alignItems: 'center', justifyContent: 'center' },
-  countZero: { backgroundColor: colors.brandSoft },
+  barRow: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  count: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center' },
+  countZero: { backgroundColor: colors.brandTint },
   countText: { color: colors.white, fontSize: 12, fontWeight: '800' },
-  barTxt: { flex: 1, minWidth: 0 },
-  barSmall: { fontSize: 11, fontWeight: '700', color: colors.textMuted },
-  barTitle: { fontSize: 13, fontWeight: '800', color: colors.text },
+  barTxt: { flex: 1, minWidth: 0, gap: 2 },
+  barSmall: { fontSize: 13, fontWeight: '600', color: colors.brandText },
+  barTitle: { fontSize: 15, fontWeight: '800', color: colors.text },
   dots: { flexDirection: 'row', gap: 3 },
   dot: { width: 7, height: 7, borderRadius: 4 },
   grip: { alignSelf: 'center', width: 36, height: 4, borderRadius: 2, backgroundColor: colors.border },

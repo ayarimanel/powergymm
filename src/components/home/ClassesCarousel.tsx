@@ -4,9 +4,12 @@ import { Text } from '../ui/Text';
 import { Icon } from '../ui/Icon';
 import { MemberProfile } from '../../types/database';
 import { ClubClass, bookedCount, isBooked, isWaitlisted, nextAttendeeIds, nextSession } from '../../services/classService';
-import { card, colors } from '../../theme';
+import { buttonShadow, colors, radius } from '../../theme';
 import { haptics } from '../../utils/haptics';
 import { claimSwipe } from '../../navigation/swipeGuard';
+import { SectionHeader } from '../ui/SectionHeader';
+import { Title } from '../ui/Title';
+import { Wordmark } from '../ui/Wordmark';
 
 interface Props {
   classes: ClubClass[];
@@ -42,7 +45,7 @@ export const ClassesCarousel: React.FC<Props> = ({ classes, userId, profiles, on
 
   const sorted = [...classes].sort((a, b) => nextSession(a).start.getTime() - nextSession(b).start.getTime());
 
-  const onLayout = (e: LayoutChangeEvent) => setCardW(Math.round(e.nativeEvent.layout.width * 0.78));
+  const onLayout = (e: LayoutChangeEvent) => setCardW(Math.round(e.nativeEvent.layout.width * 0.88));
 
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     if (!cardW) return;
@@ -111,14 +114,7 @@ export const ClassesCarousel: React.FC<Props> = ({ classes, userId, profiles, on
 
   return (
     <View style={styles.wrap} onLayout={onLayout}>
-      <View style={styles.head}>
-        <Text style={styles.title}>Cours à réserver</Text>
-        {onSeeAll && (
-          <Pressable onPress={onSeeAll} accessibilityRole="button" hitSlop={6}>
-            <Text style={styles.link}>Tout voir</Text>
-          </Pressable>
-        )}
-      </View>
+      <SectionHeader title="Cours à réserver" actionLabel={onSeeAll ? 'Tout voir' : undefined} onAction={onSeeAll} />
 
       <ScrollView
         ref={trackRef}
@@ -156,16 +152,27 @@ export const ClassesCarousel: React.FC<Props> = ({ classes, userId, profiles, on
               style={[styles.card, { width: cardW }, booked && styles.cardBooked]}
               accessibilityLabel={`${c.title}, ${bc} inscrits sur ${c.capacity}`}
             >
+              {/* No class photos in the app: the club's wordmark marks the card (design-ref Main, 2nd card). */}
               <View style={styles.top}>
-                <Text style={styles.time}>{c.time}</Text>
-                <Text style={styles.when}>{whenLabel(c)}</Text>
+                <Wordmark size={15} style={styles.mark} />
+                {(booked || full || level === 'hot') && (
+                  <View style={[styles.status, booked ? styles.statusBooked : full ? styles.statusFull : styles.statusHot]}>
+                    <Text style={[styles.statusText, { color: booked ? colors.green.text : full ? colors.text : colors.amber.text }]}>
+                      {booked ? 'Réservé' : full ? 'Complet' : 'Ça se remplit'}
+                    </Text>
+                  </View>
+                )}
               </View>
 
-              <View>
-                <Text style={styles.name} numberOfLines={1}>{c.title}</Text>
-                <Text style={styles.meta} numberOfLines={1}>{c.coachName} · {c.durationMin} min</Text>
+              <Title variant="card" numberOfLines={1} style={styles.name}>{c.title}</Title>
+              <View style={styles.metaRow}>
+                <View style={styles.metaMark} />
+                <Text style={styles.meta} numberOfLines={2}>
+                  {whenLabel(c)} {c.time} · {c.coachName} · {c.durationMin} min
+                </Text>
               </View>
 
+              <View style={styles.bottom}>
               <View style={styles.peopleRow}>
                 <View style={styles.faces}>
                   {attendeeIds.map((uid, i) => {
@@ -185,17 +192,9 @@ export const ClassesCarousel: React.FC<Props> = ({ classes, userId, profiles, on
                     </View>
                   )}
                 </View>
-                <View style={{ flex: 1, minWidth: 0 }}>
-                  <Text style={styles.count} numberOfLines={1}>
-                    <Text style={styles.countBold}>{bc}</Text> {bc > 1 ? 'membres inscrits' : 'membre inscrit'}
-                    {full && <Text style={[styles.countStatus, { color: lvText }]}> · complet</Text>}
-                    {!full && level === 'hot' && <Text style={[styles.countStatus, { color: lvText }]}> · ça se remplit</Text>}
-                  </Text>
-                </View>
-              </View>
-
-              <View style={styles.bar}>
-                <View style={[styles.barFill, { width: `${ratio * 100}%`, backgroundColor: lv }]} />
+                <Text style={styles.count} numberOfLines={1}>
+                  {full ? `${bc} / ${c.capacity} inscrits` : `${bc} ${bc > 1 ? 'membres inscrits' : 'membre inscrit'}`}
+                </Text>
               </View>
 
               <Pressable
@@ -204,9 +203,10 @@ export const ClassesCarousel: React.FC<Props> = ({ classes, userId, profiles, on
                 disabled={busyId === c.id}
                 style={[styles.btn, btn.style, busyId === c.id && { opacity: 0.7 }]}
               >
-                {(booked || (full && waitl)) && <Icon name="checkmark" size={14} color={booked ? colors.green.text : colors.brand} />}
+                {(booked || (full && waitl)) && <Icon name="checkmark" size={14} color={booked ? colors.green.text : colors.brandText} />}
                 <Text style={[styles.btnText, btn.textStyle]}>{btn.label}</Text>
               </Pressable>
+              </View>
             </View>
           );
         })}
@@ -233,49 +233,48 @@ export const ClassesCarousel: React.FC<Props> = ({ classes, userId, profiles, on
 };
 
 const styles = StyleSheet.create({
-  wrap: { gap: 10 },
-  head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingHorizontal: 4 },
-  title: { fontSize: 15, fontWeight: '800', color: colors.text },
-  link: { fontSize: 12, fontWeight: '800', color: colors.brand },
+  wrap: { gap: 14 },
 
-  track: { paddingLeft: 2, paddingRight: 14, gap: CARD_GAP },
+  track: { paddingRight: 16, gap: CARD_GAP },
 
-  card: { ...card, borderRadius: 20, padding: 14, gap: 10 },
+  card: { minHeight: 196, borderRadius: radius.cardLg, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.card, padding: 18, justifyContent: 'flex-end', gap: 6 },
   cardBooked: { borderColor: colors.green.bar },
 
-  top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  time: { fontSize: 26, fontWeight: '900', color: colors.text, lineHeight: 28 },
-  when: { fontSize: 11, fontWeight: '800', color: colors.textMuted, letterSpacing: 0.5, textTransform: 'uppercase' },
+  top: { position: 'absolute', top: 16, left: 18, right: 14, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  mark: { opacity: 0.9 },
+  status: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 },
+  statusHot: { backgroundColor: colors.amber.soft },
+  statusFull: { backgroundColor: colors.track },
+  statusBooked: { backgroundColor: colors.green.soft },
+  statusText: { fontSize: 11, fontWeight: '800', letterSpacing: 1, textTransform: 'uppercase' },
 
-  name: { fontSize: 15, fontWeight: '800', color: colors.text },
-  meta: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
+  name: { marginTop: 40 },
+  metaRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  metaMark: { width: 3, alignSelf: 'stretch', minHeight: 16, borderRadius: 2, backgroundColor: colors.brand },
+  meta: { flex: 1, fontSize: 14, fontWeight: '600', color: colors.brandText },
 
-  peopleRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  bottom: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 6 },
+  peopleRow: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', gap: 8 },
   faces: { flexDirection: 'row' },
-  face: { width: 26, height: 26, borderRadius: 13, borderWidth: 2, borderColor: colors.card, backgroundColor: colors.brand + '22', alignItems: 'center', justifyContent: 'center' },
+  face: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: colors.card, backgroundColor: colors.brandSoft, alignItems: 'center', justifyContent: 'center' },
   faceOverlap: { marginLeft: -8 },
-  faceInit: { backgroundColor: colors.brand + '22' },
-  faceInitText: { color: colors.brand, fontSize: 11, fontWeight: '800' },
+  faceInit: { backgroundColor: colors.brandSoft },
+  faceInitText: { color: colors.brandText, fontSize: 10, fontWeight: '800' },
   faceMore: { backgroundColor: colors.track },
   faceMoreText: { color: colors.textMuted, fontSize: 10, fontWeight: '800' },
 
-  count: { fontSize: 12, color: colors.textMuted },
-  countBold: { fontSize: 15, color: colors.text, fontWeight: '800' },
-  countStatus: { fontWeight: '800' },
+  count: { flexShrink: 1, fontSize: 13, fontWeight: '500', color: colors.textSecondary },
 
-  bar: { height: 6, borderRadius: 99, backgroundColor: colors.track, overflow: 'hidden' },
-  barFill: { height: '100%', borderRadius: 99 },
-
-  btn: { flexDirection: 'row', gap: 4, borderRadius: 12, paddingVertical: 10, paddingHorizontal: 12, alignItems: 'center', justifyContent: 'center' },
-  btnText: { fontSize: 13, fontWeight: '800' },
-  btnPrimary: { backgroundColor: colors.brand },
+  btn: { flexDirection: 'row', gap: 4, height: 44, borderRadius: 999, paddingHorizontal: 18, alignItems: 'center', justifyContent: 'center' },
+  btnText: { fontSize: 14, fontWeight: '800' },
+  btnPrimary: { backgroundColor: colors.brand, ...buttonShadow },
   btnPrimaryText: { color: colors.white },
   btnBooked: { backgroundColor: colors.green.soft },
   btnBookedText: { color: colors.green.text },
-  btnFull: { backgroundColor: colors.track },
-  btnFullText: { color: colors.textMuted },
-  btnWait: { backgroundColor: colors.brand + '18' },
-  btnWaitText: { color: colors.brand },
+  btnFull: { borderWidth: 1.5, borderColor: colors.disabled },
+  btnFullText: { color: colors.text },
+  btnWait: { backgroundColor: colors.brandSoft },
+  btnWaitText: { color: colors.brandText },
 
   dots: { flexDirection: 'row', justifyContent: 'center', gap: 6 },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.border },

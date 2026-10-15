@@ -72,7 +72,8 @@ function Item({ tab, active, onPress }: { tab: BarTab; active: boolean; onPress:
       <Animated.View style={{ transform: [{ scale: press }] }}>
         <Icon name={tab.icon} size={22} color={color} />
       </Animated.View>
-      <Text style={[s.label, { color }]} numberOfLines={1}>{tab.label}</Text>
+      {/* As in the mockup: only the active tab spells its name (screen readers get it on every tab). */}
+      {active ? <Text style={[s.label, { color }]} numberOfLines={1}>{tab.label}</Text> : null}
       <Animated.View style={[s.dash, { opacity: on, transform: [{ scaleX: on }] }]} />
     </Pressable>
   );

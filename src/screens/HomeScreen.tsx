@@ -9,7 +9,11 @@ import {
   View,
 } from 'react-native';
 import { Text } from '../components/ui/Text';
-import { Icon } from '../components/ui/Icon';
+import { Icon, IconName } from '../components/ui/Icon';
+import { Title } from '../components/ui/Title';
+import { SectionHeader } from '../components/ui/SectionHeader';
+import { LiveRingCard } from '../components/home/LiveRingCard';
+import { AffluenceSheet } from '../components/home/AffluenceSheet';
 import { CheckInRecord, CommunityPost, MemberProfile, MuscleGroup, StaffPermissions, UserProfile } from '../types/database';
 import { CheckInService } from '../services/checkInService';
 import { LiveFloorEngine, LiveFloorSummary } from '../services/liveFloorEngine';
@@ -25,7 +29,6 @@ import { ClubMember, ClubService, Renewal } from '../services/clubService';
 import { ShopService } from '../services/shopService';
 import { PERMISSION_LABELS, PermissionsService, hasPermission, withFreshPermissions } from '../services/permissionsService';
 import { AuditService } from '../services/auditService';
-import { ConsoleCard } from '../components/home/FloorCoachCards';
 import { ClassesManageSheet } from '../components/home/ClassesSection';
 import { ClassesCarousel } from '../components/home/ClassesCarousel';
 import { ClassService, ClubClass, nextSession } from '../services/classService';
@@ -38,7 +41,7 @@ import { ClubBan, MemberAdminService } from '../services/memberAdminService';
 import { ClubGrowthCard } from '../components/home/ClubGrowthCard';
 import { useT } from '../i18n';
 import { useOnline } from '../hooks/useDeviceState';
-import { colors, light } from '../theme';
+import { colors, light, radius } from '../theme';
 import { HomeHeader } from '../components/home/HomeHeader';
 import { StreakSheet } from '../components/home/StreakSheet';
 import { StreakSuccessSheet } from '../components/home/StreakSuccessSheet';
@@ -79,7 +82,7 @@ interface HomeScreenProps {
   /** Open a Wall post (from an activity row). */
   onOpenWallPost: (postId: string) => void;
   /** Jump to another tab (owner console shortcuts). */
-  onNavigate: (tab: 'shop' | 'coaches') => void;
+  onNavigate: (tab: 'shop' | 'coaches' | 'machines') => void;
   /** Opens the app-level Paramètres sheet (lives above the tabs so every screen can reach it). */
   onOpenAccount: () => void;
   onLogout: () => void;
@@ -89,6 +92,21 @@ interface HomeScreenProps {
 }
 
 const REFRESH_MS = 30_000;
+
+/** One round quick action under the live card (design-ref Main). */
+const QuickAction: React.FC<{ icon: IconName; label: string; onPress: () => void; badge?: number }> = ({ icon, label, onPress, badge }) => (
+  <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={badge ? `${label}, ${badge} à traiter` : label} style={({ pressed }) => [styles.qa, pressed && { opacity: 0.8 }]}>
+    <View style={styles.qaCircle}>
+      <Icon name={icon} size={24} color={colors.text} />
+      {!!badge && (
+        <View style={styles.qaBadge}>
+          <Text style={styles.qaBadgeText}>{badge > 9 ? '9+' : badge}</Text>
+        </View>
+      )}
+    </View>
+    <Text style={styles.qaLabel} numberOfLines={1}>{label}</Text>
+  </Pressable>
+);
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOpenWallPost, onNavigate, onOpenAccount, onLogout, onWipe, onStartSession }) => {
   const [floor, setFloor] = useState<LiveFloorSummary | null>(null);
@@ -105,6 +123,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
 
   // Sheets & modals
   const [showStreak, setShowStreak] = useState(false);
+  /** "Voir l'affluence": the full crowd view, now in a sheet. */
+  const [showAffluence, setShowAffluence] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [showMusclePick, setShowMusclePick] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
@@ -535,7 +555,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
         contentContainerStyle={[styles.content, news.length > 0 && { paddingTop: NEWS_BAR_HEIGHT + 14 }]}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.brand} progressViewOffset={news.length ? NEWS_BAR_HEIGHT : 0} />}
       >
-        <Text style={styles.greeting}>Salut {firstName(user.fullName)}</Text>
+        <Title variant="section" size={32} style={styles.greeting}>Salut {firstName(user.fullName)} !</Title>
 
         {isAdmin && gymConfig && (gymConfig.adminPassword || '0000') === '0000' && (
           <Pressable onPress={() => setShowAdmin(true)} accessibilityRole="button" style={styles.membershipBanner}>
@@ -555,28 +575,117 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
           </Pressable>
         )}
 
-        {/* The manager's first job is talking to the club, so it comes first. */}
-        {isAdmin && canManageNotifications && (
-          <Pressable
-            onPress={() => setShowStatusManage(true)}
-            accessibilityRole="button"
-            style={({ pressed }) => [styles.announce, pressed && { opacity: 0.9 }]}
-          >
-            <Icon name="megaphone" size={20} color={colors.white} />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.announceTitle}>{t('Publier une info du club')}</Text>
-              <Text style={styles.announceSub}>{t('Vue par tous les membres, tout de suite')}</Text>
-            </View>
-            <Icon name="chevron-forward" size={20} color={colors.white} />
-          </Pressable>
-        )}
-
+        {/* Live crowd: the ring card here, the full view (days, hours, muscles) behind "Voir l'affluence". */}
         {crowdLocked ? (
           <FloorLocked gymName={gymConfig?.name ?? ''} onScan={() => setShowScanner(true)} />
         ) : snapshot ? (
           <>
-            {/* Which muscles are busy is a member's question, not the manager's: he gets the gym side only.
-                Members get one card with two sides: the whole gym, and muscle by muscle. */}
+            <LiveRingCard snapshot={snapshot} showCounts={showCounts} checkedIn={!!snapshot.myCheckIn} onScanOut={handleScanOut} />
+            <View style={styles.crowdBtns}>
+              {snapshot.isOpen && (
+                <Pressable
+                  onPress={toggleAlert}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: alertOn }}
+                  style={({ pressed }) => [styles.crowdBtn, alertOn && styles.crowdBtnOn, pressed && { opacity: 0.85 }]}
+                >
+                  <Icon name={alertOn ? 'notifications' : 'notifications-outline'} size={18} color={alertOn ? colors.green.text : colors.text} />
+                  <Text style={[styles.crowdBtnText, alertOn && { color: colors.green.text }]} numberOfLines={1}>{alertOn ? 'Alerte activée' : "M'alerter si calme"}</Text>
+                </Pressable>
+              )}
+              <Pressable onPress={() => setShowAffluence(true)} accessibilityRole="button" style={({ pressed }) => [styles.crowdBtn, pressed && { opacity: 0.85 }]}>
+                <Text style={styles.crowdBtnText} numberOfLines={1}>Voir l'affluence</Text>
+              </Pressable>
+            </View>
+          </>
+        ) : (
+          <FloorSkeleton />
+        )}
+
+        {/* Quick actions: the training side for members and coaches, the club side for the owner. */}
+        <View style={styles.quick}>
+          {isAdmin ? (
+            <>
+              {canManageNotifications && <QuickAction icon="megaphone-outline" label="Publier" onPress={() => setShowStatusManage(true)} />}
+              <QuickAction icon="stats-chart" label="Console" badge={consoleTodo} onPress={() => setShowConsole(true)} />
+              <QuickAction icon="pulse-outline" label="Live" onPress={() => setShowFloorAdmin(true)} />
+              {canManageStaff && <QuickAction icon="people-outline" label="Membres" onPress={() => setShowMembersAdmin(true)} />}
+            </>
+          ) : (
+            <>
+              <QuickAction icon="barbell-outline" label="Séance" onPress={onStartSession} />
+              <QuickAction icon="ribbon-outline" label="Coachs" onPress={() => onNavigate('coaches')} />
+              <QuickAction icon="bag-handle-outline" label="Boutique" onPress={() => onNavigate('shop')} />
+              <QuickAction icon="pulse-outline" label="Mon bilan" onPress={() => onNavigate('machines')} />
+            </>
+          )}
+        </View>
+
+        {/* Staff who are not the manager keep their tools as slim rows. */}
+        {!isAdmin && canManageNotifications && (
+          <Pressable onPress={() => setShowStatusManage(true)} accessibilityRole="button" style={({ pressed }) => [styles.liveBtn, pressed && { opacity: 0.85 }]}>
+            <Icon name="megaphone-outline" size={18} color={colors.textSecondary} />
+            <Text style={styles.liveBtnText}>{t('Publier une info du club')}</Text>
+            <View style={{ flex: 1 }} />
+            <Icon name="chevron-forward" size={18} color={colors.textMuted} />
+          </Pressable>
+        )}
+        {!isAdmin && canManageStaff && (
+          <Pressable onPress={() => setShowMembersAdmin(true)} accessibilityRole="button" style={({ pressed }) => [styles.liveBtn, pressed && { opacity: 0.85 }]}>
+            <Icon name="people-outline" size={18} color={colors.textSecondary} />
+            <Text style={styles.liveBtnText}>
+              {t('Membres & permissions')} · {clubMembers.length}
+            </Text>
+            <View style={{ flex: 1 }} />
+            <Icon name="chevron-forward" size={18} color={colors.textMuted} />
+          </Pressable>
+        )}
+
+        {gymConfig?.classesEnabled !== false && (
+          <View style={styles.section} onLayout={e => (classesY.current = e.nativeEvent.layout.y)}>
+            <ClassesCarousel
+              classes={classes}
+              userId={user.id}
+              profiles={profiles}
+              onBook={bookClass}
+              onCancel={cancelClass}
+              onWaitlist={waitlistClass}
+              onSeeAll={canManageClasses ? () => setShowClassesManage(true) : undefined}
+            />
+          </View>
+        )}
+
+        {/* The numbers: is the app actually helping? */}
+        {canViewAnalytics && analytics && (
+          <View style={styles.section}>
+            <ClubGrowthCard analytics={analytics} />
+          </View>
+        )}
+
+        {/* Coachs left the navbar: they open from here. */}
+        <View style={styles.section}>
+          <SectionHeader title="Les coachs du club" actionLabel="Voir" onAction={() => onNavigate('coaches')} />
+          <Pressable onPress={() => onNavigate('coaches')} accessibilityRole="button" accessibilityLabel="Les coachs du club" style={({ pressed }) => [styles.coachCard, pressed && { opacity: 0.88 }]}>
+            <View style={styles.coachIcon}>
+              <Icon name="ribbon-outline" size={22} color={colors.text} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.coachTitle}>Trouve ton coach</Text>
+              <Text style={styles.coachSub}>Coaching perso, programmes et séances</Text>
+            </View>
+            <Icon name="chevron-forward" size={20} color={colors.textMuted} />
+          </Pressable>
+        </View>
+      </ScrollView>
+
+      <ClubNewsBar items={news} onAction={handleNewsAction} onRead={markNewsRead} />
+      </View>
+
+      <Toast message={toast} onHide={() => setToast(null)} />
+
+      <AffluenceSheet visible={showAffluence} onClose={() => setShowAffluence(false)}>
+        {snapshot ? (
+          <>
             {isAdmin || !snapshot.isOpen ? (
               <FloorLive
                 snapshot={snapshot}
@@ -616,90 +725,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
               />
             )}
           </>
-        ) : (
-          <FloorSkeleton />
-        )}
-
-        {/* Then: who is on the app, and what each of them may do. */}
-        {canManageStaff && (
-          <Pressable
-            onPress={() => setShowMembersAdmin(true)}
-            accessibilityRole="button"
-            style={({ pressed }) => [styles.liveBtn, pressed && { opacity: 0.85 }]}
-          >
-            <Icon name="people-outline" size={18} color={colors.brand} />
-            <Text style={styles.liveBtnText}>
-              {t('Membres & permissions')} · {clubMembers.length}
-            </Text>
-            <View style={{ flex: 1 }} />
-            <Icon name="chevron-forward" size={18} color={colors.textMuted} />
-          </Pressable>
-        )}
-
-        {/* Then the numbers: is the app actually helping? */}
-        {canViewAnalytics && analytics && <ClubGrowthCard analytics={analytics} />}
-
-        {isAdmin && (
-          <Pressable
-            onPress={() => setShowFloorAdmin(true)}
-            accessibilityRole="button"
-            accessibilityLabel="Ouvrir le tableau de bord Live"
-            style={({ pressed }) => [styles.liveBtn, pressed && { opacity: 0.85 }]}
-          >
-            <Icon name="pulse-outline" size={18} color={colors.brand} />
-            <Text style={styles.liveBtnText}>Résumé de la semaine & Live</Text>
-            <View style={{ flex: 1 }} />
-            <Icon name="chevron-forward" size={18} color={colors.textMuted} />
-          </Pressable>
-        )}
-
-        {isAdmin && <ConsoleCard todo={consoleTodo} onOpen={() => setShowConsole(true)} />}
-
-        {/* Staff who are not the manager still get the publish entry here. */}
-        {canManageNotifications && !isAdmin && (
-          <Pressable
-            onPress={() => setShowStatusManage(true)}
-            accessibilityRole="button"
-            style={({ pressed }) => [styles.liveBtn, pressed && { opacity: 0.85 }]}
-          >
-            <Icon name="megaphone-outline" size={18} color={colors.brand} />
-            <Text style={styles.liveBtnText}>{t('Publier une info du club')}</Text>
-            <View style={{ flex: 1 }} />
-            <Icon name="chevron-forward" size={18} color={colors.textMuted} />
-          </Pressable>
-        )}
-
-        {gymConfig?.classesEnabled !== false && (
-          <View onLayout={e => (classesY.current = e.nativeEvent.layout.y)}>
-            <ClassesCarousel
-              classes={classes}
-              userId={user.id}
-              profiles={profiles}
-              onBook={bookClass}
-              onCancel={cancelClass}
-              onWaitlist={waitlistClass}
-              onSeeAll={canManageClasses ? () => setShowClassesManage(true) : undefined}
-            />
-          </View>
-        )}
-
-        {/* Coachs left the navbar: it opens from here (Prompt 10 turns this into the mockup's coaches card). */}
-        <Pressable
-          onPress={() => onNavigate('coaches')}
-          accessibilityRole="button"
-          style={({ pressed }) => [styles.liveBtn, pressed && { opacity: 0.85 }]}
-        >
-          <Icon name="people-outline" size={18} color={colors.brand} />
-          <Text style={styles.liveBtnText}>Les coachs du club</Text>
-          <View style={{ flex: 1 }} />
-          <Icon name="chevron-forward" size={18} color={colors.textMuted} />
-        </Pressable>
-      </ScrollView>
-
-      <ClubNewsBar items={news} onAction={handleNewsAction} onRead={markNewsRead} />
-      </View>
-
-      <Toast message={toast} onHide={() => setToast(null)} />
+        ) : null}
+      </AffluenceSheet>
       {/* Scan now lives in the floating navbar (App): it calls openScanner through useScanRequests. */}
 
       <ReportProblemSheet visible={showReport} mine={myReports} onClose={() => setShowReport(false)} onSend={sendReport} />
@@ -900,11 +927,26 @@ const styles = StyleSheet.create({
   askLaterText: { fontSize: 13, fontWeight: '700', color: colors.textMuted },
   askGo: { backgroundColor: colors.brand, borderRadius: 12, paddingVertical: 10, paddingHorizontal: 14 },
   askGoText: { color: colors.white, fontWeight: '800', fontSize: 13 },
-  content: { padding: 16, paddingBottom: 104, gap: 12 },
-  membershipBanner: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14, borderRadius: 16, backgroundColor: colors.amber.soft },
+  content: { padding: 16, paddingBottom: 32, gap: 14 },
+  membershipBanner: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, paddingHorizontal: 14, borderRadius: 16, backgroundColor: colors.amber.soft },
   membershipText: { flex: 1, fontSize: 14, fontWeight: '700', color: colors.amber.text },
-  greeting: { fontSize: 15, fontWeight: '600', color: colors.textSecondary },
-  liveBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, height: 48, borderRadius: 16, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
+  greeting: { marginTop: 4 },
+  crowdBtns: { flexDirection: 'row', gap: 10 },
+  crowdBtn: { flex: 1, height: 48, borderRadius: 999, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.card, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 12 },
+  crowdBtnOn: { borderColor: colors.green.bar, backgroundColor: colors.green.soft },
+  crowdBtnText: { fontSize: 14, fontWeight: '700', color: colors.text },
+  quick: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 4, marginTop: 4 },
+  qa: { width: 76, alignItems: 'center', gap: 8 },
+  qaCircle: { width: 64, height: 64, borderRadius: 32, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
+  qaBadge: { position: 'absolute', top: -2, right: -2, minWidth: 20, height: 20, paddingHorizontal: 5, borderRadius: 10, backgroundColor: colors.red.bar, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: colors.page },
+  qaBadgeText: { color: colors.white, fontSize: 11, fontWeight: '800' },
+  qaLabel: { fontSize: 13, fontWeight: '600', color: colors.text },
+  section: { marginTop: 14, gap: 14 },
+  coachCard: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 18, borderRadius: radius.cardLg, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
+  coachIcon: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center' },
+  coachTitle: { fontSize: 16, fontWeight: '800', color: colors.text },
+  coachSub: { fontSize: 13, fontWeight: '500', color: colors.textSecondary, marginTop: 2 },
+  liveBtn: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, height: 52, borderRadius: 16, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
   liveBtnText: { fontSize: 15, fontWeight: '800', color: colors.text },
   secHead: { paddingHorizontal: 4, marginTop: 2 },
   secTitle: { fontSize: 15, fontWeight: '800', color: colors.text },

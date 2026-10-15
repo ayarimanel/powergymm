@@ -5,7 +5,9 @@ import { Icon } from '../components/ui/Icon';
 import { CommunityPost, MemberProfile, UserProfile } from '../types/database';
 import { GymConfigService } from '../config/gymConfig';
 import { CommunityService } from '../services/communityService';
-import { clubTheme, colors, communityTint, radius } from '../theme';
+import { clubTheme, colors, communityTint, fonts, radius } from '../theme';
+import { Title } from '../components/ui/Title';
+import { ClubChallengeCard } from '../components/community/mur/ClubChallengeCard';
 import { CommentActor, Community, CommunityAdmin, JoinRequest, MurComments, MurPost, MurService, PostKind, Report, memStatus, standingIn } from '../community/murService';
 import { CommentsSheet } from '../components/community/CommentsSheet';
 import { ClubRole, MemStatus, CommunityType, REFUSED, canAcceptRequests, canBan, canLeave, canManage, canSetStatus, canTransferFounder, canPost, canRead, canSee, canCreateCommunity, canOverride, isIn, rankOf } from '../community/permissions';
@@ -423,12 +425,13 @@ export const CommunityScreen: React.FC<Props> = ({ user, onOpenAccount }) => {
     <View style={styles.screen}>
       {/* Header */}
       <View style={styles.header}>
-        <View style={styles.brandIcon}><Text style={styles.brandIconText}>M</Text></View>
         <View style={{ flex: 1, minWidth: 0 }}>
-          <Text style={styles.title} numberOfLines={1}>Communauté</Text>
-          <Text style={styles.subtitle} numberOfLines={1}>{gymName || 'Membres du club uniquement'}</Text>
+          <Title variant="display" size={40} numberOfLines={1}>Communauté</Title>
+          <View style={styles.subRow}>
+            <Text style={styles.subtitle} numberOfLines={1}>{gymName || 'Membres du club uniquement'}</Text>
+            <View style={styles.roleBadge}><Text style={styles.roleBadgeText}>{ROLE_LABEL[role]}</Text></View>
+          </View>
         </View>
-        <View style={styles.roleBadge}><Text style={styles.roleBadgeText}>{ROLE_LABEL[role]}</Text></View>
         <Pressable onPress={onOpenAccount} accessibilityRole="button" accessibilityLabel="Mon profil" style={styles.avatar}>
           <Text style={styles.avatarText}>{meInit}</Text>
         </Pressable>
@@ -450,8 +453,15 @@ export const CommunityScreen: React.FC<Props> = ({ user, onOpenAccount }) => {
       <ScrollView ref={scrollRef} {...scrollProps} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {tab === 'fyp' && (
           <>
+            {/* Demo: the app has no challenges yet (see ClubChallengeCard). */}
+            <ClubChallengeCard onJoin={() => setToast('Inscris-toi à l’accueil du club avant samedi')} />
+
+            {prRecords.length > 0 && (
+              <PrStoriesRow records={prRecords} profiles={profiles} onOpen={setPrStoryIndex} />
+            )}
+
             <View style={styles.secH}>
-              <Text style={styles.h2}>Mes communautés</Text>
+              <Text style={styles.h2} accessibilityRole="header">Mes communautés</Text>
               <Pressable onPress={() => setTab('comm')} accessibilityRole="button">
                 <Text style={styles.link}>{mine.length > MINE_PREVIEW ? `Voir tout (${mine.length})` : 'Explorer'}</Text>
               </Pressable>
@@ -462,10 +472,6 @@ export const CommunityScreen: React.FC<Props> = ({ user, onOpenAccount }) => {
               <Pressable onPress={() => setTab('comm')} accessibilityRole="button" style={[styles.card, styles.emptyCard]}>
                 <Text style={styles.empty}>Tu n’es dans aucune communauté. Touche ici pour en trouver une.</Text>
               </Pressable>
-            )}
-
-            {prRecords.length > 0 && (
-              <PrStoriesRow records={prRecords} profiles={profiles} onOpen={setPrStoryIndex} />
             )}
 
             <Pressable onPress={() => openComposer()} accessibilityRole="button" style={styles.composer}>
@@ -507,7 +513,7 @@ export const CommunityScreen: React.FC<Props> = ({ user, onOpenAccount }) => {
             {createCard}
 
             <View style={styles.secH}>
-              <Text style={styles.h2}>Mes communautés</Text>
+              <Text style={styles.h2} accessibilityRole="header">Mes communautés</Text>
               <Text style={styles.small}>{mine.length}</Text>
             </View>
             <View style={[styles.card, { overflow: 'hidden' }]}>
@@ -518,7 +524,7 @@ export const CommunityScreen: React.FC<Props> = ({ user, onOpenAccount }) => {
             {lockedForOwner.length > 0 && (
               <>
                 <View style={styles.secH}>
-                  <Text style={styles.h2}>Communautés privées</Text>
+                  <Text style={styles.h2} accessibilityRole="header">Communautés privées</Text>
                 </View>
                 <View style={[styles.card, { padding: 14, gap: 10 }]}>
                   <Text style={styles.ovText}>
@@ -544,7 +550,7 @@ export const CommunityScreen: React.FC<Props> = ({ user, onOpenAccount }) => {
             )}
 
             <View style={styles.secH}>
-              <Text style={styles.h2}>À découvrir</Text>
+              <Text style={styles.h2} accessibilityRole="header">À découvrir</Text>
             </View>
 
             <View style={[styles.card, { overflow: 'hidden' }]}>
@@ -681,7 +687,7 @@ const ManageTab: React.FC<{
 
   return (
     <>
-      <View style={styles.secH}><Text style={styles.h2}>Demandes d'adhésion</Text><Text style={styles.small}>{totalReqs} en attente</Text></View>
+      <View style={styles.secH}><Text style={styles.h2} accessibilityRole="header">Demandes d'adhésion</Text><Text style={styles.small}>{totalReqs} en attente</Text></View>
       {withReqs.length > 0 ? withReqs.map(c => {
         const t = communityTint(c.color);
         return (
@@ -707,7 +713,7 @@ const ManageTab: React.FC<{
         );
       }) : <View style={[styles.card, styles.emptyCard]}><Text style={styles.empty}>Aucune demande en attente.</Text></View>}
 
-      <View style={styles.secH}><Text style={styles.h2}>Signalements</Text><Text style={styles.small}>masqué auto à 3 signalements</Text></View>
+      <View style={styles.secH}><Text style={styles.h2} accessibilityRole="header">Signalements</Text><Text style={styles.small}>masqué auto à 3 signalements</Text></View>
       {myReports.length > 0 ? myReports.map(r => (
         <View key={r.id} style={[styles.card, styles.mcard]}>
           <View style={styles.req}>
@@ -725,7 +731,7 @@ const ManageTab: React.FC<{
         </View>
       )) : <View style={[styles.card, styles.emptyCard]}><Text style={styles.empty}>Aucun signalement.</Text></View>}
 
-      <View style={styles.secH}><Text style={styles.h2}>Tes communautés</Text></View>
+      <View style={styles.secH}><Text style={styles.h2} accessibilityRole="header">Tes communautés</Text></View>
       <View style={[styles.card, { overflow: 'hidden' }]}>
         {own.map((c, i) => {
           const t = communityTint(c.color);
@@ -746,80 +752,81 @@ const ManageTab: React.FC<{
 };
 
 const styles = StyleSheet.create({
+  subRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
   ovText: { fontSize: 13, color: colors.textSecondary, lineHeight: 19 },
   ovRow: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 44 },
   ovName: { flex: 1, fontSize: 15, fontWeight: '700', color: colors.text },
   ovCta: { fontSize: 14, fontWeight: '800', color: colors.brand },
   screen: { flex: 1, backgroundColor: colors.page },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingLeft: 16, paddingRight: 12, height: 68, backgroundColor: colors.header },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingTop: 18, paddingBottom: 14, backgroundColor: colors.header },
   brandIcon: { width: 32, height: 32, borderRadius: 16, backgroundColor: communityTint('accent').soft, alignItems: 'center', justifyContent: 'center' },
   brandIconText: { color: colors.brand, fontWeight: '800', fontSize: 13 },
   title: { fontSize: 17, fontWeight: '800', color: colors.text, lineHeight: 20 },
-  subtitle: { fontSize: 11, color: colors.textMuted, lineHeight: 14 },
-  roleBadge: { backgroundColor: colors.card, borderRadius: 999, paddingHorizontal: 9, paddingVertical: 3 },
-  roleBadgeText: { fontSize: 11, fontWeight: '800', color: colors.textMuted },
-  avatar: { width: 30, height: 30, borderRadius: 15, backgroundColor: colors.pink.soft, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { color: colors.pink.text, fontWeight: '800', fontSize: 13 },
+  subtitle: { flexShrink: 1, fontSize: 13, color: colors.textMuted },
+  roleBadge: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 999, paddingHorizontal: 9, paddingVertical: 2 },
+  roleBadgeText: { fontSize: 11, fontWeight: '700', color: colors.textSecondary },
+  avatar: { width: 48, height: 48, borderRadius: 24, borderWidth: 2, borderColor: colors.brand, backgroundColor: colors.brandSoft, alignItems: 'center', justifyContent: 'center' },
+  avatarText: { color: colors.brandText, fontWeight: '800', fontSize: 17 },
 
-  tabs: { flexDirection: 'row', gap: 6, paddingHorizontal: 12, paddingBottom: 10, backgroundColor: colors.header, borderBottomWidth: 1, borderBottomColor: colors.border },
-  tab: { flex: 1, flexDirection: 'row', gap: 6, backgroundColor: colors.card, borderRadius: 12, paddingVertical: 9, alignItems: 'center', justifyContent: 'center' },
+  tabs: { flexDirection: 'row', gap: 4, marginHorizontal: 16, marginBottom: 8, padding: 4, borderRadius: 999, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
+  tab: { flex: 1, flexDirection: 'row', gap: 6, borderRadius: 999, paddingVertical: 12, alignItems: 'center', justifyContent: 'center' },
   tabOn: { backgroundColor: colors.brand },
-  tabText: { fontSize: 13, fontWeight: '800', color: colors.textMuted },
-  tabTextOn: { color: colors.white },
+  tabText: { fontSize: 15, fontWeight: '600', color: colors.textSecondary },
+  tabTextOn: { color: colors.white, fontWeight: '800' },
   cnt: { minWidth: 18, height: 18, borderRadius: 9, backgroundColor: colors.red.bar, paddingHorizontal: 5, alignItems: 'center', justifyContent: 'center' },
   cntText: { color: colors.white, fontSize: 11, fontWeight: '800' },
 
-  scroll: { padding: 12, paddingBottom: 120, gap: 12 },
-  secH: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 4, gap: 8 },
-  h2: { fontSize: 15, fontWeight: '800', color: colors.text },
-  small: { fontSize: 12, color: colors.textMuted },
-  link: { fontSize: 12, fontWeight: '800', color: colors.brand, padding: 4 },
-  card: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 20, shadowColor: colors.black, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 14, elevation: 2 },
+  scroll: { padding: 16, paddingBottom: 120, gap: 16 },
+  secH: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginTop: 8 },
+  h2: { flexShrink: 1, fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 24, lineHeight: 27, textTransform: 'uppercase', color: colors.text },
+  small: { fontSize: 13, color: colors.textMuted },
+  link: { fontSize: 13, fontWeight: '700', color: colors.brand, padding: 4 },
+  card: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: radius.cardLg },
 
 
-  composer: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 20, padding: 10, shadowColor: colors.black, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 14, elevation: 2 },
-  composerAv: { width: 30, height: 30, borderRadius: 15, backgroundColor: colors.pink.soft, alignItems: 'center', justifyContent: 'center' },
-  composerAvText: { color: colors.pink.text, fontWeight: '800', fontSize: 13 },
-  composerText: { flex: 1, color: colors.textMuted, fontSize: 13 },
+  composer: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 999, paddingVertical: 8, paddingLeft: 8, paddingRight: 18, minHeight: 56 },
+  composerAv: { width: 38, height: 38, borderRadius: 19, backgroundColor: colors.brandSoft, alignItems: 'center', justifyContent: 'center' },
+  composerAvText: { color: colors.brandText, fontWeight: '800', fontSize: 14 },
+  composerText: { flex: 1, color: colors.textMuted, fontSize: 15 },
 
-  chips: { flexDirection: 'row', gap: 6, paddingVertical: 2 },
-  chip: { borderWidth: 1, borderColor: colors.border, backgroundColor: colors.card, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
+  chips: { flexDirection: 'row', gap: 8, paddingVertical: 2 },
+  chip: { borderWidth: 1, borderColor: colors.border, backgroundColor: colors.card, borderRadius: 999, paddingHorizontal: 16, paddingVertical: 9 },
   chipOn: { backgroundColor: colors.brand, borderColor: colors.brand },
-  chipText: { fontSize: 12, fontWeight: '700', color: colors.textMuted },
-  chipTextOn: { color: colors.card },
+  chipText: { fontSize: 14, fontWeight: '600', color: colors.textSecondary },
+  chipTextOn: { color: colors.white, fontWeight: '800' },
 
 
-  drow: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12 },
+  drow: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 14, paddingHorizontal: 16 },
   drowBorder: { borderTopWidth: 1, borderTopColor: colors.border },
-  drowIc: { width: 44, height: 44, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
+  drowIc: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   drowPressed: { backgroundColor: colors.bg },
   mineTitle: { flexDirection: 'row', alignItems: 'center', gap: 6, minWidth: 0 },
   rankTag: { borderRadius: radius.pill, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: colors.brandSoft },
   rankTagText: { fontSize: 11, fontWeight: '800', color: colors.brandText },
   waitPill: { minWidth: 22, height: 22, borderRadius: 11, paddingHorizontal: 6, backgroundColor: colors.notification, alignItems: 'center', justifyContent: 'center' },
   waitPillText: { fontSize: 12, fontWeight: '800', color: colors.onBrand },
-  createCard: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: radius.card, borderWidth: 1.5, borderStyle: 'dashed', borderColor: colors.brand, backgroundColor: colors.brandSoft, marginTop: 4 },
-  createIc: { width: 40, height: 40, borderRadius: radius.md, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center' },
+  createCard: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16, borderRadius: radius.cardLg, borderWidth: 1, borderStyle: 'dashed', borderColor: colors.brand, backgroundColor: colors.brandTint, marginTop: 4 },
+  createIc: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center' },
   createTitle: { fontSize: 15, fontWeight: '800', color: colors.text },
   createSub: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
-  drowIcText: { fontSize: 16, fontWeight: '800' },
-  drowName: { fontSize: 14, fontWeight: '800', color: colors.text },
+  drowIcText: { fontSize: 17, fontWeight: '800' },
+  drowName: { fontSize: 16, fontWeight: '800', color: colors.text },
   drowMeta: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2, flexWrap: 'wrap' },
-  drowSub: { fontSize: 12, color: colors.textMuted },
+  drowSub: { fontSize: 13, color: colors.textSecondary },
   typeTag: { borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
   typeTagText: { fontSize: 10, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 },
-  drowBtn: { borderRadius: 12, paddingHorizontal: 14, paddingVertical: 9 },
-  drowBtnSoft: { backgroundColor: communityTint('accent').soft },
+  drowBtn: { borderRadius: 999, paddingHorizontal: 16, paddingVertical: 9 },
+  drowBtnSoft: { backgroundColor: colors.brandSoft },
   drowBtnOff: { backgroundColor: colors.track },
   drowBtnText: { fontSize: 13, fontWeight: '800' },
 
-  info: { backgroundColor: colors.track, borderRadius: 12, padding: 12 },
-  infoText: { fontSize: 12, color: colors.textMuted, lineHeight: 18 },
+  info: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 20, padding: 16 },
+  infoText: { fontSize: 13, color: colors.textSecondary, lineHeight: 20 },
   b: { color: colors.text, fontWeight: '800' },
-  empty: { textAlign: 'center', color: colors.textMuted, fontSize: 13, paddingVertical: 24, paddingHorizontal: 12 },
+  empty: { textAlign: 'center', color: colors.textMuted, fontSize: 14, paddingVertical: 24, paddingHorizontal: 12 },
   emptyCard: { padding: 0 },
 
-  mcard: { padding: 14, gap: 10 },
+  mcard: { padding: 16, gap: 12 },
   mcardTitle: { fontSize: 14, fontWeight: '800' },
   req: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
   reqAv: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center' },
@@ -828,6 +835,6 @@ const styles = StyleSheet.create({
   reqSmall: { fontSize: 12, color: colors.textMuted, marginTop: 1 },
   reqNote: { fontSize: 13, color: colors.text, marginTop: 4, fontStyle: 'italic' },
   reqBtns: { gap: 6 },
-  mBtn: { borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8, alignItems: 'center' },
+  mBtn: { borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8, alignItems: 'center' },
   mBtnText: { fontSize: 13, fontWeight: '800' },
 });

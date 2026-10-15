@@ -4,7 +4,8 @@ import { Text } from '../ui/Text';
 import { Icon } from '../ui/Icon';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { CommunityPost, MemberProfile } from '../../types/database';
-import { colors } from '../../theme';
+import { colors, fonts } from '../../theme';
+import { SectionHeader } from '../ui/SectionHeader';
 import { Avatar } from './Avatar';
 import { claimSwipe } from '../../navigation/swipeGuard';
 
@@ -14,8 +15,8 @@ interface Props {
   onOpen: (index: number) => void;
 }
 
-const SIZE = 66;
-const STROKE = 3;
+const SIZE = 76;
+const STROKE = 2.5;
 
 const GoldRing: React.FC<{ approved: boolean }> = ({ approved }) => {
   const r = (SIZE - STROKE) / 2;
@@ -23,9 +24,8 @@ const GoldRing: React.FC<{ approved: boolean }> = ({ approved }) => {
     <Svg width={SIZE} height={SIZE} style={StyleSheet.absoluteFill}>
       <Defs>
         <LinearGradient id="prRing" x1="0" y1="1" x2="1" y2="0">
-          <Stop offset="0" stopColor={colors.gold.border} />
-          <Stop offset="0.5" stopColor={colors.gold.bar} />
-          <Stop offset="1" stopColor={colors.gold.deep} />
+          <Stop offset="0" stopColor={colors.brand} />
+          <Stop offset="1" stopColor={colors.brandText} />
         </LinearGradient>
       </Defs>
       <Circle cx={SIZE / 2} cy={SIZE / 2} r={r} stroke={approved ? 'url(#prRing)' : colors.border} strokeWidth={STROKE} strokeDasharray={approved ? undefined : '4 4'} fill="none" />
@@ -38,10 +38,7 @@ export const PrStoriesRow: React.FC<Props> = ({ records, profiles, onOpen }) => 
   if (records.length === 0) return null;
   return (
     <View>
-      <View style={styles.head}>
-        <Icon name="trophy" size={16} color={colors.gold.deep} />
-        <Text style={styles.title}>Records du club</Text>
-      </View>
+      <SectionHeader title="Records du club" actionLabel="Tout voir" onAction={() => onOpen(0)} style={styles.head} />
       <ScrollView horizontal onTouchStart={claimSwipe} showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -16 }} contentContainerStyle={styles.row}>
         {records.map((r, i) => {
           const approved = r.prApproval?.status === 'approved';
@@ -64,7 +61,7 @@ export const PrStoriesRow: React.FC<Props> = ({ records, profiles, onOpen }) => 
                 </View>
               </View>
               <Text style={styles.weight} numberOfLines={1}>{r.prDetails!.weightKg} kg</Text>
-              <Text style={styles.exercise} numberOfLines={1}>{r.prDetails!.exercise}</Text>
+              <Text style={styles.exercise} numberOfLines={2}>{r.prDetails!.exercise}</Text>
             </Pressable>
           );
         })}
@@ -74,15 +71,15 @@ export const PrStoriesRow: React.FC<Props> = ({ records, profiles, onOpen }) => 
 };
 
 const styles = StyleSheet.create({
-  head: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 },
+  head: { marginBottom: 14 },
   title: { fontSize: 16, fontWeight: '800', color: colors.text },
-  row: { paddingHorizontal: 16, gap: 14 },
-  item: { alignItems: 'center', width: SIZE + 6 },
+  row: { paddingHorizontal: 16, gap: 16 },
+  item: { alignItems: 'center', width: SIZE + 8 },
   circleWrap: { width: SIZE, height: SIZE, alignItems: 'center', justifyContent: 'center' },
   inner: { width: SIZE - 10, height: SIZE - 10, borderRadius: (SIZE - 10) / 2, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
-  badge: { position: 'absolute', bottom: -1, right: -1, width: 20, height: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: colors.bg },
-  badgeGold: { backgroundColor: colors.gold.bar },
+  badge: { position: 'absolute', bottom: -1, right: -1, width: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: colors.page },
+  badgeGold: { backgroundColor: colors.brand },
   badgePending: { backgroundColor: colors.textMuted },
-  weight: { fontSize: 13, fontWeight: '900', color: colors.gold.text, marginTop: 5 },
-  exercise: { fontSize: 11, color: colors.textMuted, fontWeight: '600', textAlign: 'center' },
+  weight: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 22, lineHeight: 25, color: colors.text, marginTop: 8 },
+  exercise: { fontSize: 13, color: colors.textSecondary, fontWeight: '500', textAlign: 'center', lineHeight: 17 },
 });

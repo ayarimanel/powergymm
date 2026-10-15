@@ -3,7 +3,7 @@ import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../../ui/Text';
 import { Icon } from '../../ui/Icon';
 import { Community, MurPost } from '../../../community/murService';
-import { clubTheme, communityTint, colors } from '../../../theme';
+import { clubTheme, communityTint, colors, fonts, radius } from '../../../theme';
 
 interface Props {
   post: MurPost;
@@ -28,13 +28,7 @@ export const MurPostCard: React.FC<Props> = ({ post: p, community: c, liked, can
 
   return (
     <View style={styles.card}>
-      {/* why */}
-      <Text style={styles.why}>
-        dans <Text style={[styles.whyBold, { color: tint.bar }]}>{c.name}</Text>
-        {official ? '' : ' · parce que tu en fais partie'}
-      </Text>
-
-      {/* header */}
+      {/* header: who, where, when */}
       <View style={styles.ph}>
         {official ? (
           <View style={[styles.av, styles.avOfficial]}>
@@ -47,20 +41,17 @@ export const MurPostCard: React.FC<Props> = ({ post: p, community: c, liked, can
         )}
         <View style={{ flex: 1, minWidth: 0 }}>
           <View style={styles.nameRow}>
-            <Text style={styles.author}>{official ? clubTheme.clubName : p.anonymous ? 'Membre anonyme' : p.author}</Text>
-            {official && <View style={[styles.bdg, { backgroundColor: communityTint('accent').soft }]}><Text style={[styles.bdgText, { color: colors.brand }]}>Officiel</Text></View>}
+            <Text style={styles.author} numberOfLines={1}>{official ? clubTheme.clubName : p.anonymous ? 'Membre anonyme' : p.author}</Text>
+            {official && <View style={[styles.bdg, { backgroundColor: colors.brandSoft }]}><Text style={[styles.bdgText, { color: colors.brandText }]}>Officiel</Text></View>}
           </View>
-          <Text style={styles.ago}>{p.ago}</Text>
+          <Text style={styles.ago} numberOfLines={1}>
+            dans <Text style={styles.whyBold}>{c.name}</Text> · {p.ago}
+          </Text>
         </View>
+        {p.kind === 'question' && (
+          <View style={[styles.bdg, { backgroundColor: colors.blue.soft }]}><Text style={[styles.bdgText, { color: colors.blue.text }]}>Question</Text></View>
+        )}
       </View>
-
-      {/* question badges */}
-      {p.kind === 'question' && (
-        <View style={styles.badges}>
-          <View style={[styles.bdg, { backgroundColor: communityTint('accent').soft }]}><Text style={[styles.bdgText, { color: colors.brand }]}>Question</Text></View>
-          {p.answer && <View style={[styles.bdg, { backgroundColor: colors.green.soft }]}><Text style={[styles.bdgText, { color: colors.green.text }]}>Répondu par un coach</Text></View>}
-        </View>
-      )}
 
       {!!p.text && <Text style={styles.text}>{p.text}</Text>}
 
@@ -73,7 +64,7 @@ export const MurPostCard: React.FC<Props> = ({ post: p, community: c, liked, can
           </View>
           <View style={styles.badges}>
             <View style={[styles.bdg, { backgroundColor: colors.green.soft }]}><Text style={[styles.bdgText, { color: colors.green.text }]}>Validé par {p.validatedBy}</Text></View>
-            {!!p.delta && <View style={[styles.bdg, { backgroundColor: colors.gold.soft }]}><Text style={[styles.bdgText, { color: colors.gold.deep }]}>{p.delta}</Text></View>}
+            {!!p.delta && <View style={[styles.bdg, { backgroundColor: colors.track }]}><Text style={[styles.bdgText, { color: colors.text }]}>{p.delta}</Text></View>}
           </View>
         </>
       )}
@@ -84,9 +75,14 @@ export const MurPostCard: React.FC<Props> = ({ post: p, community: c, liked, can
         </View>
       )}
 
+      {/* a coach's answer to a question */}
       {p.answer && (
         <View style={styles.answer}>
-          <Text style={styles.answerText}><Text style={styles.answerBy}>{p.answer.by} : </Text>{p.answer.text}</Text>
+          <View style={styles.answerHead}>
+            <Icon name="shield-checkmark-outline" size={16} color={colors.brandText} />
+            <Text style={styles.answerBy}>Répondu par {p.answer.by}</Text>
+          </View>
+          <Text style={styles.answerText}>{p.answer.text}</Text>
         </View>
       )}
 
@@ -103,26 +99,33 @@ export const MurPostCard: React.FC<Props> = ({ post: p, community: c, liked, can
 
       {/* actions */}
       <View style={styles.acts}>
-        <Pressable onPress={onLike} accessibilityRole="button" style={[styles.act, styles.actRow, liked && styles.actOn]}>
-          <Icon name="heart" size={14} color={liked ? colors.gold.deep : colors.textMuted} />
-          <Text style={[styles.actText, liked && { color: colors.gold.deep }]}>{isReaction ? 'Féliciter' : "J'aime"} · {n}</Text>
+        <Pressable
+          onPress={onLike}
+          accessibilityRole="button"
+          accessibilityLabel={`${isReaction ? 'Féliciter' : "J'aime"}, ${n}`}
+          accessibilityState={{ selected: liked }}
+          hitSlop={6}
+          style={styles.act}
+        >
+          <Icon name={liked ? 'heart' : 'heart-outline'} size={20} color={liked ? colors.brand : colors.textSecondary} />
+          <Text style={[styles.actText, liked && { color: colors.brandText }]}>{isReaction ? `Féliciter · ${n}` : n}</Text>
         </Pressable>
-        <Pressable onPress={onReply} accessibilityRole="button" accessibilityLabel={p.kind === 'question' ? 'Répondre' : 'Commenter'} style={[styles.act, styles.actRow]}>
-          <Icon name="chatbubble-outline" size={14} color={colors.textMuted} />
+        <Pressable onPress={onReply} accessibilityRole="button" accessibilityLabel={p.kind === 'question' ? 'Répondre' : 'Commenter'} hitSlop={6} style={styles.act}>
+          <Icon name="chatbubble-outline" size={19} color={colors.textSecondary} />
           <Text style={styles.actText}>
             {p.kind === 'question' ? 'Répondre' : 'Commenter'}
             {nComments ? ` · ${nComments}` : ''}
           </Text>
         </Pressable>
         {canManage && (
-          <Pressable onPress={onHide} accessibilityRole="button" style={[styles.act, { marginLeft: 'auto' }]}>
-            <Text style={styles.actText}>Masquer</Text>
+          <Pressable onPress={onHide} accessibilityRole="button" hitSlop={6} style={[styles.act, { marginLeft: 'auto' }]}>
+            <Text style={styles.modText}>Masquer</Text>
           </Pressable>
         )}
         {/* Hiding one post is not always enough: removing the person is the other half. */}
         {canManage && canBan && onBan && (
-          <Pressable onPress={onBan} accessibilityRole="button" accessibilityLabel="Retirer ce membre de la communauté" style={styles.act}>
-            <Text style={[styles.actText, { color: colors.red.text }]}>Retirer</Text>
+          <Pressable onPress={onBan} accessibilityRole="button" accessibilityLabel="Retirer ce membre de la communauté" hitSlop={6} style={styles.act}>
+            <Text style={[styles.modText, { color: colors.red.text }]}>Retirer</Text>
           </Pressable>
         )}
       </View>
@@ -131,36 +134,35 @@ export const MurPostCard: React.FC<Props> = ({ post: p, community: c, liked, can
 };
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 20, padding: 14, gap: 10, shadowColor: colors.black, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 14, elevation: 2 },
-  why: { fontSize: 11, color: colors.textMuted },
-  whyBold: { fontWeight: '800' },
-  ph: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  av: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center' },
-  avText: { fontWeight: '800', fontSize: 14 },
-  avOfficial: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
+  card: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: radius.cardLg, padding: 18, gap: 12 },
+  whyBold: { fontWeight: '700', color: colors.textSecondary },
+  ph: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  av: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
+  avText: { fontWeight: '800', fontSize: 15 },
+  avOfficial: { backgroundColor: colors.brand, overflow: 'hidden' },
   avMark: { width: 30, height: 30 },
-  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
-  author: { fontSize: 14, fontWeight: '800', color: colors.text },
-  ago: { fontSize: 12, color: colors.textMuted },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 8, minWidth: 0 },
+  author: { flexShrink: 1, fontSize: 15, fontWeight: '800', color: colors.text },
+  ago: { fontSize: 13, color: colors.textMuted, marginTop: 1 },
   badges: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
-  bdg: { borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
-  bdgText: { fontSize: 11, fontWeight: '800' },
-  text: { fontSize: 14, color: colors.text, lineHeight: 20 },
-  rec: { flexDirection: 'row', alignItems: 'baseline', gap: 6 },
-  recKg: { fontSize: 40, lineHeight: 40, fontWeight: '800', color: colors.gold.deep },
-  recSub: { fontSize: 13, color: colors.textMuted, fontWeight: '700' },
-  media: { height: 150, borderRadius: 14, backgroundColor: communityTint('accent').soft, alignItems: 'center', justifyContent: 'center' },
-  mediaText: { color: colors.brand, fontWeight: '800', fontSize: 22 },
-  answer: { borderLeftWidth: 3, borderLeftColor: colors.green.bar, backgroundColor: colors.green.soft, borderTopRightRadius: 12, borderBottomRightRadius: 12, padding: 10 },
-  answerText: { fontSize: 13, color: colors.text, lineHeight: 19 },
-  answerBy: { color: colors.green.text, fontWeight: '800' },
-  lastComment: { backgroundColor: colors.bg, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 8, gap: 2 },
-  lastCommentText: { fontSize: 13, lineHeight: 18, color: colors.text },
+  bdg: { borderRadius: 6, paddingHorizontal: 7, paddingVertical: 3 },
+  bdgText: { fontSize: 10.5, fontWeight: '800', letterSpacing: 0.8, textTransform: 'uppercase' },
+  text: { fontSize: 15, fontWeight: '500', color: colors.text, lineHeight: 22 },
+  rec: { flexDirection: 'row', alignItems: 'baseline', gap: 8 },
+  recKg: { fontFamily: fonts.headingBlack, fontWeight: 'normal', fontSize: 44, lineHeight: 46, color: colors.text },
+  recSub: { fontSize: 14, color: colors.textSecondary, fontWeight: '600' },
+  media: { height: 150, borderRadius: 16, backgroundColor: colors.brandSoft, alignItems: 'center', justifyContent: 'center' },
+  mediaText: { fontFamily: fonts.heading, fontWeight: 'normal', textTransform: 'uppercase', color: colors.brandText, fontSize: 26 },
+  answer: { backgroundColor: colors.brandSoft, borderRadius: 16, padding: 14, gap: 6 },
+  answerHead: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  answerBy: { fontSize: 13, fontWeight: '800', color: colors.brandText },
+  answerText: { fontSize: 14, color: colors.text, lineHeight: 21 },
+  lastComment: { backgroundColor: colors.bg, borderRadius: 14, paddingHorizontal: 12, paddingVertical: 10, gap: 2 },
+  lastCommentText: { fontSize: 13, lineHeight: 19, color: colors.text },
   lastCommentName: { fontWeight: '800' },
   moreComments: { fontSize: 12, fontWeight: '700', color: colors.textMuted },
-  acts: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  act: { borderWidth: 1, borderColor: colors.border, backgroundColor: colors.card, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
-  actRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  actOn: { backgroundColor: colors.gold.soft, borderColor: 'transparent' },
-  actText: { fontSize: 12, fontWeight: '800', color: colors.textMuted },
+  acts: { flexDirection: 'row', alignItems: 'center', gap: 20, marginTop: 2 },
+  act: { flexDirection: 'row', alignItems: 'center', gap: 7, minHeight: 32 },
+  actText: { fontSize: 14, fontWeight: '700', color: colors.textSecondary },
+  modText: { fontSize: 13, fontWeight: '700', color: colors.textMuted },
 });

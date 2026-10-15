@@ -1,9 +1,12 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
+import { Icon } from '../../ui/Icon';
+import { Title } from '../../ui/Title';
 import { Text } from '../../ui/Text';
 import { Community } from '../../../community/murService';
 import { MemStatus, ClubRole, CommunityType, isIn, canManage } from '../../../community/permissions';
-import { communityTint, colors } from '../../../theme';
+import { buttonShadow, communityTint, colors, fonts, radius } from '../../../theme';
 import { BottomSheet, SheetScrollView } from '../../home/BottomSheet';
 
 const TYPE_META: Record<CommunityType, { label: string; color: Parameters<typeof communityTint>[0] }> = {
@@ -70,60 +73,87 @@ export const CommunitySheet: React.FC<Props> = ({ community: c, status, role, re
     return <Info>Sur invitation d'un coach uniquement.</Info>;
   };
 
+  const locked = c.type === 'request' || c.type === 'invite';
+  const team: { name: string; role: string; icon: 'shield-outline' | 'star-outline'; color: string }[] = [
+    ...c.adminNames.map(n => ({ name: n, role: 'Admin', icon: 'shield-outline' as const, color: colors.brandText })),
+    ...c.modNames.map(n => ({ name: n, role: 'Modérateur', icon: 'star-outline' as const, color: colors.blue.text })),
+  ];
+
   return (
-    <BottomSheet
-      visible={!!c}
-      onClose={onClose}
-      snaps={[0.6, 0.9]}
-      initialSnap={0}
-      header={
-        <View style={styles.top}>
-          <View style={[styles.circle, { backgroundColor: tint.soft }]}><Text style={[styles.ini, { color: tint.bar }]}>{c.ini}</Text></View>
-          <View style={{ flex: 1, minWidth: 0 }}>
-            <Text style={styles.name}>{c.name}</Text>
-            <View style={styles.metaRow}>
-              <TypeTag type={c.type} />
-              <Text style={styles.metaText}>{c.members} membre{c.members > 1 ? 's' : ''} · {c.today} post{c.today > 1 ? 's' : ''}</Text>
-            </View>
-          </View>
-        </View>
-      }
-    >
+    <BottomSheet visible={!!c} onClose={onClose} snaps={[0.6, 0.94]} initialSnap={0}>
       {(_e, extraBottom) => (
-        <SheetScrollView contentContainerStyle={[styles.body, { paddingBottom: 28 + extraBottom }]} showsVerticalScrollIndicator={false}>
-          {!!c.desc && <Text style={styles.desc}>{c.desc}</Text>}
-
-          {c.rules.length > 0 && (
-            <>
-              <Text style={styles.lbl}>Règles</Text>
-              <View style={styles.rules}>
-                {c.rules.map((r, i) => (
-                  <Text key={i} style={styles.rule}>{i + 1}. {r}</Text>
-                ))}
-              </View>
-            </>
-          )}
-
-          <View style={styles.who}>
-            <Text style={styles.whoLine}>Admin : <Text style={styles.b}>{c.adminNames.join(', ')}</Text></Text>
-            {c.modNames.length > 0 && <Text style={styles.whoLine}>Modérateurs : <Text style={styles.b}>{c.modNames.join(', ')}</Text></Text>}
+        <SheetScrollView contentContainerStyle={{ paddingBottom: 28 + extraBottom }} showsVerticalScrollIndicator={false}>
+          {/* design-ref Page communauté: red banner, the community's tile over it */}
+          <View style={styles.banner}>
+            <Svg style={StyleSheet.absoluteFill} width="100%" height="100%" preserveAspectRatio="none">
+              <Defs>
+                <LinearGradient id="commBanner" x1="0" y1="0" x2="1" y2="1">
+                  <Stop offset="0" stopColor={colors.brand} stopOpacity="1" />
+                  <Stop offset="1" stopColor={colors.brand} stopOpacity="0.45" />
+                </LinearGradient>
+              </Defs>
+              <Rect x="0" y="0" width="100%" height="100%" fill="url(#commBanner)" />
+            </Svg>
           </View>
+          <View style={styles.body}>
+            <View style={[styles.tile, { backgroundColor: tint.soft }]}>
+              <Text style={[styles.ini, { color: tint.bar }]}>{c.ini}</Text>
+            </View>
+            <Title variant="display" size={40}>{c.name}</Title>
+            <View style={styles.metaRow}>
+              <Text style={styles.metaText}>
+                {c.members} membre{c.members > 1 ? 's' : ''} · {TYPE_META[c.type].label} · {c.today} post{c.today > 1 ? 's' : ''}
+              </Text>
+              {locked && <Icon name="lock-closed-outline" size={15} color={colors.textMuted} />}
+            </View>
+            {!!c.desc && <Text style={styles.desc}>{c.desc}</Text>}
 
-          {manages && (
-            <>
-              <Info><Text style={styles.b}>{status === 'founder' ? 'Tu as créé cette communauté.' : 'Tu gères cette communauté.'}</Text> Tu acceptes ou refuses chaque demande, tu peux masquer un post, retirer un membre ou nommer un modérateur.</Info>
-              {requestsCount > 0 && <Secondary label={`Voir les demandes · ${requestsCount}`} soft onPress={onRequests} />}
-              {c.type === 'invite' && <Secondary label="Inviter un membre" soft onPress={onInvite} />}
-            </>
-          )}
+            <View style={{ gap: 10, marginTop: 6 }}>
+              <Action />
+            </View>
 
-          {/* Anyone inside can see who else is; only a manager gets the actions. */}
-          {(isIn(status) || manages) && (
-            <Secondary label={`Voir les membres · ${c.members}`} soft onPress={onMembers} />
-          )}
+            {/* Anyone inside can see who else is; only a manager gets the actions. */}
+            {(isIn(status) || manages) && (
+              <Secondary label={`Voir les membres · ${c.members}`} soft onPress={onMembers} />
+            )}
 
-          <View style={{ gap: 10, marginTop: 4 }}>
-            <Action />
+            {manages && (
+              <>
+                <Info><Text style={styles.b}>{status === 'founder' ? 'Tu as créé cette communauté.' : 'Tu gères cette communauté.'}</Text> Tu acceptes ou refuses chaque demande, tu peux masquer un post, retirer un membre ou nommer un modérateur.</Info>
+                {requestsCount > 0 && <Secondary label={`Voir les demandes · ${requestsCount}`} soft onPress={onRequests} />}
+                {c.type === 'invite' && <Secondary label="Inviter un membre" soft onPress={onInvite} />}
+              </>
+            )}
+
+            {team.length > 0 && (
+              <>
+                <Title variant="section" style={styles.h}>Équipe</Title>
+                <View style={styles.box}>
+                  {team.map((m, i) => (
+                    <View key={`${m.role}-${m.name}-${i}`} style={[styles.teamRow, i > 0 && styles.sep]}>
+                      <View style={styles.teamAv}><Text style={styles.teamAvText}>{m.name.replace(/^Coach\s+/i, '').charAt(0).toUpperCase()}</Text></View>
+                      <Text style={styles.teamName} numberOfLines={1}>{m.name}</Text>
+                      <Icon name={m.icon} size={16} color={m.color} />
+                      <Text style={[styles.teamRole, { color: m.color }]}>{m.role}</Text>
+                    </View>
+                  ))}
+                </View>
+              </>
+            )}
+
+            {c.rules.length > 0 && (
+              <>
+                <Title variant="section" style={styles.h}>Règles</Title>
+                <View style={styles.box}>
+                  {c.rules.map((r, i) => (
+                    <View key={i} style={[styles.ruleRow, i > 0 && styles.sep]}>
+                      <Text style={styles.ruleNum}>{i + 1}</Text>
+                      <Text style={styles.rule}>{r}</Text>
+                    </View>
+                  ))}
+                </View>
+              </>
+            )}
           </View>
         </SheetScrollView>
       )}
@@ -136,7 +166,7 @@ const Primary: React.FC<{ label: string; onPress: () => void }> = ({ label, onPr
 );
 const Secondary: React.FC<{ label: string; onPress: () => void; soft?: boolean }> = ({ label, onPress, soft }) => (
   <Pressable onPress={onPress} accessibilityRole="button" style={[styles.btn, soft ? styles.btnSoft : styles.btnOff]}>
-    <Text style={[styles.btnText, soft ? { color: colors.brand } : { color: colors.textMuted }]}>{label}</Text>
+    <Text style={[styles.btnText, soft ? { color: colors.text } : { color: colors.textMuted }]}>{label}</Text>
   </Pressable>
 );
 const Disabled: React.FC<{ label: string }> = ({ label }) => (
@@ -144,26 +174,31 @@ const Disabled: React.FC<{ label: string }> = ({ label }) => (
 );
 
 const styles = StyleSheet.create({
-  top: { flexDirection: 'row', alignItems: 'center', gap: 14 },
-  circle: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center' },
-  ini: { fontSize: 26, fontWeight: '800' },
-  name: { fontSize: 20, fontWeight: '800', color: colors.text },
-  metaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4, flexWrap: 'wrap' },
-  metaText: { fontSize: 12, color: colors.textMuted },
-  body: { paddingHorizontal: 20, gap: 14 },
-  desc: { fontSize: 14, color: colors.text, lineHeight: 20 },
-  lbl: { fontSize: 12, fontWeight: '800', color: colors.textMuted },
-  rules: { backgroundColor: colors.track, borderRadius: 14, padding: 12, gap: 4 },
-  rule: { fontSize: 13, color: colors.text },
-  who: { gap: 4 },
-  whoLine: { fontSize: 12, color: colors.textMuted },
+  banner: { height: 120, overflow: 'hidden' },
+  tile: { width: 88, height: 88, borderRadius: 24, borderWidth: 4, borderColor: colors.card, alignItems: 'center', justifyContent: 'center', marginTop: -50, marginBottom: 6 },
+  ini: { fontFamily: fonts.headingBlack, fontWeight: 'normal', fontSize: 44, lineHeight: 48 },
+  metaRow: { flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
+  metaText: { fontSize: 14, color: colors.textMuted },
+  body: { paddingHorizontal: 20, gap: 12 },
+  desc: { fontSize: 15, fontWeight: '500', color: colors.textSecondary, lineHeight: 22 },
+  h: { marginTop: 14 },
+  box: { backgroundColor: colors.bg, borderWidth: 1, borderColor: colors.border, borderRadius: radius.cardLg, paddingHorizontal: 16 },
+  sep: { borderTopWidth: 1, borderTopColor: colors.border },
+  teamRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14 },
+  teamAv: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.track, alignItems: 'center', justifyContent: 'center' },
+  teamAvText: { fontSize: 15, fontWeight: '800', color: colors.text },
+  teamName: { flex: 1, fontSize: 16, fontWeight: '600', color: colors.text },
+  teamRole: { fontSize: 14, fontWeight: '700' },
+  ruleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 16, paddingVertical: 14 },
+  ruleNum: { width: 16, fontFamily: fonts.display, fontWeight: 'normal', fontSize: 24, lineHeight: 24, color: colors.brand },
+  rule: { flex: 1, fontSize: 15, lineHeight: 22, color: colors.text },
   b: { color: colors.text, fontWeight: '800' },
   type: { borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
   typeText: { fontSize: 10, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 },
-  info: { backgroundColor: colors.track, borderRadius: 12, padding: 12 },
-  infoText: { fontSize: 12, color: colors.textMuted, lineHeight: 18 },
-  btn: { height: 48, borderRadius: 12, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center' },
-  btnSoft: { backgroundColor: communityTint('accent').soft },
-  btnOff: { backgroundColor: colors.track },
-  btnText: { fontSize: 14, fontWeight: '800', color: colors.white },
+  info: { backgroundColor: colors.track, borderRadius: 16, padding: 14 },
+  infoText: { fontSize: 13, color: colors.textSecondary, lineHeight: 19 },
+  btn: { height: 54, borderRadius: 999, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center', ...buttonShadow },
+  btnSoft: { backgroundColor: colors.track, shadowOpacity: 0, elevation: 0 },
+  btnOff: { backgroundColor: colors.track, shadowOpacity: 0, elevation: 0 },
+  btnText: { fontSize: 15, fontWeight: '800', color: colors.white },
 });

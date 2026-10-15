@@ -30,7 +30,7 @@ export const BookingSheet: React.FC<Props> = ({ coach, offer, onClose, onWhatsAp
   const schedule = c ? [daysSummary(c.availabilityDays), c.availabilityHours].filter(Boolean).join(' · ') : '';
 
   return (
-    <BottomSheet visible={!!coach} onClose={onClose} snaps={[0.72]}>
+    <BottomSheet variant="sheet" visible={!!coach} onClose={onClose} snaps={[0.72]}>
       {() =>
         c ? (
           <View style={s.body}>

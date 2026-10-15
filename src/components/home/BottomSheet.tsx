@@ -18,6 +18,7 @@ import {
 import { useBackHandler } from '../../navigation/backStack';
 import { haptics } from '../../utils/haptics';
 import { colors } from '../../theme';
+import { Icon } from '../ui/Icon';
 import { useReduceMotion } from '../../hooks/useDeviceState';
 import { useKeyboardHeight } from '../../hooks/useKeyboardHeight';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -37,6 +38,11 @@ interface BottomSheetProps {
   children: (expanded: boolean, extraBottom: number) => React.ReactNode;
   /** Rendered inside the drag zone under the handle (title row). Dragging works from here too. */
   header?: React.ReactNode;
+  /**
+   * 'page' (default): a full screen that slides in from the right, with a back button.
+   * 'sheet': the slide-up sheet with snap points; kept for the coaches and the notifications.
+   */
+  variant?: 'page' | 'sheet';
 }
 
 /** Lets a scroll list inside the sheet tell the sheet whether it is scrolled to the top. */
@@ -68,12 +74,90 @@ export const SheetScrollView = React.forwardRef<ScrollView, ScrollViewProps>(({ 
   );
 });
 
+/** A sheet's content as a full page or as a slide-up sheet (see `variant`). */
+export const BottomSheet: React.FC<BottomSheetProps> = props =>
+  props.variant === 'sheet' ? <SlideSheet {...props} /> : <PageSheet {...props} />;
+
+/**
+ * Full-screen page: slides in from the right, closes with the back button at the top,
+ * the phone's back button/gesture, or Escape on web. Same render prop as the sheet, at
+ * full height (expanded = true, extraBottom = the keyboard).
+ */
+const PageSheet: React.FC<BottomSheetProps> = ({ visible, onClose, children, header }) => {
+  const { width: winW } = useWindowDimensions();
+  const reduceMotion = useReduceMotion();
+  const insets = useSafeAreaInsets();
+  const keyboard = useKeyboardHeight();
+  const [mounted, setMounted] = useState(visible);
+  const translateX = useRef(new Animated.Value(winW)).current;
+
+  const slide = useCallback(
+    (toValue: number, done?: () => void) =>
+      Animated.timing(translateX, {
+        toValue,
+        duration: reduceMotion ? 120 : toValue === 0 ? 300 : 220,
+        easing: toValue === 0 ? Easing.out(Easing.cubic) : Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }).start(({ finished }) => finished && done?.()),
+    [translateX, reduceMotion]
+  );
+
+  const requestClose = useCallback(() => {
+    haptics.light();
+    slide(winW, () => {
+      setMounted(false);
+      onClose();
+    });
+  }, [slide, winW, onClose]);
+
+  useEffect(() => {
+    if (visible) {
+      setMounted(true);
+      translateX.setValue(reduceMotion ? 0 : winW);
+      const t = setTimeout(() => slide(0), 16);
+      return () => clearTimeout(t);
+    } else if (mounted) {
+      slide(winW, () => setMounted(false));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
+
+  useBackHandler(visible && mounted, requestClose);
+
+  useEffect(() => {
+    if (Platform.OS !== 'web' || !visible) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && requestClose();
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [visible, requestClose]);
+
+  if (!mounted) return null;
+
+  return (
+    <Modal visible transparent animationType="none" onRequestClose={requestClose} statusBarTranslucent>
+      <Animated.View style={[styles.page, { paddingTop: insets.top, transform: [{ translateX }] }]}>
+        <View style={styles.pageInner}>
+          <View style={styles.pageTop}>
+            <Pressable onPress={requestClose} hitSlop={8} accessibilityRole="button" accessibilityLabel="Retour" style={({ pressed }) => [styles.back, pressed && { opacity: 0.7 }]}>
+              <Icon name="chevron-back" size={24} color={colors.text} />
+            </Pressable>
+            {!!header && <View style={styles.pageHeader}>{header}</View>}
+          </View>
+          <View style={[styles.body, { paddingBottom: insets.bottom }]}>
+            <SheetScrollContext.Provider value={null}>{children(true, keyboard)}</SheetScrollContext.Provider>
+          </View>
+        </View>
+      </Animated.View>
+    </Modal>
+  );
+};
+
 /**
  * Bottom sheet with snap points. Close it by swiping down anywhere on it (the list must be
  * at its top), tapping the backdrop, or the phone's back button/gesture. Swiping up on a
  * half-open sheet expands it. Only core React Native APIs, so it runs on iOS, Android and web.
  */
-export const BottomSheet: React.FC<BottomSheetProps> = ({
+const SlideSheet: React.FC<BottomSheetProps> = ({
   visible,
   onClose,
   snaps,
@@ -346,4 +430,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   body: { flex: 1 },
+
+  page: { flex: 1, backgroundColor: colors.page },
+  pageInner: { flex: 1, width: '100%', maxWidth: 640, alignSelf: 'center' },
+  pageTop: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingTop: 10, paddingBottom: 8, minHeight: 64 },
+  pageHeader: { flex: 1, minWidth: 0 },
+  back: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
 });

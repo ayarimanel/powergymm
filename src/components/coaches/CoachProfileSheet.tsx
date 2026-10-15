@@ -39,7 +39,7 @@ export const CoachProfileSheet: React.FC<Props> = ({ coach, isMine, isOwner, onC
   const canEdit = isMine || isOwner;
 
   return (
-    <BottomSheet visible={!!coach} onClose={onClose} snaps={[0.94]}>
+    <BottomSheet variant="sheet" visible={!!coach} onClose={onClose} snaps={[0.94]}>
       {(_, extraBottom) => {
         if (!c) return null;
         const pending = c.status === 'pending';

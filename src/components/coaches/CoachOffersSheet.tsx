@@ -42,7 +42,7 @@ export const CoachOffersSheet: React.FC<Props> = ({ visible, coach, onClose, onC
   };
 
   return (
-    <BottomSheet
+    <BottomSheet variant="sheet"
       visible={visible}
       onClose={onClose}
       snaps={[0.94]}

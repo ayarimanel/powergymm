@@ -150,7 +150,7 @@ export const ActivitySheet: React.FC<Props> = ({ visible, onClose, events, seenA
   };
 
   return (
-    <BottomSheet
+    <BottomSheet variant="sheet"
       visible={visible}
       onClose={onClose}
       snaps={[0.6, 0.94]}

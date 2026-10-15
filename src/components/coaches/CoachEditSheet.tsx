@@ -170,7 +170,7 @@ export const CoachEditSheet: React.FC<Props> = ({ visible, mode, coach, me, isOw
   };
 
   return (
-    <BottomSheet
+    <BottomSheet variant="sheet"
       visible={visible}
       onClose={onClose}
       snaps={[0.96]}

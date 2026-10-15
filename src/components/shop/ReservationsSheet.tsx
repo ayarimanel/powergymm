@@ -54,7 +54,7 @@ const ActionBtn: React.FC<{ label: string; onPress: () => void; kind?: 'dark' | 
   </Pressable>
 );
 
-/** Member: "Mes réservations". Owner: "Commandes" with actions to move each order along. */
+/** Member: "Mes commandes". Owner: "Commandes" with actions to move each order along. */
 export const ReservationsSheet: React.FC<Props> = ({ visible, onClose, mode, reservations, onSetStatus }) => {
   const [tab, setTab] = useState<'active' | 'history'>('active');
   const isOwner = mode === 'owner';
@@ -68,7 +68,7 @@ export const ReservationsSheet: React.FC<Props> = ({ visible, onClose, mode, res
       snaps={[0.6, 0.92]}
       header={
         <View>
-          <Title variant="section" style={styles.title}>{isOwner ? 'Commandes' : 'Mes réservations'}</Title>
+          <Title variant="section" style={styles.title}>{isOwner ? 'Commandes' : 'Mes commandes'}</Title>
           <View style={styles.tabs}>
             {(
               [
@@ -92,20 +92,14 @@ export const ReservationsSheet: React.FC<Props> = ({ visible, onClose, mode, res
     >
       {(_e, extraBottom) => (
         <SheetScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 32 + extraBottom, gap: 12 }}>
-          {/* design-ref Panier: how many items, big */}
-          {list.length > 0 && (
-            <Title variant="display" size={40} style={{ marginTop: 6 }}>
-              {list.reduce((a, r) => a + r.quantity, 0)} article{list.reduce((a, r) => a + r.quantity, 0) > 1 ? 's' : ''}
-            </Title>
-          )}
           {list.length === 0 && (
             <View style={styles.empty}>
               <Icon name="bag-check-outline" size={44} color={colors.textMuted} />
               <Text style={styles.emptyTitle}>
-                {tab === 'active' ? (isOwner ? 'Aucune commande à traiter' : 'Aucune réservation en cours') : 'Rien dans l’historique'}
+                {tab === 'active' ? (isOwner ? 'Aucune commande à traiter' : 'Aucune commande en cours') : 'Rien dans l’historique'}
               </Text>
               {!isOwner && tab === 'active' && (
-                <Text style={styles.emptySub}>Choisis un produit et touche « Réserver » : tu le retires à l’accueil.</Text>
+                <Text style={styles.emptySub}>Ajoute des produits au panier puis touche « Commander » : tu les retires à l’accueil.</Text>
               )}
             </View>
           )}
@@ -143,7 +137,7 @@ export const ReservationsSheet: React.FC<Props> = ({ visible, onClose, mode, res
                 )}
                 {!isOwner && r.status === 'pending' && (
                   <View style={styles.actions}>
-                    <ActionBtn label="Annuler la réservation" kind="danger" onPress={() => onSetStatus(r.id, 'cancelled')} />
+                    <ActionBtn label="Annuler la commande" kind="danger" onPress={() => onSetStatus(r.id, 'cancelled')} />
                   </View>
                 )}
                 {!isOwner && r.status === 'ready' && (
@@ -157,7 +151,7 @@ export const ReservationsSheet: React.FC<Props> = ({ visible, onClose, mode, res
           {!isOwner && tab === 'active' && list.length > 0 && (
             <View style={styles.total}>
               <View style={styles.totalRow}>
-                <Text style={styles.totalLbl}>Total</Text>
+                <Text style={styles.totalLbl}>À payer à l’accueil</Text>
                 <Text style={styles.totalVal}>{formatPrice(list.reduce((a, r) => a + r.unitPriceTnd * r.quantity, 0))}</Text>
               </View>
               <View style={styles.pickup}>
@@ -173,7 +167,7 @@ export const ReservationsSheet: React.FC<Props> = ({ visible, onClose, mode, res
 };
 
 const styles = StyleSheet.create({
-  title: { textAlign: 'center', fontSize: 22 },
+  title: { fontSize: 26 },
   tabs: { flexDirection: 'row', padding: 4, marginTop: 12, marginBottom: 4, borderRadius: 999, backgroundColor: colors.bg },
   tab: { flex: 1, height: 40, borderRadius: 999, alignItems: 'center', justifyContent: 'center' },
   tabOn: { backgroundColor: colors.brand },

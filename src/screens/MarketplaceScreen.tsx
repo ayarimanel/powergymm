@@ -4,7 +4,7 @@ import { Text, TextInput } from '../components/ui/Text';
 import { Icon } from '../components/ui/Icon';
 import { MarketplaceProduct, ProductReservation, ReservationStatus, ShopCategory, UserProfile } from '../types/database';
 import { GymConfigService } from '../config/gymConfig';
-import { ShopService, isActive } from '../services/shopService';
+import { CartItem, ShopService, formatPrice, isActive } from '../services/shopService';
 import { hasPermission } from '../services/permissionsService';
 import { buttonShadow, colors, fonts, radius } from '../theme';
 import { Avatar } from '../components/community/Avatar';
@@ -16,7 +16,7 @@ import { ReservationsSheet } from '../components/shop/ReservationsSheet';
 import { ProductFormModal, ProductDraft } from '../components/shop/ProductFormModal';
 import { CategoryRail } from '../components/shop/CategoryRail';
 import { PromoHero } from '../components/shop/PromoHero';
-import { OrdersPill } from '../components/shop/OrdersPill';
+import { CartSheet } from '../components/shop/CartSheet';
 import { CATEGORY_META, ProductCategory } from '../shop/categoryMeta';
 import { useScrollToTopOnReselect } from '../navigation/tabEvents';
 import { Toast } from '../components/home/Toast';
@@ -61,12 +61,15 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const [showOrders, setShowOrders] = useState(false);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [showCart, setShowCart] = useState(false);
   const [form, setForm] = useState<{ open: boolean; product: MarketplaceProduct | null }>({ open: false, product: null });
   const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     ShopService.getProducts().then(setProducts);
     ShopService.getReservations().then(setReservations);
+    ShopService.getCart(user.id).then(setCart);
     GymConfigService.getConfig().then(c => setGymName(c.name));
   }, []);
 
@@ -81,6 +84,9 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
   const badgeCount = canManage
     ? reservations.filter(r => r.status === 'pending').length
     : myActiveReservations.length;
+
+  // Members: green badge on "Mes commandes" once an order waits at the desk.
+  const ordersReady = !canManage && myActiveReservations.some(r => r.status === 'ready');
 
   const productList = products ?? [];
 
@@ -113,13 +119,42 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
   }, [productList, query, filter, sort]);
 
   const activeProduct = productList.find(p => p.id === activeId) ?? null;
+
+  // The cart, with each line's current product (lines whose product was removed drop out).
+  const cartLines = useMemo(
+    () => cart.flatMap(c => {
+      const product = productList.find(p => p.id === c.productId);
+      return product ? [{ product, quantity: c.quantity }] : [];
+    }),
+    [cart, productList]
+  );
+  const cartCount = cartLines.reduce((a, l) => a + l.quantity, 0);
+  const cartTotal = cartLines.reduce((a, l) => a + l.quantity * l.product.priceTnd, 0);
   const activeCategoryTint = filter !== 'all' && filter !== 'promo' ? CATEGORY_META[filter]?.tint : null;
 
   // ---- Actions ----
-  const reserve = async (p: MarketplaceProduct, qty: number) => {
-    setReservations(await ShopService.reserve(user, p, qty));
+  const updateCart = (next: CartItem[]) => {
+    setCart(next);
+    ShopService.saveCart(user.id, next);
+  };
+
+  const addToCart = (p: MarketplaceProduct, qty: number) => {
+    const has = cart.some(c => c.productId === p.id);
+    updateCart(has ? cart.map(c => (c.productId === p.id ? { ...c, quantity: c.quantity + qty } : c)) : [...cart, { productId: p.id, quantity: qty }]);
     setActiveId(null);
-    setToast('Réservé ! Retire-le à l’accueil du club');
+    setToast('Ajouté au panier');
+  };
+
+  const setCartQty = (productId: string, quantity: number) =>
+    updateCart(quantity <= 0 ? cart.filter(c => c.productId !== productId) : cart.map(c => (c.productId === productId ? { ...c, quantity } : c)));
+
+  const order = async () => {
+    const lines = cartLines.filter(l => l.product.inStock);
+    if (!lines.length) return;
+    setReservations(await ShopService.placeOrder(user, lines));
+    setCart([]);
+    setShowCart(false);
+    setToast('Commande envoyée ! Retire-la à l’accueil du club');
   };
 
   const setStatus = async (id: string, status: ReservationStatus) => {
@@ -172,14 +207,22 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
         <Pressable
           onPress={() => setShowOrders(true)}
           accessibilityRole="button"
-          accessibilityLabel={canManage ? 'Commandes' : 'Mes réservations'}
+          accessibilityLabel={canManage ? 'Commandes' : `Mes commandes${badgeCount ? `, ${badgeCount} en cours${ordersReady ? ', prête à retirer' : ''}` : ''}`}
           style={styles.headerBtn}
         >
-          <Icon name={canManage ? 'clipboard-outline' : 'bag-check-outline'} size={22} color={colors.text} />
+          <Icon name={canManage ? 'clipboard-outline' : 'receipt-outline'} size={22} color={colors.text} />
           {badgeCount > 0 && (
-            <View style={styles.badge}><Text style={styles.badgeText}>{badgeCount > 9 ? '9+' : badgeCount}</Text></View>
+            <View style={[styles.badge, ordersReady && { backgroundColor: colors.green.bar }]}><Text style={styles.badgeText}>{badgeCount > 9 ? '9+' : badgeCount}</Text></View>
           )}
         </Pressable>
+        {!canManage && (
+          <Pressable onPress={() => setShowCart(true)} accessibilityRole="button" accessibilityLabel={`Panier, ${cartCount} article${cartCount > 1 ? 's' : ''}`} style={styles.headerBtn}>
+            <Icon name="bag-handle-outline" size={22} color={colors.text} />
+            {cartCount > 0 && (
+              <View style={styles.badge}><Text style={styles.badgeText}>{cartCount > 9 ? '9+' : cartCount}</Text></View>
+            )}
+          </Pressable>
+        )}
       </View>
 
       <View style={styles.searchWrap}>
@@ -205,11 +248,6 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
       </View>
 
       <ScrollView ref={scrollRef} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        {/* Members: order status pill */}
-        {!canManage && myActiveReservations.length > 0 && (
-          <OrdersPill reservations={myActiveReservations} onPress={() => setShowOrders(true)} />
-        )}
-
         {/* En solde */}
         {filter === 'all' && !query && promoProducts.length > 0 && (
           <View style={{ gap: 14 }}>
@@ -280,6 +318,20 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
 
       <Toast message={toast} onHide={() => setToast(null)} />
 
+      {/* Members: the cart, always one tap away once it has something in it */}
+      {!canManage && cartCount > 0 && (
+        <Pressable
+          onPress={() => setShowCart(true)}
+          accessibilityRole="button"
+          accessibilityLabel={`Voir le panier, ${cartCount} article${cartCount > 1 ? 's' : ''}, ${formatPrice(cartTotal)}`}
+          style={({ pressed }) => [styles.cartBar, pressed && { transform: [{ scale: 0.98 }] }]}
+        >
+          <View style={styles.cartCount}><Text style={styles.cartCountText}>{cartCount}</Text></View>
+          <Text style={styles.cartBarText}>Voir le panier</Text>
+          <Text style={styles.cartBarTotal}>{formatPrice(cartTotal)}</Text>
+        </Pressable>
+      )}
+
       {canManage && (
         <Pressable
           onPress={() => setForm({ open: true, product: null })}
@@ -296,7 +348,7 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
         product={activeProduct}
         isOwner={canManage}
         onClose={() => setActiveId(null)}
-        onReserve={reserve}
+        onReserve={addToCart}
         onEdit={p => { setActiveId(null); setForm({ open: true, product: p }); }}
         onDelete={deleteProduct}
       />
@@ -306,6 +358,14 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
         mode={canManage ? 'owner' : 'member'}
         reservations={visibleReservations}
         onSetStatus={setStatus}
+      />
+      <CartSheet
+        visible={showCart}
+        lines={cartLines}
+        onClose={() => setShowCart(false)}
+        onSetQty={setCartQty}
+        onOrder={order}
+        onOpenOrders={() => { setShowCart(false); setShowOrders(true); }}
       />
       <ProductFormModal
         visible={form.open}
@@ -328,6 +388,12 @@ const styles = StyleSheet.create({
   headerBtn: { width: 46, height: 46, alignItems: 'center', justifyContent: 'center', borderRadius: 23, backgroundColor: colors.bg },
   badge: { position: 'absolute', top: 2, right: 2, minWidth: 18, height: 18, paddingHorizontal: 4, borderRadius: 9, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: colors.page },
   badgeText: { color: colors.white, fontSize: 10, fontWeight: '800' },
+
+  cartBar: { position: 'absolute', left: 16, right: 16, bottom: 16, height: 58, borderRadius: 999, flexDirection: 'row', alignItems: 'center', gap: 12, paddingLeft: 8, paddingRight: 22, backgroundColor: colors.brand, ...buttonShadow },
+  cartCount: { minWidth: 42, height: 42, borderRadius: 21, paddingHorizontal: 8, backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center' },
+  cartCountText: { fontSize: 16, fontWeight: '800', color: colors.brand },
+  cartBarText: { flex: 1, fontSize: 16, fontWeight: '800', color: colors.white },
+  cartBarTotal: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 22, color: colors.white },
 
   searchWrap: { flexDirection: 'row', alignItems: 'center', gap: 10, height: 52, marginHorizontal: 16, marginBottom: 12, paddingHorizontal: 16, borderRadius: radius.input, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
   searchInput: { flex: 1, fontSize: 15, fontWeight: '500', color: colors.text, height: '100%' as any },

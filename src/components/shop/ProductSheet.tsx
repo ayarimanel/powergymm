@@ -167,7 +167,7 @@ export const ProductSheet: React.FC<Props> = ({ product, isOwner, onClose, onRes
                     style={[styles.reserveBtn, !p.inStock && styles.reserveBtnOff]}
                   >
                     <Text style={styles.footerBtnText}>
-                      {p.inStock ? `Réserver · ${formatPrice(p.priceTnd * qty)}` : 'Indisponible'}
+                      {p.inStock ? `Ajouter au panier · ${formatPrice(p.priceTnd * qty)}` : 'Indisponible'}
                     </Text>
                   </Pressable>
                 </View>

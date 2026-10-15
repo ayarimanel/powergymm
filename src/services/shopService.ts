@@ -4,6 +4,13 @@ import { DEFAULT_PRODUCTS } from '../data/defaultProducts';
 
 const PRODUCTS_KEY = '@gym_app_shop_products_v1';
 const RESERVATIONS_KEY = '@gym_app_shop_reservations_v1';
+const CART_KEY = '@gym_app_shop_cart_v1';
+
+/** One line of a member's cart, before it is ordered. */
+export interface CartItem {
+  productId: string;
+  quantity: number;
+}
 
 const read = async <T,>(key: string): Promise<T | null> => {
   try {
@@ -77,6 +84,46 @@ export const ShopService = {
     };
     const next = [reservation, ...(await ShopService.getReservations())];
     await write(RESERVATIONS_KEY, next);
+    return next;
+  },
+
+  /** The member's cart, kept on the phone until they order. */
+  getCart: async (userId: string): Promise<CartItem[]> =>
+    ((await read<Record<string, CartItem[]>>(CART_KEY)) ?? {})[userId] ?? [],
+
+  saveCart: async (userId: string, items: CartItem[]) => {
+    const all = (await read<Record<string, CartItem[]>>(CART_KEY)) ?? {};
+    await write(CART_KEY, { ...all, [userId]: items });
+  },
+
+  /** "Commander": every cart line becomes an order the club prepares (same flow as before). */
+  placeOrder: async (
+    user: UserProfile,
+    lines: { product: MarketplaceProduct; quantity: number }[]
+  ): Promise<ProductReservation[]> => {
+    let next = await ShopService.getReservations();
+    for (const [i, l] of lines.entries()) {
+      const now = new Date().toISOString();
+      next = [
+        {
+          id: `res-${Date.now()}-${i}`,
+          gymId: user.gymId,
+          productId: l.product.id,
+          productName: l.product.name,
+          productImage: l.product.imageUrls[0],
+          unitPriceTnd: l.product.priceTnd,
+          quantity: l.quantity,
+          userId: user.id,
+          userName: user.fullName,
+          status: 'pending',
+          createdAt: now,
+          updatedAt: now,
+        },
+        ...next,
+      ];
+    }
+    await write(RESERVATIONS_KEY, next);
+    await ShopService.saveCart(user.id, []);
     return next;
   },
 

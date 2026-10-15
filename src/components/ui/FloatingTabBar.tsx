@@ -61,7 +61,7 @@ function Item({ tab, active, onPress }: { tab: BarTab; active: boolean; onPress:
 
   return (
     <Pressable
-      style={s.item}
+      style={[s.item, active && s.itemActive]}
       onPress={onPress}
       onPressIn={() => pressTo(0.86)}
       onPressOut={() => pressTo(1)}
@@ -92,6 +92,7 @@ const s = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 10,
   },
+  itemActive: { flex: 1.45 },
   item: { flex: 1, minWidth: 48, alignItems: 'center', justifyContent: 'center', gap: 4, paddingTop: 7 },
   label: { fontSize: 11, fontWeight: '700' },
   dash: { width: 16, height: 3, borderRadius: 2, backgroundColor: colors.tabActive },

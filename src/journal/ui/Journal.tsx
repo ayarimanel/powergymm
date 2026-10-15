@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../../components/ui/Text';
-import { MuscleGroup } from '../../types/database';
+import { GenderType, MuscleGroup } from '../../types/database';
 import {
   CustomExercise, ExerciseKind, Workout, WorkoutSet, dayKey, doneSets, exById, fmtKg, fmtNum, isNewRecord, lastPerformance, nextSet,
   cloneForRepeat, setCustomExercises, workoutSets, workoutVolume,
@@ -32,6 +32,8 @@ interface Props {
   startToken?: number;
   /** Tab re-tapped: back to the top. */
   scrollRef?: React.RefObject<ScrollView | null>;
+  /** The member's gender: which body "Mon corps" shows first. */
+  gender?: GenderType;
 }
 
 const REST_DEFAULT = 90;
@@ -47,7 +49,7 @@ function useTick(active: boolean) {
   return now;
 }
 
-export const Journal: React.FC<Props> = ({ history, customExercises, draft, onDraftChange, onSaveWorkout, onDeleteWorkout, onCreateExercise, sync, startToken, scrollRef }) => {
+export const Journal: React.FC<Props> = ({ history, customExercises, draft, onDraftChange, onSaveWorkout, onDeleteWorkout, onCreateExercise, sync, startToken, scrollRef, gender }) => {
   setCustomExercises(customExercises); // keep the catalog in sync before rendering anything
 
   type Screen = 'home' | 'logger' | 'session' | 'summary';
@@ -254,6 +256,7 @@ export const Journal: React.FC<Props> = ({ history, customExercises, draft, onDr
         onRepeat={repeatWorkout}
         onResume={() => setScreen('session')}
         onMuscle={id => setSheet({ muscleId: id })}
+        gender={gender}
         onDelete={async id => {
           try {
             await onDeleteWorkout(id);
@@ -321,26 +324,21 @@ const JournalHeader: React.FC<{ history: Workout[]; now: Date; sync: SyncInfo }>
   const sets = today.reduce((a, x) => a + workoutSets(x), 0);
   const prs = today.reduce((a, x) => a + x.exercises.reduce((b, e) => b + e.sets.filter(y => y.pr && y.done).length, 0), 0);
   return (
+    // A quiet line above the title (design-ref Entrainement has no bar): sync state + today's totals.
     <View style={s.head}>
-      <View style={{ flex: 1, minWidth: 0 }}>
-        <Text style={s.h1} accessibilityRole="header">Mon journal</Text>
-        <SyncBadge sync={sync} />
-      </View>
-      <View style={s.chip} accessibilityLabel={`Aujourd'hui : ${fmtKg(vol)}, ${sets} séries, ${prs} records`}>
-        <Text style={[s.chipVal, tabular]}>{fmtKg(vol)}</Text>
-        <Text style={s.chipSub}>
-          {sets} série{sets > 1 ? 's' : ''} · {prs} PR
-        </Text>
-      </View>
+      <SyncBadge sync={sync} />
+      <Text style={[s.chipSub, tabular]} accessibilityLabel={`Aujourd'hui : ${fmtKg(vol)}, ${sets} séries, ${prs} records`}>
+        Aujourd'hui · {fmtKg(vol)} · {sets} série{sets > 1 ? 's' : ''} · {prs} PR
+      </Text>
     </View>
   );
 };
 
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.page },
-  head: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 68, paddingVertical: 12, paddingHorizontal: 16, backgroundColor: colors.header, borderBottomWidth: 1, borderBottomColor: J.line },
+  head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingTop: 10, paddingHorizontal: 16, backgroundColor: colors.page },
   h1: { fontSize: 18, fontWeight: '800', color: J.fg },
-  sync: { flexDirection: 'row', alignItems: 'center', gap: 5, alignSelf: 'flex-start', marginTop: 1 },
+  sync: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   syncDot: { width: 7, height: 7, borderRadius: 4 },
   syncText: { fontSize: 11, fontWeight: '700', color: J.muted },
   chip: { alignItems: 'flex-end', backgroundColor: colors.card, borderRadius: 14, paddingVertical: 6, paddingHorizontal: 12 },

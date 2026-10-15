@@ -37,6 +37,7 @@ export const JournalScreen: React.FC<Props> = ({ user, startToken }) => {
       sync={data.sync}
       startToken={startToken}
       scrollRef={scrollRef}
+      gender={user.gender}
     />
   );
 };

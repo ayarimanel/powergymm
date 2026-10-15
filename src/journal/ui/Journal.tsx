@@ -59,6 +59,8 @@ export const Journal: React.FC<Props> = ({ history, customExercises, draft, onDr
   const [exIdx, setExIdx] = useState(0);
   const [selDay, setSelDay] = useState(() => new Date());
   const [rest, setRest] = useState<Rest | null>(null);
+  /** Rest length picked in the timer (60/90/120 s), used for the next sets too. */
+  const [restLen, setRestLen] = useState(REST_DEFAULT);
   const [toast, setToast] = useState<string | null>(null);
   const [finished, setFinished] = useState<Workout | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -141,7 +143,7 @@ export const Journal: React.FC<Props> = ({ history, customExercises, draft, onDr
       haptics.success();
       say(`Nouveau record : ${fmtNum(Number(String(x.kg).replace(',', '.')) || 0)} kg × ${x.reps} !`);
     }
-    if (willBeDone && active.live && meta.kind !== 'cardio') setRest({ end: Date.now() + REST_DEFAULT * 1000, total: REST_DEFAULT });
+    if (willBeDone && active.live && meta.kind !== 'cardio') setRest({ end: Date.now() + restLen * 1000, total: restLen });
   };
 
   const finishWorkout = async () => {
@@ -206,6 +208,12 @@ export const Journal: React.FC<Props> = ({ history, customExercises, draft, onDr
         workout={active}
         ex={active.exercises[exIdx]}
         history={allHistory}
+        now={now}
+        next={
+          exIdx + 1 < active.exercises.length
+            ? { name: exById(active.exercises[exIdx + 1].exerciseId)?.name ?? '', onPress: () => setExIdx(exIdx + 1) }
+            : undefined
+        }
         onBack={() => setScreen('session')}
         onToggle={toggleDone}
         updateSets={updateSets}
@@ -276,7 +284,19 @@ export const Journal: React.FC<Props> = ({ history, customExercises, draft, onDr
         {body}
       </ScrollView>
       {active && screen === 'home' && !rest && <ActiveBar workout={active} now={now} onResume={() => setScreen('session')} />}
-      {rest && <RestTimer rest={rest} now={now} onAdd={sec => setRest(r => (r ? { ...r, end: r.end + sec * 1000 } : r))} onSkip={() => setRest(null)} />}
+      {rest && (
+        <RestTimer
+          rest={rest}
+          now={now}
+          onAdd={sec => setRest(r => (r ? { ...r, end: r.end + sec * 1000 } : r))}
+          onSkip={() => setRest(null)}
+          onLength={sec => {
+            // Same start, new length: the time already rested still counts.
+            setRestLen(sec);
+            setRest(r => (r ? { end: r.end - r.total * 1000 + sec * 1000, total: sec } : r));
+          }}
+        />
+      )}
       <MuscleSheet
         sheet={sheet}
         history={allHistory}
@@ -344,5 +364,6 @@ const s = StyleSheet.create({
   chip: { alignItems: 'flex-end', backgroundColor: colors.card, borderRadius: 14, paddingVertical: 6, paddingHorizontal: 12 },
   chipVal: { fontSize: 20, fontWeight: '900', color: J.fg, lineHeight: 22 },
   chipSub: { fontSize: 11, color: J.muted },
-  body: { padding: 12, paddingBottom: 120 },
+  // Room at the bottom for the floating rest timer / session bar.
+  body: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 220 },
 });

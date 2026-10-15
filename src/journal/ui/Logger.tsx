@@ -6,9 +6,12 @@ import {
   Exercise, ProgressPoint, Workout, WorkoutExercise, WorkoutSet, dayLabel, doneSets, exById, exVolume, exerciseProgress, fmtKg, fmtNum,
   lastPerformance, muscleById, nextSet, num, personalRecord, progressionHint, summarizeSets,
 } from '../journalLogic';
-import { Btn, Card, J, Link, MuscleIcon, SecHead, Seg, k, tabular } from './kit';
-import { colors } from '../../theme';
+import { Btn, Card, J, Link, SecHead, Seg, k, tabular } from './kit';
+import { colors, fonts } from '../../theme';
 import { Icon } from '../../components/ui/Icon';
+import { Title } from '../../components/ui/Title';
+import { SegmentedProgress } from '../../components/ui/SegmentedProgress';
+import { mmss } from './SessionScreens';
 
 interface Props {
   workout: Workout;
@@ -18,9 +21,13 @@ interface Props {
   onToggle: (i: number) => void;
   updateSets: (fn: (sets: WorkoutSet[]) => WorkoutSet[]) => void;
   onRemove: () => void;
+  /** Live clock for the session timer in the top bar. */
+  now?: Date;
+  /** The next exercise of the session, to go straight to it. */
+  next?: { name: string; onPress: () => void };
 }
 
-export const Logger: React.FC<Props> = ({ workout, ex, history, onBack, onToggle, updateSets, onRemove }) => {
+export const Logger: React.FC<Props> = ({ workout, ex, history, onBack, onToggle, updateSets, onRemove, now, next }) => {
   const meta = exById(ex.exerciseId)!;
   const m = muscleById(meta.muscle);
   const others = history.filter(x => x.id !== workout.id);
@@ -42,6 +49,10 @@ export const Logger: React.FC<Props> = ({ workout, ex, history, onBack, onToggle
     updateSets(sets => sets.map(x => (x.done ? x : { ...x, ...hint.apply })));
     setHintUsed(true);
   };
+  const pos = Math.max(0, workout.exercises.findIndex(e => e.exerciseId === ex.exerciseId));
+  const secs = now ? Math.max(0, (+now - +new Date(workout.startedAt)) / 1000) : 0;
+  /** The set to do next gets the highlight (design-ref Seance). */
+  const current = ex.sets.findIndex(x => !x.done);
   const copyPrev = (i: number) => {
     const p = last?.sets[i];
     if (p) set(i, cardio ? { min: p.min, km: p.km } : { kg: p.kg, reps: p.reps });
@@ -49,28 +60,42 @@ export const Logger: React.FC<Props> = ({ workout, ex, history, onBack, onToggle
 
   return (
     <View style={s.stack}>
-      <Link label="‹ Séance en cours" onPress={onBack} />
-      <Card style={s.head}>
-        <MuscleIcon id={m.id} color={m.color} small />
-        <View style={{ flex: 1, minWidth: 0 }}>
-          <Text style={s.title} accessibilityRole="header">{meta.name}</Text>
-          <Text style={k.sub}>{m.name}{!workout.live ? ` · ${dayLabel(workout.date)}` : ''}</Text>
+      {/* Top bar: back to the session · clock · done */}
+      <View style={s.topBar}>
+        <Pressable onPress={onBack} accessibilityRole="button" accessibilityLabel="Retour à la séance en cours" style={s.round}>
+          <Icon name="chevron-back" size={22} color={J.fg} />
+        </Pressable>
+        <View style={s.clockRow}>
+          {workout.live ? (
+            <>
+              <Icon name="time-outline" size={20} color={J.muted} />
+              <Text style={[s.clock, tabular]}>{mmss(secs)}</Text>
+            </>
+          ) : (
+            <Text style={s.dayText}>{dayLabel(workout.date)}</Text>
+          )}
         </View>
-      </Card>
+        <Pressable onPress={onBack} accessibilityRole="button" accessibilityLabel="Exercice terminé" style={s.donePill}>
+          <Text style={s.donePillText}>Terminé</Text>
+        </Pressable>
+      </View>
+      {workout.exercises.length > 1 && <SegmentedProgress current={pos + 1} total={workout.exercises.length} />}
 
-      <View style={s.refs}>
-        <View style={s.ref}>
-          <Text style={s.refLbl}>Dernière fois</Text>
-          <Text style={[s.refVal, tabular]}>{last ? summarizeSets(last.sets, meta.kind) : 'Première fois'}</Text>
-          {last && <Text style={s.refDate}>{dayLabel(last.date)}</Text>}
-        </View>
+      <View>
+        <Text style={s.over}>
+          Exercice {pos + 1} / {workout.exercises.length} · {m.name}
+        </Text>
+        <Title variant="display" size={40}>{meta.name}</Title>
         {!cardio && (
-          <View style={[s.ref, s.refGold]}>
-            <Text style={[s.refLbl, { color: J.gold }]}>Mon record</Text>
-            <Text style={[s.refVal, { color: J.gold }, tabular]}>{pr ? `${fmtNum(pr.kg)} kg × ${pr.reps}` : 'À établir'}</Text>
-            {pr && <Text style={s.refDate}>{dayLabel(pr.date)}</Text>}
+          <View style={s.refLine}>
+            <Icon name="trophy-outline" size={18} color={J.recText} />
+            <Text style={[s.refText, tabular]}>{pr ? `Ton record : ${fmtNum(pr.kg)} kg × ${pr.reps}` : 'Ton record : à établir'}</Text>
           </View>
         )}
+        <View style={s.refLine}>
+          <Icon name="refresh" size={16} color={J.muted} />
+          <Text style={[s.refText, tabular]}>{last ? `Dernière fois (${dayLabel(last.date)}) : ${summarizeSets(last.sets, meta.kind)}` : 'Première fois'}</Text>
+        </View>
       </View>
 
       {hint && !hintUsed && nDone === 0 && (
@@ -83,18 +108,18 @@ export const Logger: React.FC<Props> = ({ workout, ex, history, onBack, onToggle
         </View>
       )}
 
-      <Card style={s.sets}>
+      <View style={s.sets}>
         <View style={[s.row, s.rowHead]}>
-          <Text style={[s.hCell, s.cN]}>#</Text>
+          <Text style={[s.hCell, s.cN]}>Série</Text>
           <Text style={[s.hCell, s.cPrev]}>Avant</Text>
-          <Text style={[s.hCell, s.cNum]}>{cardio ? 'Min' : meta.kind === 'body' ? '+kg' : 'kg'}</Text>
+          <Text style={[s.hCell, s.cNum]}>{cardio ? 'Min' : meta.kind === 'body' ? '+kg' : 'Poids'}</Text>
           <Text style={[s.hCell, s.cNum]}>{cardio ? 'Km' : 'Reps'}</Text>
           <View style={s.cCheck} />
         </View>
         {ex.sets.map((x, i) => {
           const p = last?.sets[i];
           return (
-            <View key={i} style={[s.row, x.done && s.rowDone, x.pr && s.rowPr]}>
+            <View key={i} style={[s.row, s.setCard, i === current && s.setCurrent, x.pr && s.rowPr]}>
               <View style={s.cN}>
                 {x.pr ? <Text style={s.prTag}>PR</Text> : <Text style={[s.n, tabular]}>{i + 1}</Text>}
               </View>
@@ -119,18 +144,19 @@ export const Logger: React.FC<Props> = ({ workout, ex, history, onBack, onToggle
                 accessibilityRole="checkbox"
                 accessibilityState={{ checked: x.done }}
                 accessibilityLabel={x.done ? 'Série validée' : 'Valider la série'}
-                style={[s.check, x.done && s.checkOn, x.done && x.pr && s.checkPr]}
+                style={[s.check, i === current && s.checkNext, x.done && s.checkOn, x.done && x.pr && s.checkPr]}
               >
-                <Icon name="checkmark" size={16} color={x.done ? colors.white : 'transparent'} />
+                <Icon name="checkmark" size={20} color={x.done || i === current ? colors.white : J.muted} />
               </Pressable>
             </View>
           );
         })}
-        <View style={s.setsActions}>
-          <Btn small variant="soft" label="+ Ajouter une série" onPress={add} />
-          {ex.sets.length > 1 && !ex.sets[ex.sets.length - 1].done && <Link muted label="Retirer la dernière" onPress={removeLast} />}
-        </View>
-      </Card>
+        <Pressable onPress={add} accessibilityRole="button" style={({ pressed }) => [s.addSet, pressed && { opacity: 0.8 }]}>
+          <Icon name="add" size={20} color={J.fg} />
+          <Text style={s.addSetText}>Ajouter une série</Text>
+        </Pressable>
+        {ex.sets.length > 1 && !ex.sets[ex.sets.length - 1].done && <Link muted label="Retirer la dernière" onPress={removeLast} style={{ alignSelf: 'center' }} />}
+      </View>
 
       <Card style={s.total}>
         {cardio ? (
@@ -161,6 +187,13 @@ export const Logger: React.FC<Props> = ({ workout, ex, history, onBack, onToggle
         <Btn variant="ghost" label="Retirer l'exercice" onPress={onRemove} style={{ flex: 1 }} />
         <Btn label="Exercice terminé" onPress={onBack} style={{ flex: 1.4 }} />
       </View>
+
+      {next && (
+        <Pressable onPress={next.onPress} accessibilityRole="button" accessibilityLabel={`Exercice suivant : ${next.name}`} style={({ pressed }) => [s.next, pressed && { opacity: 0.7 }]}>
+          <Text style={s.nextText} numberOfLines={1}>Suivant : {next.name}</Text>
+          <Icon name="arrow-forward" size={18} color={J.muted} />
+        </Pressable>
+      )}
     </View>
   );
 };
@@ -169,7 +202,7 @@ export const Logger: React.FC<Props> = ({ workout, ex, history, onBack, onToggle
 const Num: React.FC<{ label: string; value: WorkoutSet['kg']; done: boolean; onChange: (v: string | number) => void; onStep: (d: number) => void }> = ({ label, value, done, onChange, onStep }) => {
   const [text, setText] = useState<string | null>(null); // while typing, keep the raw text ("2," …)
   return (
-    <View style={[s.num, done && { backgroundColor: J.surface }]}>
+    <View style={[s.num, done && s.numDone]}>
       <Pressable onPress={() => onStep(-1)} accessibilityRole="button" accessibilityLabel={`${label} moins`} hitSlop={4} style={s.numBtn}>
         <Text style={s.numBtnText}>−</Text>
       </Pressable>
@@ -294,50 +327,62 @@ const LineChart: React.FC<{ points: (ProgressPoint & { y: number })[]; unit: str
 };
 
 const s = StyleSheet.create({
-  stack: { gap: 12 },
-  head: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  title: { fontSize: 18, fontWeight: '800', color: J.fg },
-  refs: { flexDirection: 'row', gap: 8 },
-  ref: { flex: 1, minWidth: 0, backgroundColor: J.surface, borderWidth: 1, borderColor: J.line, borderRadius: 16, paddingVertical: 10, paddingHorizontal: 12 },
-  refGold: { backgroundColor: J.goldSoft, borderColor: 'transparent' },
-  refLbl: { fontSize: 11, fontWeight: '800', color: J.muted },
-  refVal: { fontSize: 14, fontWeight: '800', color: J.fg },
-  refDate: { fontSize: 11, color: J.muted },
-  hint: { flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 16, paddingVertical: 10, paddingHorizontal: 12, backgroundColor: J.okSoft },
-  hintIc: { width: 28, height: 28, borderRadius: 14, backgroundColor: J.ok, alignItems: 'center', justifyContent: 'center' },
+  stack: { gap: 14 },
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
+  round: { width: 44, height: 44, borderRadius: 22, backgroundColor: J.surface2, alignItems: 'center', justifyContent: 'center' },
+  clockRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  clock: { fontFamily: fonts.headingBlack, fontWeight: 'normal', fontSize: 28, lineHeight: 30, color: J.fg },
+  dayText: { fontSize: 15, fontWeight: '800', color: J.fg },
+  donePill: { height: 44, paddingHorizontal: 20, borderRadius: 999, backgroundColor: J.accent, alignItems: 'center', justifyContent: 'center' },
+  donePillText: { color: colors.white, fontSize: 15, fontWeight: '800' },
+
+  over: { fontSize: 12, fontWeight: '800', letterSpacing: 2, textTransform: 'uppercase', color: J.accentText, marginBottom: 4 },
+  refLine: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 },
+  refText: { flex: 1, fontSize: 14, fontWeight: '500', color: J.muted },
+
+  hint: { flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 18, paddingVertical: 12, paddingHorizontal: 14, backgroundColor: J.okSoft },
+  hintIc: { width: 30, height: 30, borderRadius: 15, backgroundColor: J.ok, alignItems: 'center', justifyContent: 'center' },
   hintIcText: { color: colors.white, fontWeight: '900' },
   hintText: { flex: 1, fontSize: 13, fontWeight: '700', color: J.fg, minWidth: 0 },
 
-  sets: { paddingVertical: 10, paddingHorizontal: 8, gap: 6 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: 12, padding: 4 },
-  rowHead: { paddingVertical: 0 },
-  hCell: { fontSize: 10.5, fontWeight: '800', color: J.muted, textAlign: 'center', letterSpacing: 0.5, textTransform: 'uppercase' },
-  rowDone: { backgroundColor: J.okSoft },
-  rowPr: { backgroundColor: J.goldSoft },
-  cN: { width: 26, alignItems: 'center' },
+  sets: { gap: 10 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  rowHead: { paddingHorizontal: 10 },
+  hCell: { fontSize: 10, fontWeight: '800', color: J.muted, textAlign: 'center', letterSpacing: 0.6, textTransform: 'uppercase' },
+  setCard: { minHeight: 68, paddingHorizontal: 10, paddingVertical: 10, borderRadius: 20, backgroundColor: J.surface, borderWidth: 1, borderColor: J.line },
+  setCurrent: { borderColor: J.fg, borderWidth: 1.5 },
+  rowDone: {},
+  rowPr: { backgroundColor: J.goldSoft, borderColor: J.goldBright },
+  cN: { width: 40, alignItems: 'center' },
   cPrev: { width: 50, alignItems: 'center', paddingVertical: 6 },
   cNum: { flex: 1 },
-  cCheck: { width: 40 },
-  n: { fontWeight: '800', color: J.fg, textAlign: 'center' },
-  prTag: { fontSize: 10, fontWeight: '900', color: J.gold },
+  cCheck: { width: 44 },
+  n: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 24, color: J.fg, textAlign: 'center' },
+  prTag: { fontSize: 11, fontWeight: '900', color: J.gold },
   prev: { fontSize: 12, color: J.muted },
-  num: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', backgroundColor: J.surface2, borderRadius: 10, overflow: 'hidden' },
-  numBtn: { width: 24, height: 40, alignItems: 'center', justifyContent: 'center' },
-  numBtnText: { fontSize: 17, fontWeight: '800', color: J.muted },
-  numInput: { flex: 1, minWidth: 0, textAlign: 'center', fontWeight: '800', fontSize: 15, color: J.fg, paddingVertical: 0, paddingHorizontal: 0, height: 40 },
-  check: { width: 40, height: 40, borderRadius: 10, borderWidth: 2, borderColor: J.line, backgroundColor: J.surface, alignItems: 'center', justifyContent: 'center' },
+  num: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', backgroundColor: J.surface2, borderRadius: 14, overflow: 'hidden' },
+  numDone: { backgroundColor: 'transparent' },
+  numBtn: { width: 26, height: 44, alignItems: 'center', justifyContent: 'center' },
+  numBtnText: { fontSize: 18, fontWeight: '800', color: J.muted },
+  numInput: { flex: 1, minWidth: 0, textAlign: 'center', fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 22, color: J.fg, paddingVertical: 0, paddingHorizontal: 0, height: 44 },
+  check: { width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: J.line, backgroundColor: J.surface2, alignItems: 'center', justifyContent: 'center' },
+  checkNext: { backgroundColor: J.accent, borderColor: J.accent },
   checkOn: { backgroundColor: J.ok, borderColor: J.ok },
   checkPr: { backgroundColor: J.goldBright, borderColor: J.goldBright },
   checkText: { fontWeight: '900', color: 'transparent', fontSize: 16 },
+  addSet: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 56, borderRadius: 20, borderWidth: 1.5, borderStyle: 'dashed', borderColor: colors.disabled },
+  addSetText: { fontSize: 15, fontWeight: '700', color: J.fg },
   setsActions: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8, paddingHorizontal: 4, paddingTop: 6 },
 
   total: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  totalLbl: { fontSize: 11, fontWeight: '800', color: J.muted },
-  totalVal: { fontSize: 28, fontWeight: '900', color: J.fg, lineHeight: 32 },
+  totalLbl: { fontSize: 11, fontWeight: '800', letterSpacing: 1.2, textTransform: 'uppercase', color: J.muted },
+  totalVal: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 30, color: J.fg, lineHeight: 34 },
 
   progHead: { flexDirection: 'row', alignItems: 'baseline', gap: 10, marginBottom: 4 },
-  progVal: { fontSize: 28, fontWeight: '900', color: J.fg },
+  progVal: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 30, color: J.fg },
   progDelta: { fontSize: 12, fontWeight: '800', color: J.muted },
 
   rowBtns: { flexDirection: 'row', gap: 8 },
+  next: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 16 },
+  nextText: { fontSize: 15, fontWeight: '600', color: J.muted, flexShrink: 1 },
 });

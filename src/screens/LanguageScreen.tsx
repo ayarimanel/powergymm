@@ -49,13 +49,18 @@ export const LanguageScreen: React.FC<Props> = ({ onPick, current, onClose }) =>
               accessibilityRole="button"
               accessibilityState={{ selected: on }}
               accessibilityLabel={l.native}
-              style={({ pressed }) => [styles.option, on && styles.optionOn, pressed && { opacity: 0.9 }]}
+              style={({ pressed }) => [styles.option, (on || pressed) && styles.optionOn]}
             >
-              <View style={[styles.code, on && styles.codeOn]}>
-                <Text style={[styles.codeText, on && { color: colors.white }]}>{l.id.toUpperCase()}</Text>
-              </View>
-              <Text style={[styles.optionText, on && { color: colors.onInverse }]}>{l.native}</Text>
-              {on ? <Icon name="checkmark" size={24} color={colors.brand} /> : null}
+              {({ pressed }) => (
+                <>
+                  {/* Picked or under the finger: red card with a soft red glow */}
+                  <View style={[styles.code, (on || pressed) && styles.codeOn]}>
+                    <Text style={[styles.codeText, (on || pressed) && { color: colors.white }]}>{l.id.toUpperCase()}</Text>
+                  </View>
+                  <Text style={styles.optionText}>{l.native}</Text>
+                  {on ? <Icon name="checkmark" size={24} color={colors.brandText} /> : null}
+                </>
+              )}
             </Pressable>
           );
         })}
@@ -89,9 +94,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 16,
   },
-  optionOn: { borderColor: colors.text, backgroundColor: colors.text },
+  optionOn: {
+    borderColor: colors.brand,
+    backgroundColor: colors.brandTint,
+    shadowColor: colors.brand,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.55,
+    shadowRadius: 22,
+    elevation: 10,
+  },
   code: { width: 40, height: 40, borderRadius: 12, backgroundColor: colors.track, alignItems: 'center', justifyContent: 'center' },
-  codeOn: { backgroundColor: colors.onInverse },
+  codeOn: { backgroundColor: colors.brand, shadowColor: colors.brand, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.6, shadowRadius: 10 },
   codeText: { fontSize: 13, fontWeight: '800', color: colors.text },
   optionText: { flex: 1, fontSize: 17, fontWeight: '800', color: colors.text },
 

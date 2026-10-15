@@ -15,6 +15,11 @@ import { WelcomeCover } from '../components/onboarding/WelcomeCover';
 import { Title } from '../components/ui/Title';
 import { TextField } from '../components/ui/TextField';
 import { Button } from '../components/ui/Button';
+import { Chip } from '../components/ui/Chip';
+import { SegmentedProgress } from '../components/ui/SegmentedProgress';
+import { AgeRuler } from '../components/ui/AgeRuler';
+import { PinBoxes } from '../components/ui/PinBoxes';
+import { IconName } from '../components/ui/Icon';
 
 interface Props {
   onCompleteOnboarding: (profile: UserProfile) => void;
@@ -23,12 +28,22 @@ interface Props {
 type Mode = 'welcome' | 'login' | 'signup' | 'setPin';
 
 /** Members and coaches create their own account. The club manager signs in as "admin". */
-const ROLES: { id: UserRole; title: string; sub: string; icon: string }[] = [
+const ROLES: { id: UserRole; title: string; sub: string; icon: IconName }[] = [
   { id: 'member', title: 'Membre', sub: 'Je m’entraîne au club', icon: 'barbell-outline' },
   { id: 'coach', title: 'Coach', sub: 'J’accompagne les membres (validé par le club)', icon: 'ribbon-outline' },
 ];
 
 const digits = (s: string) => s.replace(/[^0-9]/g, '');
+
+/** Icons for the goal cards and training-time cards (look only). */
+const GOAL_ICON: Record<string, IconName> = {
+  'Prendre du muscle': 'barbell-outline',
+  'Perdre du poids': 'flame-outline',
+  'Rester en forme': 'heart-outline',
+  'Gagner en force': 'flash-outline',
+  'Préparer une compétition': 'trophy-outline',
+};
+const TIME_ICON: Record<TrainingTimeSlot, IconName> = { morning: 'sunny-outline', afternoon: 'time-outline', evening: 'moon-outline' };
 
 /** Big italic title, its second half in the club color (design-ref Connexion). */
 const TwoToneTitle: React.FC<{ text: string }> = ({ text }) => {
@@ -122,7 +137,8 @@ export const OnboardingScreen: React.FC<Props> = ({ onCompleteOnboarding }) => {
   };
 
   /* ---------- sign-up ---------- */
-  const totalSteps = 3;
+  /** One question per screen: 1 role · 2 identity · 3 gender & age · 4 goal · 5 habits · 6 secret code. */
+  const totalSteps = 6;
   const validate = (): boolean => {
     const e: Record<string, string> = {};
     if (step === 2) {
@@ -130,6 +146,8 @@ export const OnboardingScreen: React.FC<Props> = ({ onCompleteOnboarding }) => {
       const uErr = usernameError(username) ?? (taken.has(normUsername(username)) ? 'Cet identifiant est déjà pris.' : null);
       if (uErr) e.username = uErr;
       if (digits(phone).length < 8) e.phone = role === 'coach' ? 'Obligatoire : les membres te contactent dessus.' : 'Obligatoire : le club te contacte dessus.';
+    }
+    if (step === 6) {
       const pErr = pinError(pin);
       if (pErr) e.pin = pErr;
       else if (pin.trim() !== pin2.trim()) e.pin2 = 'Les deux codes ne sont pas identiques.';
@@ -198,15 +216,16 @@ export const OnboardingScreen: React.FC<Props> = ({ onCompleteOnboarding }) => {
             <Icon name="chevron-back" size={24} color={colors.text} />
           </Pressable>
           {mode === 'signup' ? (
-            <View style={styles.bars}>
-              {Array.from({ length: totalSteps }).map((_, i) => (
-                <View key={i} style={[styles.bar, i < step && styles.barOn]} />
-              ))}
-            </View>
+            <>
+              <SegmentedProgress current={step} total={totalSteps} />
+              <Text style={styles.stepCount}>{step}/{totalSteps}</Text>
+            </>
           ) : (
-            <View style={{ flex: 1 }} />
+            <>
+              <View style={{ flex: 1 }} />
+              <View style={styles.topSpacer} />
+            </>
           )}
-          <View style={styles.topSpacer} />
         </View>
 
         <ScrollView
@@ -297,100 +316,122 @@ export const OnboardingScreen: React.FC<Props> = ({ onCompleteOnboarding }) => {
             </>
           )}
 
-          {/* ---------- sign-up step 1: role ---------- */}
+          {/* ---------- 1/6 role ---------- */}
           {mode === 'signup' && step === 1 && (
             <>
-              <Text style={styles.title}>{t('Créer mon compte')}</Text>
-              <Text style={styles.sub}>{t('Qui es-tu ?')}</Text>
-              {ROLES.map(r => {
-                const on = role === r.id;
-                return (
-                  <Pressable key={r.id} onPress={() => { setRole(r.id); setErrors({}); }} accessibilityRole="radio" accessibilityState={{ selected: on }} style={[styles.roleCard, on && styles.roleCardOn]}>
-                    <View style={[styles.roleIcon, on && { backgroundColor: colors.brand }]}>
-                      <Icon name={r.icon as any} size={24} color={on ? colors.white : colors.textSecondary} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.roleTitle}>{r.title}</Text>
-                      <Text style={styles.roleSub}>{r.sub}</Text>
-                    </View>
-                    <View style={[styles.radio, on && styles.radioOn]}>{on && <View style={styles.radioDot} />}</View>
-                  </Pressable>
-                );
-              })}
-              <View style={styles.hint}>
-                <Icon name="key-outline" size={16} color={colors.textSecondary} />
-                <Text style={styles.hintText}>{t('Gérant du club ? Pas besoin de compte : connecte-toi avec l’identifiant « admin ».')}</Text>
+              <Text style={styles.overline}>{t('Créer mon compte')}</Text>
+              <Title variant="display" style={styles.qTitle}>{t('Qui es-tu ?')}</Title>
+              <View style={styles.options}>
+                {ROLES.map(r => {
+                  const on = role === r.id;
+                  return (
+                    <Pressable key={r.id} onPress={() => { setRole(r.id); setErrors({}); }} accessibilityRole="radio" accessibilityState={{ selected: on }} style={[styles.roleCard, on && styles.optionOn]}>
+                      <View style={[styles.roleIcon, on && { backgroundColor: colors.brand }]}>
+                        <Icon name={r.icon} size={24} color={on ? colors.white : colors.textSecondary} />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.roleTitle}>{r.title}</Text>
+                        <Text style={styles.roleSub}>{r.sub}</Text>
+                      </View>
+                      <View style={[styles.radio, on && styles.radioOn]}>{on && <View style={styles.radioDot} />}</View>
+                    </Pressable>
+                  );
+                })}
+              </View>
+              <View style={styles.loginHint}>
+                <Icon name="shield-outline" size={20} color={colors.textSecondary} />
+                <Text style={styles.loginHintText}>{t('Gérant du club ? Pas besoin de compte : connecte-toi avec l’identifiant « admin ».')}</Text>
               </View>
             </>
           )}
 
-          {/* ---------- sign-up step 2: identity ---------- */}
+          {/* ---------- 2/6 identity ---------- */}
           {mode === 'signup' && step === 2 && (
             <>
-              <Text style={styles.title}>{t('Fais connaissance')}</Text>
-              <Text style={styles.sub}>{role === 'coach' ? 'Les membres te contacteront sur WhatsApp. Le club validera ton profil coach.' : 'Ton identifiant et ton numéro te serviront à te connecter.'}</Text>
+              <TwoToneTitle text={t('Fais connaissance')} />
+              <Text style={styles.loginSub}>{role === 'coach' ? 'Les membres te contacteront sur WhatsApp. Le club validera ton profil coach.' : 'Ton identifiant et ton numéro te serviront à te connecter.'}</Text>
 
-              <Text style={styles.label}>{t('Prénom et nom')}</Text>
-              <TextInput style={[styles.input, !!errors.name && styles.inputError]} value={fullName} onChangeText={t => { setFullName(t); setErrors({}); }} placeholder="Ex : Lahbib Ben Ali" placeholderTextColor={colors.textMuted} autoCapitalize="words" accessibilityLabel="Prénom et nom" />
-              {!!errors.name && <Text style={styles.error}>{errors.name}</Text>}
-
-              <Text style={styles.label}>{t('Identifiant')}</Text>
-              <View style={[styles.input, styles.prefixed, !!errors.username && styles.inputError]}>
-                <Text style={styles.prefix}>@</Text>
-                <TextInput
-                  style={styles.prefixedInput}
-                  value={username}
-                  onChangeText={t => { usernameEdited.current = true; setUsername(t.toLowerCase().replace(/\s/g, '')); setErrors({}); }}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  maxLength={20}
-                  placeholder="lahbib"
-                  placeholderTextColor={colors.textMuted}
-                  accessibilityLabel="Identifiant"
-                />
-              </View>
-              {!!errors.username && <Text style={styles.error}>{errors.username}</Text>}
-
-              <Text style={styles.label}>{t('Numéro WhatsApp')}</Text>
-              <TextInput style={[styles.input, !!errors.phone && styles.inputError]} value={phone} onChangeText={t => { setPhone(t); setErrors({}); }} keyboardType="phone-pad" placeholder="+216 20 123 456" placeholderTextColor={colors.textMuted} accessibilityLabel="Numéro WhatsApp" />
-              {!!errors.phone ? <Text style={styles.error}>{errors.phone}</Text> : <Text style={styles.note}>Il n’est pas montré aux autres membres{role === 'coach' ? ', sauf pour te réserver' : ''}.</Text>}
-
-              <Text style={styles.label}>{t('Code secret')}</Text>
-              <TextInput
-                style={[styles.input, !!errors.pin && styles.inputError]}
-                value={pin}
-                onChangeText={t => { setPin(digits(t).slice(0, 8)); setErrors({}); }}
-                keyboardType="number-pad"
-                secureTextEntry
-                placeholder="4 à 8 chiffres"
-                placeholderTextColor={colors.textMuted}
-                accessibilityLabel="Code secret"
+              <TextField
+                label={t('Prénom et nom')}
+                error={errors.name}
+                value={fullName}
+                onChangeText={t => { setFullName(t); setErrors({}); }}
+                placeholder="Ex : Lahbib Ben Ali"
+                autoCapitalize="words"
+                accessibilityLabel="Prénom et nom"
+                containerStyle={styles.loginField}
               />
-              {!!errors.pin ? <Text style={styles.error}>{errors.pin}</Text> : <Text style={styles.note}>{t('C’est lui qui ouvre ton compte. Ne le partage avec personne.')}</Text>}
 
-              <Text style={styles.label}>{t('Confirme ton code')}</Text>
-              <TextInput
-                style={[styles.input, !!errors.pin2 && styles.inputError]}
-                value={pin2}
-                onChangeText={t => { setPin2(digits(t).slice(0, 8)); setErrors({}); }}
-                keyboardType="number-pad"
-                secureTextEntry
-                placeholder="••••"
-                placeholderTextColor={colors.textMuted}
-                accessibilityLabel="Confirme ton code secret"
+              <TextField
+                label={t('Identifiant')}
+                icon="at"
+                error={errors.username}
+                value={username}
+                onChangeText={t => { usernameEdited.current = true; setUsername(t.toLowerCase().replace(/\s/g, '')); setErrors({}); }}
+                autoCapitalize="none"
+                autoCorrect={false}
+                maxLength={20}
+                placeholder="lahbib"
+                accessibilityLabel="Identifiant"
+                containerStyle={styles.loginField}
               />
-              {!!errors.pin2 && <Text style={styles.error}>{errors.pin2}</Text>}
+              {!errors.username && !!username && !usernameError(username) && !taken.has(normUsername(username)) ? (
+                <Text style={styles.available}>{t('Disponible')}</Text>
+              ) : null}
 
-              <Text style={styles.label}>{t('Âge (facultatif)')}</Text>
-              <TextInput style={styles.input} value={age} onChangeText={t => setAge(digits(t).slice(0, 2))} keyboardType="number-pad" placeholder="25" placeholderTextColor={colors.textMuted} accessibilityLabel="Âge" />
+              <TextField
+                label={t('Numéro WhatsApp')}
+                icon="logo-whatsapp"
+                error={errors.phone}
+                value={phone}
+                onChangeText={t => { setPhone(t); setErrors({}); }}
+                keyboardType="phone-pad"
+                placeholder="+216 20 123 456"
+                accessibilityLabel="Numéro WhatsApp"
+                containerStyle={styles.loginField}
+              />
+              {!errors.phone ? <Text style={styles.note}>Il n’est pas montré aux autres membres{role === 'coach' ? ', sauf pour te réserver' : ''}.</Text> : null}
+            </>
+          )}
 
-              <Text style={styles.label}>{t('Genre')}</Text>
-              <View style={styles.chips}>
+          {/* ---------- 3/6 gender & age ---------- */}
+          {mode === 'signup' && step === 3 && (
+            <>
+              <Title variant="display" style={styles.qTitle}>{t('Tu es ?')}</Title>
+              <View style={styles.genders}>
                 {GENDERS.map(g => {
                   const on = gender === g.id;
                   return (
-                    <Pressable key={g.id} onPress={() => setGender(g.id)} accessibilityRole="button" accessibilityState={{ selected: on }} style={[styles.chip, on && styles.chipOn]}>
-                      <Text style={[styles.chipText, on && { color: colors.white }]}>{g.label}</Text>
+                    <Pressable key={g.id} onPress={() => setGender(g.id)} accessibilityRole="radio" accessibilityState={{ selected: on }} accessibilityLabel={g.label} style={styles.gender}>
+                      <View style={[styles.genderCircle, on && styles.genderCircleOn]}>
+                        <Icon name={g.id === 'female' ? 'female' : 'male'} size={44} color={on ? colors.white : colors.textSecondary} />
+                      </View>
+                      <Text style={[styles.genderText, on && { color: colors.text }]}>{g.label}</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+
+              <Text style={[styles.overline, styles.ageLabel]}>{t('Âge (facultatif)')}</Text>
+              <AgeRuler value={age ? parseInt(age, 10) : null} onChange={a => setAge(String(a))} />
+            </>
+          )}
+
+          {/* ---------- 4/6 goal ---------- */}
+          {mode === 'signup' && step === 4 && (
+            <>
+              <Title variant="display" style={styles.qTitle}>{t('Ton objectif')}</Title>
+              <Text style={styles.loginSub}>{t('Facultatif : on t’aide à organiser tes séances.')}</Text>
+              <View style={styles.options}>
+                {GOALS.map(g => {
+                  const on = goal === g;
+                  return (
+                    <Pressable key={g} onPress={() => setGoal(on ? undefined : g)} accessibilityRole="button" accessibilityState={{ selected: on }} style={[styles.goalCard, on && styles.optionOn]}>
+                      <View style={[styles.goalIcon, on && { backgroundColor: colors.brand }]}>
+                        <Icon name={GOAL_ICON[g] ?? 'flag-outline'} size={22} color={on ? colors.white : colors.textSecondary} />
+                      </View>
+                      <Text style={styles.goalText}>{g}</Text>
+                      <View style={[styles.radio, on && styles.radioOn]}>{on && <View style={styles.radioDot} />}</View>
                     </Pressable>
                   );
                 })}
@@ -398,46 +439,65 @@ export const OnboardingScreen: React.FC<Props> = ({ onCompleteOnboarding }) => {
             </>
           )}
 
-          {/* ---------- sign-up step 3: goal ---------- */}
-          {mode === 'signup' && step === 3 && (
+          {/* ---------- 5/6 habits ---------- */}
+          {mode === 'signup' && step === 5 && (
             <>
-              <Text style={styles.title}>{t('Ton objectif')}</Text>
-              <Text style={styles.sub}>{t('Facultatif : on t’aide à organiser tes séances.')}</Text>
+              <Title variant="display" style={styles.qTitle}>{t('Tes habitudes')}</Title>
 
-              <View style={styles.chips}>
-                {GOALS.map(g => {
-                  const on = goal === g;
+              <Text style={[styles.overline, { marginTop: 18 }]}>{t('Moment d’entraînement habituel')}</Text>
+              <View style={styles.times}>
+                {TIMES.map(slot => {
+                  const on = trainingTime === slot.id;
                   return (
-                    <Pressable key={g} onPress={() => setGoal(on ? undefined : g)} accessibilityRole="button" accessibilityState={{ selected: on }} style={[styles.chip, on && styles.chipOn]}>
-                      <Text style={[styles.chipText, on && { color: colors.white }]}>{g}</Text>
+                    <Pressable key={slot.id} onPress={() => setTrainingTime(slot.id)} accessibilityRole="button" accessibilityState={{ selected: on }} style={[styles.timeCard, on && styles.optionOn]}>
+                      <Icon name={TIME_ICON[slot.id]} size={22} color={on ? colors.brandText : colors.textSecondary} />
+                      <Text style={[styles.timeText, on && { color: colors.brandText }]}>{slot.label}</Text>
                     </Pressable>
                   );
                 })}
               </View>
 
-              <Text style={[styles.label, { marginTop: 24 }]}>{t('Moment d’entraînement habituel')}</Text>
-              <View style={styles.chips}>
-                {TIMES.map(t => {
-                  const on = trainingTime === t.id;
-                  return (
-                    <Pressable key={t.id} onPress={() => setTrainingTime(t.id)} accessibilityRole="button" accessibilityState={{ selected: on }} style={[styles.chip, on && styles.chipOn]}>
-                      <Text style={[styles.chipText, on && { color: colors.white }]}>{t.label}</Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-
-              <Text style={[styles.label, { marginTop: 24 }]}>{t('Muscles que tu travailles le plus')}</Text>
+              <Text style={[styles.overline, { marginTop: 28 }]}>{t('Muscles que tu travailles le plus')}</Text>
               <View style={styles.chips}>
                 {MUSCLES.map(m => {
                   const on = muscles.includes(m.id);
-                  return (
-                    <Pressable key={m.id} onPress={() => toggleMuscle(m.id)} accessibilityRole="button" accessibilityState={{ selected: on }} style={[styles.chip, on && styles.chipOn]}>
-                      <Text style={[styles.chipText, on && { color: colors.white }]}>{m.name}</Text>
-                    </Pressable>
-                  );
+                  return <Chip key={m.id} label={m.name} selected={on} icon={on ? 'checkmark' : undefined} onPress={() => toggleMuscle(m.id)} style={styles.muscleChip} />;
                 })}
               </View>
+            </>
+          )}
+
+          {/* ---------- 6/6 secret code ---------- */}
+          {mode === 'signup' && step === 6 && (
+            <>
+              <TwoToneTitle text={t('Ton code secret')} />
+              <Text style={styles.loginSub}>{t('C’est lui qui ouvre ton compte. Ne le partage avec personne.')}</Text>
+
+              <View style={styles.loginField}>
+                <PinBoxes
+                  label={`${t('Code secret')} · 4 à 8 chiffres`}
+                  value={pin}
+                  onChangeText={t => { setPin(digits(t).slice(0, 8)); setErrors({}); }}
+                  error={errors.pin}
+                  accessibilityLabel="Code secret"
+                />
+              </View>
+              <View style={styles.loginField}>
+                <PinBoxes
+                  label={t('Confirme ton code')}
+                  value={pin2}
+                  onChangeText={t => { setPin2(digits(t).slice(0, 8)); setErrors({}); }}
+                  slots={pin.length >= 4 ? pin.length : 6}
+                  error={errors.pin2}
+                  accessibilityLabel="Confirme ton code secret"
+                />
+              </View>
+              {pin.length >= 4 && !pinError(pin) && !errors.pin ? (
+                <View style={styles.solid}>
+                  <Icon name="shield-checkmark-outline" size={20} color={colors.green.text} />
+                  <Text style={styles.solidText}>{t('Code solide : pas de suite ni de répétition')}</Text>
+                </View>
+              ) : null}
             </>
           )}
         </ScrollView>
@@ -453,12 +513,9 @@ export const OnboardingScreen: React.FC<Props> = ({ onCompleteOnboarding }) => {
           )}
           {mode === 'signup' && (
             <>
-              <Pressable onPress={next} disabled={busy} accessibilityRole="button" style={[styles.cta, busy && { opacity: 0.8 }]}>
-                <Text style={styles.ctaText}>{step === totalSteps ? 'Commencer' : 'Continuer'}</Text>
-                <Icon name={step === totalSteps ? 'checkmark' : 'arrow-forward'} size={20} color={colors.white} />
-              </Pressable>
-              {step === 3 ? (
-                <Pressable onPress={() => { setGoal(undefined); setMuscles([]); next(); }} accessibilityRole="button" style={styles.skip}>
+              <Button label={step === totalSteps ? t('Créer mon compte') : 'Continuer'} onPress={next} disabled={busy} loading={busy && step === totalSteps} />
+              {step === 4 || step === 5 ? (
+                <Pressable onPress={() => { if (step === 4) setGoal(undefined); else setMuscles([]); next(); }} accessibilityRole="button" style={styles.skip}>
                   <Text style={styles.skipText}>{t('Passer')}</Text>
                 </Pressable>
               ) : step === 1 ? (
@@ -479,6 +536,7 @@ const styles = StyleSheet.create({
   top: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 24, height: 64 },
   backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center' },
   topSpacer: { width: 44 },
+  stepCount: { width: 34, textAlign: 'right', fontSize: 13, fontWeight: '800', color: colors.textSecondary },
   bars: { flex: 1, flexDirection: 'row', gap: 6, paddingHorizontal: 8 },
   bar: { flex: 1, height: 5, borderRadius: 3, backgroundColor: colors.track },
   barOn: { backgroundColor: colors.brand },
@@ -489,9 +547,9 @@ const styles = StyleSheet.create({
   sub: { fontSize: 16, color: colors.textSecondary, marginTop: 6, marginBottom: 22, lineHeight: 23 },
 
 
-  roleCard: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: 20, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.card, marginBottom: 12 },
+  roleCard: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 18, paddingHorizontal: 16, borderRadius: 22, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.card },
   roleCardOn: { borderColor: colors.brand, backgroundColor: colors.brandSoft },
-  roleIcon: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.track, alignItems: 'center', justifyContent: 'center' },
+  roleIcon: { width: 52, height: 52, borderRadius: 16, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center' },
   roleTitle: { fontSize: 17, fontWeight: '800', color: colors.text },
   roleSub: { fontSize: 14, color: colors.textSecondary, marginTop: 1 },
   radio: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: colors.disabled, alignItems: 'center', justifyContent: 'center' },
@@ -509,7 +567,7 @@ const styles = StyleSheet.create({
   hint: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 20, padding: 12, borderRadius: 14, backgroundColor: colors.bg },
   hintText: { flex: 1, fontSize: 13, color: colors.textSecondary, lineHeight: 18 },
 
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 12 },
   chip: { minHeight: 46, paddingHorizontal: 18, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.card, justifyContent: 'center' },
   chipOn: { backgroundColor: colors.brand, borderColor: colors.brand, transform: [{ scale: 1.04 }] },
   chipText: { fontSize: 15, fontWeight: '700', color: colors.textSecondary },
@@ -521,6 +579,28 @@ const styles = StyleSheet.create({
   loginField: { marginTop: 22 },
   loginHint: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 28, paddingVertical: 14, paddingHorizontal: 16, borderRadius: 16, backgroundColor: colors.card },
   loginHintText: { flex: 1, fontSize: 14, fontWeight: '500', lineHeight: 20, color: colors.textSecondary },
+
+  // Sign-up questionnaire (design-ref Q1Role → Q6Code)
+  overline: { fontSize: 11, fontWeight: '800', letterSpacing: 1.6, color: colors.textSecondary, textTransform: 'uppercase' },
+  qTitle: { marginTop: 6, marginBottom: 8 },
+  options: { gap: 12, marginTop: 18 },
+  optionOn: { backgroundColor: colors.brandTint, borderColor: colors.brand, borderWidth: 1.5 },
+  available: { marginTop: 8, fontSize: 13, fontWeight: '700', color: colors.green.text },
+  genders: { flexDirection: 'row', justifyContent: 'center', gap: 36, marginTop: 24 },
+  gender: { alignItems: 'center', gap: 10 },
+  genderCircle: { width: 116, height: 116, borderRadius: 58, backgroundColor: colors.bg, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
+  genderCircleOn: { backgroundColor: colors.brand, borderColor: colors.brand, ...buttonShadow },
+  genderText: { fontSize: 15, fontWeight: '800', color: colors.textSecondary },
+  ageLabel: { textAlign: 'center', marginTop: 36, marginBottom: 6 },
+  goalCard: { flexDirection: 'row', alignItems: 'center', gap: 14, height: 72, paddingLeft: 14, paddingRight: 18, borderRadius: 20, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.card },
+  goalIcon: { width: 44, height: 44, borderRadius: 14, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center' },
+  goalText: { flex: 1, fontSize: 15, fontWeight: '800', color: colors.text },
+  times: { flexDirection: 'row', gap: 10, marginTop: 12 },
+  timeCard: { flex: 1, alignItems: 'center', gap: 8, paddingVertical: 16, paddingHorizontal: 4, borderRadius: 18, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.card },
+  timeText: { fontSize: 14, fontWeight: '800', color: colors.text },
+  muscleChip: { height: 42, paddingHorizontal: 16 },
+  solid: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 20, paddingVertical: 14, paddingHorizontal: 16, borderRadius: 16, backgroundColor: colors.green.soft },
+  solidText: { flex: 1, fontSize: 14, fontWeight: '600', color: colors.green.text },
   // The club's red = the one primary action
   cta: { height: 56, borderRadius: radius.pill, backgroundColor: colors.brand, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, ...buttonShadow },
   ctaText: { color: colors.white, fontSize: 17, fontWeight: '800' },

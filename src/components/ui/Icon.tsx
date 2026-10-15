@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleProp, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
-  Activity, AlarmClock, Equal, Apple, Bike, HandFist, Sprout, ThumbsUp, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpDown, Asterisk, AtSign, Award,
+  Activity, AlarmClock, Equal, Sun, Apple, Bike, HandFist, Sprout, ThumbsUp, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpDown, Asterisk, AtSign, Award,
   Bell, Box, Building, Calendar, Camera, ChartColumn, ChartLine, ChartNoAxesColumn, Check, ChevronDown,
   ChevronLeft, ChevronRight, ChevronUp, Circle, CircleAlert, CircleCheck, CircleCheckBig, CircleDot,
   CirclePlus, CircleQuestionMark, CircleUser, CircleX, ClipboardList, Clock, CloudOff, Code, Copy,
@@ -137,6 +137,7 @@ const MAP: Record<string, Lucide> = {
   star: Star,
   'stats-chart': ChartNoAxesColumn,
   storefront: Store,
+  sunny: Sun,
   'swap-vertical': ArrowUpDown,
   sync: RefreshCw,
   thermometer: Thermometer,

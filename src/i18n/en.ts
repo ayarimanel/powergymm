@@ -257,4 +257,9 @@ export const EN: Record<string, string> = {
   'Ce mois': 'This month',
   'Encaissé ce mois': 'Taken in this month',
   'Aucune inscription ce mois-ci': 'No sign-ups this month',
+  'Tu es ?': 'You are',
+  'Tes habitudes': 'Your habits',
+  'Ton code secret': 'Your secret code',
+  'Disponible': 'Available',
+  'Code solide : pas de suite ni de répétition': 'Strong code: no sequence, no repeats',
 };

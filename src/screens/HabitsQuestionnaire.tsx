@@ -10,7 +10,7 @@ import { Text } from '../components/ui/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Icon } from '../components/ui/Icon';
 import { CardShell, QuestionCard } from '../components/onboarding/BubbleCard';
-import { colors } from '../theme';
+import { buttonShadow, colors, fonts } from '../theme';
 import { haptics } from '../utils/haptics';
 import { NotificationService } from '../services/notificationService';
 import { HabitsService, today } from '../services/habitsService';
@@ -402,41 +402,41 @@ export const HabitsQuestionnaire: React.FC<Props> = ({ firstName, userId, rules,
 };
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg },
-  title: { fontSize: 23, fontWeight: '800', color: colors.text, textAlign: 'center', lineHeight: 30 },
-  body: { fontSize: 15, color: colors.textSecondary, textAlign: 'center', lineHeight: 22, marginTop: 6 },
+  screen: { flex: 1, backgroundColor: colors.page },
+  title: { fontFamily: fonts.display, fontWeight: 'normal', fontSize: 38, lineHeight: 38, color: colors.text, textTransform: 'uppercase' },
+  body: { fontSize: 15, fontWeight: '500', color: colors.textSecondary, lineHeight: 22, marginTop: 10 },
 
-  primary: { marginTop: 18, minHeight: 50, borderRadius: 25, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center' },
-  primaryText: { color: colors.white, fontSize: 16, fontWeight: '800' },
+  primary: { marginTop: 28, height: 56, borderRadius: 999, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center', ...buttonShadow },
+  primaryText: { color: colors.onBrand, fontSize: 15, fontWeight: '800' },
   textBtn: { marginTop: 10, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
-  textBtnLabel: { color: colors.textMuted, fontSize: 15, fontWeight: '700' },
+  textBtnLabel: { color: colors.textSecondary, fontSize: 14, fontWeight: '700' },
 
-  variesWrap: { marginTop: 10, alignItems: 'center' },
-  wideBubble: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 18, borderRadius: 24, borderWidth: 1.5, borderColor: colors.border },
-  wideBubbleOn: { backgroundColor: colors.brand, borderColor: colors.brand },
-  wideBubbleText: { fontSize: 15, fontWeight: '700', color: colors.text },
-  wideBubbleTextOn: { color: colors.white },
+  variesWrap: { marginTop: 14, alignItems: 'flex-start' },
+  wideBubble: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 18, borderRadius: 999, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.card },
+  wideBubbleOn: { backgroundColor: colors.text, borderColor: colors.text },
+  wideBubbleText: { fontSize: 15, fontWeight: '700', color: colors.textSecondary },
+  wideBubbleTextOn: { color: colors.onInverse },
 
-  lines: { marginTop: 14, gap: 10 },
-  line: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  lines: { marginTop: 22, gap: 12 },
+  line: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 14, paddingHorizontal: 16, borderRadius: 18, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
   lineIcon: { fontSize: 18 },
-  lineText: { flex: 1, fontSize: 15, color: colors.textSecondary, lineHeight: 21 },
-  summary: { fontSize: 15, color: colors.textSecondary, textAlign: 'center', lineHeight: 22 },
+  lineText: { flex: 1, fontSize: 15, fontWeight: '600', color: colors.text, lineHeight: 21 },
+  summary: { fontSize: 15, fontWeight: '600', color: colors.text, lineHeight: 22 },
 
   suggest: {
-    marginTop: 16,
+    marginTop: 18,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    minHeight: 48,
-    borderRadius: 24,
+    height: 52,
+    borderRadius: 999,
     borderWidth: 1.5,
-    borderColor: colors.brand,
+    borderColor: colors.disabled,
     paddingHorizontal: 16,
   },
-  suggestText: { color: colors.brand, fontSize: 15, fontWeight: '800' },
+  suggestText: { color: colors.text, fontSize: 15, fontWeight: '800' },
   joined: { marginTop: 14, textAlign: 'center', color: colors.green.text, fontSize: 15, fontWeight: '700' },
 
-  foot: { marginTop: 12, fontSize: 13, color: colors.textMuted, textAlign: 'center' },
+  foot: { marginTop: 14, fontSize: 13, fontWeight: '500', color: colors.textMuted },
 });

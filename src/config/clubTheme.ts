@@ -29,6 +29,7 @@ const clubTheme = {
     primaryDark: '#C41A20', // pressed states
     primaryLight: '#3A1214', // tints for backgrounds, badges, active tab pill
     primaryText: '#FF5A5F', // red text/icons on primaryLight (>=4.5:1)
+    primaryTint: '#1A1012', // background of a selected option card (with a red border)
     primaryRgb: '227, 30, 36',
 
     // Surfaces

@@ -12,6 +12,8 @@ export const colors = {
   brandSoft: c.primaryLight,
   /** Red text and icons sitting on brandSoft (the brand red alone is too dark there). */
   brandText: c.primaryText,
+  /** Selected option card background (with a brand border). */
+  brandTint: c.primaryTint,
   onBrand: c.textOnPrimary,
   bg: c.surface,
   /** Screen background, behind the cards. */

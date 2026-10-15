@@ -10,7 +10,10 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
 import { Icon } from '../ui/Icon';
-import { colors, cardShadow } from '../../theme';
+import { colors } from '../../theme';
+import { Title } from '../ui/Title';
+import { Button } from '../ui/Button';
+import { SegmentedProgress } from '../ui/SegmentedProgress';
 import { useReduceMotion } from '../../hooks/useDeviceState';
 import { haptics } from '../../utils/haptics';
 import { withoutEmoji } from '../ui/displayText';
@@ -105,14 +108,12 @@ export const CardShell: React.FC<ShellProps> = ({ step, total, direction, cardKe
   return (
     <View style={styles.shell}>
       <View style={styles.topBar}>
-        <Pressable onPress={onBack} disabled={!onBack} accessibilityRole="button" accessibilityLabel="Retour" style={styles.topBtn}>
-          {onBack ? <Icon name="arrow-back" size={22} color={colors.textSecondary} /> : null}
+        <Pressable onPress={onBack} disabled={!onBack} accessibilityRole="button" accessibilityLabel="Retour" style={[styles.backBtn, !onBack && styles.backBtnHidden]}>
+          {onBack ? <Icon name="chevron-back" size={24} color={colors.text} /> : null}
         </Pressable>
 
         <View style={styles.dots} accessibilityLabel={total ? `Question ${step} sur ${total}` : undefined}>
-          {Array.from({ length: total }).map((_, i) => (
-            <View key={i} style={[styles.dot, i < step && styles.dotOn]} />
-          ))}
+          {total ? <SegmentedProgress current={step} total={total} /> : null}
         </View>
 
         <Pressable onPress={onSkip} disabled={!onSkip} accessibilityRole="button" style={styles.topBtn}>
@@ -155,7 +156,7 @@ export const QuestionCard: React.FC<QuestionProps> = ({ title, sub, options, sel
   const reduceMotion = useReduceMotion();
   return (
     <>
-      <Text style={styles.title}>{title}</Text>
+      <Title variant="display" size={38}>{title}</Title>
       {sub ? <Text style={styles.sub}>{sub}</Text> : null}
 
       <View style={[styles.bubbles, round && styles.bubblesRow]}>
@@ -173,54 +174,43 @@ export const QuestionCard: React.FC<QuestionProps> = ({ title, sub, options, sel
       </View>
 
       {mode === 'multi' && selected.length > 0 && onContinue ? (
-        <Pressable onPress={onContinue} accessibilityRole="button" style={({ pressed }) => [styles.primary, pressed && { opacity: 0.85 }]}>
-          <Text style={styles.primaryText}>Continuer</Text>
-        </Pressable>
+        <Button label="Continuer" onPress={onContinue} style={styles.primary} />
       ) : null}
     </>
   );
 };
 
 const styles = StyleSheet.create({
-  shell: { flex: 1, paddingHorizontal: 16, justifyContent: 'center' },
-  topBar: { position: 'absolute', top: 8, left: 8, right: 8, flexDirection: 'row', alignItems: 'center', gap: 8 },
-  topBtn: { minWidth: 56, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
-  skip: { color: colors.textSecondary, fontSize: 15, fontWeight: '700' },
-  dots: { flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 6 },
-  dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.border },
-  dotOn: { backgroundColor: colors.brand, width: 18 },
+  shell: { flex: 1, paddingHorizontal: 24 },
+  topBar: { flexDirection: 'row', alignItems: 'center', gap: 14, height: 64 },
+  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center' },
+  backBtnHidden: { backgroundColor: 'transparent' },
+  topBtn: { minWidth: 56, minHeight: 44, alignItems: 'flex-end', justifyContent: 'center' },
+  skip: { color: colors.textSecondary, fontSize: 14, fontWeight: '700' },
+  dots: { flex: 1, flexDirection: 'row', alignItems: 'center' },
 
-  cardWrap: { width: '100%', maxWidth: 480, alignSelf: 'center' },
-  card: {
-    backgroundColor: colors.card,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 22,
-    gap: 6,
-    ...cardShadow,
-  },
+  cardWrap: { flex: 1, width: '100%', maxWidth: 520, alignSelf: 'center' },
+  // The question sits on the page (design-ref sign-up screens): no box around it.
+  card: { paddingTop: 22, gap: 6 },
 
-  title: { fontSize: 23, fontWeight: '800', color: colors.text, textAlign: 'center', lineHeight: 30 },
-  sub: { fontSize: 14, color: colors.textMuted, textAlign: 'center', marginBottom: 4 },
+  sub: { fontSize: 15, fontWeight: '500', lineHeight: 22, color: colors.textSecondary, marginTop: 4 },
 
-  bubbles: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginTop: 14 },
-  bubblesRow: { flexWrap: 'nowrap', gap: 6 },
+  bubbles: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 22 },
+  bubblesRow: { flexWrap: 'nowrap', gap: 6, justifyContent: 'space-between' },
 
   bubble: {
     minHeight: 48,
     justifyContent: 'center',
-    paddingHorizontal: 16,
-    borderRadius: 24,
-    borderWidth: 1.5,
+    paddingHorizontal: 18,
+    borderRadius: 999,
+    borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.card,
   },
-  bubbleRound: { width: 40, height: 48, paddingHorizontal: 0, alignItems: 'center', borderRadius: 22 },
-  bubbleOn: { backgroundColor: colors.brand, borderColor: colors.brand },
-  bubbleText: { fontSize: 15, fontWeight: '700', color: colors.text },
-  bubbleTextOn: { color: colors.white },
+  bubbleRound: { width: 42, height: 48, paddingHorizontal: 0, alignItems: 'center' },
+  bubbleOn: { backgroundColor: colors.text, borderColor: colors.text },
+  bubbleText: { fontSize: 15, fontWeight: '700', color: colors.textSecondary },
+  bubbleTextOn: { color: colors.onInverse },
 
-  primary: { marginTop: 16, minHeight: 50, borderRadius: 25, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center' },
-  primaryText: { color: colors.white, fontSize: 16, fontWeight: '800' },
+  primary: { marginTop: 28 },
 });

@@ -12,6 +12,9 @@ import { MUSCLES } from '../journal/journalLogic';
 import { GENDERS, GOALS, TIMES } from '../data/profileOptions';
 import { buttonShadow, clubTheme, colors, radius } from '../theme';
 import { WelcomeCover } from '../components/onboarding/WelcomeCover';
+import { Title } from '../components/ui/Title';
+import { TextField } from '../components/ui/TextField';
+import { Button } from '../components/ui/Button';
 
 interface Props {
   onCompleteOnboarding: (profile: UserProfile) => void;
@@ -26,6 +29,18 @@ const ROLES: { id: UserRole; title: string; sub: string; icon: string }[] = [
 ];
 
 const digits = (s: string) => s.replace(/[^0-9]/g, '');
+
+/** Big italic title, its second half in the club color (design-ref Connexion). */
+const TwoToneTitle: React.FC<{ text: string }> = ({ text }) => {
+  const words = text.split(' ');
+  const cut = Math.ceil(words.length / 2);
+  return (
+    <View style={{ marginBottom: 8 }} accessible accessibilityRole="header" accessibilityLabel={text}>
+      <Title variant="display" accessibilityRole="none">{words.slice(0, cut).join(' ')}</Title>
+      {words.length > 1 ? <Title variant="display" color={colors.brand} accessibilityRole="none">{words.slice(cut).join(' ')}</Title> : null}
+    </View>
+  );
+};
 
 export const OnboardingScreen: React.FC<Props> = ({ onCompleteOnboarding }) => {
   const { t } = useT();
@@ -191,7 +206,7 @@ export const OnboardingScreen: React.FC<Props> = ({ onCompleteOnboarding }) => {
           ) : (
             <View style={{ flex: 1 }} />
           )}
-          <View style={styles.backBtn} />
+          <View style={styles.topSpacer} />
         </View>
 
         <ScrollView
@@ -202,27 +217,27 @@ export const OnboardingScreen: React.FC<Props> = ({ onCompleteOnboarding }) => {
           {/* ---------- login ---------- */}
           {mode === 'login' && (
             <>
-              {Logo}
-              <Text style={styles.title}>{t('Content de te revoir')}</Text>
-              <Text style={styles.sub}>{t('Connecte-toi avec ton identifiant et ton code secret.')}</Text>
+              <TwoToneTitle text={t('Content de te revoir')} />
+              <Text style={styles.loginSub}>{t('Connecte-toi avec ton identifiant et ton code secret.')}</Text>
 
-              <Text style={styles.label}>{t('Identifiant')}</Text>
-              <TextInput
-                style={[styles.input, !!errors.username && styles.inputError]}
+              <TextField
+                label={t('Identifiant')}
+                icon="person-outline"
+                error={errors.username}
                 value={loginUser}
                 onChangeText={t => { setLoginUser(t); setErrors({}); }}
                 autoCapitalize="none"
                 autoCorrect={false}
                 placeholder="ex : lahbib"
-                placeholderTextColor={colors.textMuted}
                 accessibilityLabel="Identifiant"
                 returnKeyType="next"
+                containerStyle={styles.loginField}
               />
-              {!!errors.username && <Text style={styles.error}>{errors.username}</Text>}
 
-              <Text style={styles.label}>{isAdminLogin ? 'Mot de passe' : 'Code secret'}</Text>
-              <TextInput
-                style={[styles.input, !!errors.secret && styles.inputError]}
+              <TextField
+                label={isAdminLogin ? 'Mot de passe' : 'Code secret'}
+                icon="lock-closed-outline"
+                error={errors.secret}
                 value={secret}
                 onChangeText={t => { setSecret(t); setErrors({}); }}
                 secureTextEntry={isAdminLogin}
@@ -230,16 +245,15 @@ export const OnboardingScreen: React.FC<Props> = ({ onCompleteOnboarding }) => {
                 autoCapitalize="none"
                 autoCorrect={false}
                 placeholder={isAdminLogin ? '••••' : '+216 20 123 456'}
-                placeholderTextColor={colors.textMuted}
                 accessibilityLabel={isAdminLogin ? 'Mot de passe' : 'Code secret'}
                 onSubmitEditing={login}
                 returnKeyType="go"
+                containerStyle={styles.loginField}
               />
-              {!!errors.secret && <Text style={styles.error}>{errors.secret}</Text>}
 
-              <View style={styles.hint}>
-                <Icon name="key-outline" size={16} color={colors.textSecondary} />
-                <Text style={styles.hintText}>{t('Gérant du club ? Identifiant « admin » et ton mot de passe.')}</Text>
+              <View style={styles.loginHint}>
+                <Icon name="shield-outline" size={20} color={colors.textSecondary} />
+                <Text style={styles.loginHintText}>{t('Gérant du club ? Identifiant « admin » et ton mot de passe.')}</Text>
               </View>
             </>
           )}
@@ -247,46 +261,39 @@ export const OnboardingScreen: React.FC<Props> = ({ onCompleteOnboarding }) => {
           {/* ---------- older account: pick a code ---------- */}
           {mode === 'setPin' && (
             <>
-              <Text style={styles.title}>{t('Choisis ton code')}</Text>
-              <Text style={styles.sub}>
+              <TwoToneTitle text={t('Choisis ton code')} />
+              <Text style={styles.loginSub}>
                 Ton compte s’ouvrait avec ton numéro de téléphone. Comme ce numéro est visible dans l’application, il te
                 faut un code secret pour protéger ton compte.
               </Text>
 
-              <Text style={styles.label}>{t('Nouveau code')}</Text>
-              <TextInput
-                style={[styles.input, !!errors.pin && styles.inputError]}
+              <TextField
+                label={t('Nouveau code')}
+                icon="lock-closed-outline"
+                error={errors.pin}
                 value={pin}
                 onChangeText={t => { setPin(digits(t).slice(0, 8)); setErrors({}); }}
                 keyboardType="number-pad"
                 secureTextEntry
                 placeholder="4 à 8 chiffres"
-                placeholderTextColor={colors.textMuted}
                 accessibilityLabel="Nouveau code secret"
+                containerStyle={styles.loginField}
               />
-              {!!errors.pin && <Text style={styles.error}>{errors.pin}</Text>}
 
-              <Text style={styles.label}>{t('Confirme')}</Text>
-              <TextInput
-                style={[styles.input, !!errors.pin2 && styles.inputError]}
+              <TextField
+                label={t('Confirme')}
+                icon="lock-closed-outline"
+                error={errors.pin2}
                 value={pin2}
                 onChangeText={t => { setPin2(digits(t).slice(0, 8)); setErrors({}); }}
                 keyboardType="number-pad"
                 secureTextEntry
                 placeholder="••••"
-                placeholderTextColor={colors.textMuted}
                 accessibilityLabel="Confirme le code"
+                containerStyle={styles.loginField}
               />
-              {!!errors.pin2 && <Text style={styles.error}>{errors.pin2}</Text>}
 
-              <Pressable
-                onPress={savePin}
-                disabled={busy}
-                accessibilityRole="button"
-                style={({ pressed }) => [styles.cta, (pressed || busy) && { opacity: 0.85 }]}
-              >
-                <Text style={styles.ctaText}>{busy ? 'Un instant…' : 'Enregistrer mon code'}</Text>
-              </Pressable>
+              <Button label={busy ? 'Un instant…' : 'Enregistrer mon code'} onPress={savePin} disabled={busy} style={{ marginTop: 28 }} />
             </>
           )}
 
@@ -438,10 +445,7 @@ export const OnboardingScreen: React.FC<Props> = ({ onCompleteOnboarding }) => {
         <View style={styles.footer}>
           {mode === 'login' && (
             <>
-              <Pressable onPress={login} disabled={busy} accessibilityRole="button" style={[styles.cta, busy && { opacity: 0.8 }]}>
-                <Text style={styles.ctaText}>{busy ? 'Connexion…' : 'Se connecter'}</Text>
-                <Icon name="log-in-outline" size={20} color={colors.white} />
-              </Pressable>
+              <Button label={busy ? 'Connexion…' : 'Se connecter'} onPress={login} disabled={busy} />
               <Pressable onPress={() => go('signup')} accessibilityRole="button" style={styles.skip}>
                 <Text style={styles.skipText}>{t('Pas encore de compte ?')} <Text style={{ color: colors.brand }}>{t('Créer un compte')}</Text></Text>
               </Pressable>
@@ -471,9 +475,10 @@ export const OnboardingScreen: React.FC<Props> = ({ onCompleteOnboarding }) => {
 };
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.card, paddingTop: Platform.OS === 'android' ? 28 : 12 },
-  top: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, height: 56 },
-  backBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+  screen: { flex: 1, backgroundColor: colors.page, paddingTop: Platform.OS === 'android' ? 28 : 12 },
+  top: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 24, height: 64 },
+  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center' },
+  topSpacer: { width: 44 },
   bars: { flex: 1, flexDirection: 'row', gap: 6, paddingHorizontal: 8 },
   bar: { flex: 1, height: 5, borderRadius: 3, backgroundColor: colors.track },
   barOn: { backgroundColor: colors.brand },
@@ -509,7 +514,13 @@ const styles = StyleSheet.create({
   chipOn: { backgroundColor: colors.brand, borderColor: colors.brand, transform: [{ scale: 1.04 }] },
   chipText: { fontSize: 15, fontWeight: '700', color: colors.textSecondary },
 
-  footer: { padding: 20, paddingBottom: 24, gap: 6, maxWidth: 520, width: '100%', alignSelf: 'center' },
+  footer: { padding: 20, paddingHorizontal: 24, paddingBottom: 24, gap: 6, maxWidth: 520, width: '100%', alignSelf: 'center' },
+
+  // Login + set-code (design-ref Connexion)
+  loginSub: { fontSize: 15, fontWeight: '500', lineHeight: 22, color: colors.textSecondary, marginTop: 6, marginBottom: 6 },
+  loginField: { marginTop: 22 },
+  loginHint: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 28, paddingVertical: 14, paddingHorizontal: 16, borderRadius: 16, backgroundColor: colors.card },
+  loginHintText: { flex: 1, fontSize: 14, fontWeight: '500', lineHeight: 20, color: colors.textSecondary },
   // The club's red = the one primary action
   cta: { height: 56, borderRadius: radius.pill, backgroundColor: colors.brand, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, ...buttonShadow },
   ctaText: { color: colors.white, fontSize: 17, fontWeight: '800' },

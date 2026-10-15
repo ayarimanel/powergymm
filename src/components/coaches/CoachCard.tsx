@@ -1,13 +1,15 @@
 import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { Text } from '../ui/Text';
 import { Icon } from '../ui/Icon';
+import { Title } from '../ui/Title';
 import { CoachProfile } from '../../types/database';
 import { daysSummary, isOnFloorNow } from '../../services/coachService';
 import { fmtTnd, fromPrice, offersPersonal } from '../../coaching/offers';
 import { Avatar } from '../community/Avatar';
-import { Btn, J, Pill, tabular } from '../../journal/ui/kit';
-import { colors } from '../../theme';
+import { Btn, J } from '../../journal/ui/kit';
+import { colors, radius } from '../../theme';
 
 interface Props {
   coach: CoachProfile;
@@ -18,61 +20,77 @@ interface Props {
   onRefuse?: () => void;
 }
 
+/** A coach as a photo card (design-ref Coachs): photo, status tag, name, what they do, price. */
 export const CoachCard: React.FC<Props> = ({ coach: c, isMine, onPress, onApprove, onRefuse }) => {
   const live = c.onFloor && isOnFloorNow(c);
   const personal = offersPersonal(c);
   const from = personal ? fromPrice(c) : null;
   const pending = c.status === 'pending';
   const schedule = [daysSummary(c.availabilityDays), c.availabilityHours].filter(Boolean).join(' · ');
+  const photo = c.bannerUrl || c.avatarUrl;
+
+  const tag = pending
+    ? { label: 'À valider', bg: colors.amber.soft, fg: colors.amber.text }
+    : live
+      ? { label: 'Sur le plateau', bg: colors.green.soft, fg: colors.green.text }
+      : personal
+        ? c.isAcceptingClients
+          ? { label: 'Disponible', bg: colors.green.soft, fg: colors.green.text }
+          : { label: 'Complet', bg: colors.track, fg: colors.text }
+        : c.onFloor
+          ? { label: 'Coach plateau', bg: colors.blue.soft, fg: colors.blue.text }
+          : null;
+  const line = [c.headline, from ? `dès ${fmtTnd(from)}` : null].filter(Boolean).join(' · ');
+  const under = c.specialties.length ? c.specialties.slice(0, 3).join(' · ') : schedule;
 
   return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={`${c.fullName}${c.headline ? `, ${c.headline}` : ''}${from ? `, à partir de ${from} dinars` : ''}`}
-      style={({ pressed }) => [s.card, pending && s.cardPending, pressed && { opacity: 0.92 }]}
-    >
-      <View style={s.top}>
-        <Avatar name={c.fullName} url={c.avatarUrl} size={56} online={live} />
-        <View style={{ flex: 1, minWidth: 0 }}>
+    <View style={[s.card, pending && s.cardPending]}>
+      <Pressable
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={`${c.fullName}${c.headline ? `, ${c.headline}` : ''}${from ? `, à partir de ${from} dinars` : ''}`}
+        style={({ pressed }) => [s.photoBox, pressed && { opacity: 0.92 }]}
+      >
+        {photo ? (
+          <Image source={{ uri: photo }} style={StyleSheet.absoluteFill} resizeMode="cover" accessibilityIgnoresInvertColors />
+        ) : (
+          <View style={s.noPhoto}>
+            <Avatar name={c.fullName} size={72} />
+          </View>
+        )}
+        {/* Dark fade so the name stays readable on any photo */}
+        <Svg style={StyleSheet.absoluteFill} width="100%" height="100%" preserveAspectRatio="none" pointerEvents="none">
+          <Defs>
+            <LinearGradient id={`fade-${c.id}`} x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0" stopColor={colors.night} stopOpacity="0.1" />
+              <Stop offset="0.45" stopColor={colors.night} stopOpacity="0.25" />
+              <Stop offset="1" stopColor={colors.night} stopOpacity="0.95" />
+            </LinearGradient>
+          </Defs>
+          <Rect x="0" y="0" width="100%" height="100%" fill={`url(#fade-${c.id})`} />
+        </Svg>
+
+        {tag && (
+          <View style={[s.tag, { backgroundColor: tag.bg }]}>
+            <Text style={[s.tagText, { color: tag.fg }]}>{tag.label}</Text>
+          </View>
+        )}
+
+        <View style={s.info}>
           <View style={s.nameRow}>
-            <Text style={s.name} numberOfLines={1}>{c.fullName}</Text>
-            {!pending && <Icon name="shield-checkmark" size={16} color={J.goldBright} />}
+            <Title variant="card" numberOfLines={1} style={{ flexShrink: 1 }}>{c.fullName}</Title>
+            {!pending && <Icon name="shield-checkmark-outline" size={22} color={colors.blue.text} accessibilityLabel="Coach validé par le club" />}
             {isMine && <Text style={s.me}>Toi</Text>}
           </View>
-          {!!c.headline && <Text style={s.headline} numberOfLines={1}>{c.headline}</Text>}
-          <View style={s.pills}>
-            {pending && <Pill tone="rec" label="À valider" />}
-            {live && <Pill tone="ok" label="Sur le plateau" />}
-            {personal && !pending && <Pill tone={c.isAcceptingClients ? 'ok' : 'tired'} label={c.isAcceptingClients ? 'Disponible' : 'Complet'} />}
-            {!personal && c.onFloor && !live && <Pill tone="never" label="Coach plateau" />}
-          </View>
+          {!!line && (
+            <View style={s.lineRow}>
+              <View style={s.lineMark} />
+              <Text style={s.line} numberOfLines={1}>{line}</Text>
+            </View>
+          )}
+          {!!under && <Text style={s.under} numberOfLines={1}>{under}</Text>}
         </View>
-        <Icon name="chevron-forward" size={18} color={J.muted} />
-      </View>
-
-      {c.specialties.length > 0 && (
-        <View style={s.tags}>
-          {c.specialties.slice(0, 3).map(t => (
-            <Text key={t} style={s.tag}>{t}</Text>
-          ))}
-        </View>
-      )}
-
-      <View style={s.bottom}>
-        {from ? (
-          <>
-            <Text style={s.from}>
-              À partir de <Text style={[s.fromVal, tabular]}>{fmtTnd(from)}</Text>
-            </Text>
-            <Text style={s.offers}>Voir le coaching ›</Text>
-          </>
-        ) : (
-          <Text style={s.schedule} numberOfLines={1}>
-            <Icon name="time-outline" size={13} color={J.muted} /> {schedule || 'Horaires à venir'}
-          </Text>
-        )}
-      </View>
+      </Pressable>
 
       {pending && (onApprove || onRefuse) && (
         <View style={s.review}>
@@ -80,25 +98,23 @@ export const CoachCard: React.FC<Props> = ({ coach: c, isMine, onPress, onApprov
           {onApprove && <Btn small label="Valider le coach" onPress={onApprove} style={{ flex: 1.4 }} />}
         </View>
       )}
-    </Pressable>
+    </View>
   );
 };
 
 const s = StyleSheet.create({
-  card: { backgroundColor: J.surface, borderWidth: 1, borderColor: J.line, borderRadius: 20, padding: 14, gap: 10, shadowColor: colors.black, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 14, elevation: 1 },
+  card: { borderRadius: radius.cardLg, backgroundColor: J.surface, borderWidth: 1, borderColor: J.line, overflow: 'hidden' },
   cardPending: { borderStyle: 'dashed', borderColor: J.rec },
-  top: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  name: { fontSize: 16, fontWeight: '800', color: J.fg, flexShrink: 1 },
-  me: { fontSize: 10.5, fontWeight: '900', color: J.accentText, backgroundColor: J.accentSoft, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1, overflow: 'hidden' },
-  headline: { fontSize: 13, color: J.muted, marginTop: 1 },
-  pills: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 2 },
-  tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  tag: { fontSize: 12, fontWeight: '700', color: J.fg, backgroundColor: J.surface2, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4, overflow: 'hidden' },
-  bottom: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, borderTopWidth: 1, borderTopColor: J.line, paddingTop: 10 },
-  from: { fontSize: 13, color: J.muted },
-  fromVal: { fontSize: 16, fontWeight: '900', color: J.fg },
-  offers: { fontSize: 13, fontWeight: '800', color: J.accent },
-  schedule: { fontSize: 13, color: J.muted, flex: 1 },
-  review: { flexDirection: 'row', gap: 8 },
+  photoBox: { height: 220, justifyContent: 'flex-end', backgroundColor: J.surface2 },
+  noPhoto: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center', paddingBottom: 60 },
+  tag: { position: 'absolute', top: 14, right: 14, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 },
+  tagText: { fontSize: 11, fontWeight: '800', letterSpacing: 1.2, textTransform: 'uppercase' },
+  info: { padding: 18, gap: 6 },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  me: { fontSize: 11, fontWeight: '900', color: J.accentText, backgroundColor: J.accentSoft, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1, overflow: 'hidden' },
+  lineRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  lineMark: { width: 3, height: 16, borderRadius: 2, backgroundColor: colors.brand },
+  line: { flex: 1, fontSize: 14, fontWeight: '600', color: colors.brandText },
+  under: { fontSize: 13, fontWeight: '500', color: colors.textSecondary },
+  review: { flexDirection: 'row', gap: 8, padding: 14, borderTopWidth: 1, borderTopColor: J.line },
 });

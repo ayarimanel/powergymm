@@ -8,9 +8,10 @@ import { fmtTnd, offersPersonal, plansOf } from '../../coaching/offers';
 import { BottomSheet, SheetScrollView } from '../home/BottomSheet';
 import { Avatar } from '../community/Avatar';
 import { ProductImage } from '../shop/ProductImage';
-import { Btn, J, Pill, k } from '../../journal/ui/kit';
+import { Btn, J, k } from '../../journal/ui/kit';
 import { OfferCard } from './OfferCard';
-import { colors, ink } from '../../theme';
+import { colors, fonts, ink, radius } from '../../theme';
+import { Title } from '../ui/Title';
 
 interface Props {
   coach: CoachProfile | null;
@@ -49,27 +50,52 @@ export const CoachProfileSheet: React.FC<Props> = ({ coach, isMine, isOwner, onC
         return (
           <View style={{ flex: 1 }}>
             <SheetScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
-              <ProductImage uri={c.bannerUrl} style={s.cover} iconSize={40} />
-              <View style={s.pad}>
-                <View style={s.avatarRow}>
-                  <View style={s.avatarRing}>
-                    <Avatar name={c.fullName} url={c.avatarUrl} size={84} online={live} />
-                  </View>
-                  <View style={s.pills}>
-                    {live && <Pill tone="ok" label="Sur le plateau" />}
-                    {personal && <Pill tone={c.isAcceptingClients ? 'ok' : 'tired'} label={c.isAcceptingClients ? 'Disponible' : 'Complet'} />}
-                  </View>
+              {/* Big photo on top (design-ref CoachFiche): the banner, else the coach's photo */}
+              {c.bannerUrl || c.avatarUrl ? (
+                <ProductImage uri={c.bannerUrl || c.avatarUrl} style={s.cover} iconSize={40} />
+              ) : (
+                <View style={[s.cover, s.coverEmpty]}>
+                  <Avatar name={c.fullName} size={96} />
                 </View>
-
+              )}
+              <View style={s.pad}>
                 <View style={s.nameRow}>
-                  <Text style={s.name} accessibilityRole="header">{c.fullName}</Text>
-                  {!pending && <Icon name="shield-checkmark" size={20} color={J.goldBright} accessibilityLabel="Coach validé par le club" />}
+                  <Title variant="section" size={30} style={{ flexShrink: 1 }}>{c.fullName}</Title>
+                  {!pending && <Icon name="shield-checkmark-outline" size={24} color={colors.blue.text} accessibilityLabel="Coach validé par le club" />}
                 </View>
                 {!!c.headline && <Text style={s.headline}>{c.headline}</Text>}
-                {c.yearsExperience > 0 && (
-                  <View style={s.exp}>
-                    <Icon name="trophy-outline" size={15} color={J.muted} />
-                    <Text style={s.expText}>{c.yearsExperience} an{c.yearsExperience > 1 ? 's' : ''} d’expérience</Text>
+
+                {/* Key facts */}
+                <View style={s.facts}>
+                  {c.yearsExperience > 0 && (
+                    <View style={s.fact}>
+                      <Text style={s.factVal}>{c.yearsExperience} an{c.yearsExperience > 1 ? 's' : ''}</Text>
+                      <Text style={s.factLbl}>Expérience</Text>
+                    </View>
+                  )}
+                  {!!c.clientsCount && (
+                    <View style={[s.fact, s.factSep]}>
+                      <Text style={s.factVal}>{c.clientsCount}+</Text>
+                      <Text style={s.factLbl}>Membres suivis</Text>
+                    </View>
+                  )}
+                  {(live || personal) && (
+                    <View style={[s.fact, s.factSep]}>
+                      <Text style={[s.factVal, { color: live || c.isAcceptingClients ? colors.green.text : colors.textSecondary }]}>
+                        {live ? 'Là' : c.isAcceptingClients ? 'Dispo' : 'Complet'}
+                      </Text>
+                      <Text style={s.factLbl} numberOfLines={1}>{live ? 'Sur le plateau' : c.availabilityHours || 'Coaching perso'}</Text>
+                    </View>
+                  )}
+                </View>
+
+                {c.specialties.length > 0 && (
+                  <View style={s.tags}>
+                    {c.specialties.map(t => (
+                      <View key={t} style={s.tag}>
+                        <Text style={s.tagText}>{t}</Text>
+                      </View>
+                    ))}
                   </View>
                 )}
 
@@ -89,7 +115,7 @@ export const CoachProfileSheet: React.FC<Props> = ({ coach, isMine, isOwner, onC
 
                 {personal && (
                   <>
-                    <Text style={s.h}>Coaching personnel</Text>
+                    <Title variant="section" style={s.h}>Formules</Title>
                     {offers.length ? (
                       <View style={{ gap: 12 }}>
                         <Text style={k.sub}>Choisis un plan, puis réserve : tu reçois le numéro du coach.</Text>
@@ -115,21 +141,12 @@ export const CoachProfileSheet: React.FC<Props> = ({ coach, isMine, isOwner, onC
                   </View>
                 )}
 
-                <Text style={s.h}>À propos</Text>
+                <Title variant="section" style={s.h}>À propos</Title>
                 <Text style={s.bio}>{c.bio}</Text>
-                {c.specialties.length > 0 && (
-                  <View style={s.tags}>
-                    {c.specialties.map(t => (
-                      <View key={t} style={s.tag}>
-                        <Text style={s.tagText}>{t}</Text>
-                      </View>
-                    ))}
-                  </View>
-                )}
 
                 {!!c.beforeAfterTransformations?.length && (
                   <>
-                    <Text style={s.h}>Résultats de ses clients</Text>
+                    <Title variant="section" style={s.h}>Résultats de ses clients</Title>
                     <View style={{ gap: 12 }}>
                       {c.beforeAfterTransformations.map((t, i) => (
                         <View key={i} style={{ gap: 8 }}>
@@ -154,13 +171,13 @@ export const CoachProfileSheet: React.FC<Props> = ({ coach, isMine, isOwner, onC
 
                 {(!!c.availabilityDays?.length || !!c.availabilityHours) && (
                   <>
-                    <Text style={s.h}>{c.onFloor ? 'Présence au club' : 'Disponibilités'}</Text>
+                    <Title variant="section" style={s.h}>{c.onFloor ? 'Présence au club' : 'Disponibilités'}</Title>
                     <View style={s.days}>
                       {DAYS.map(d => {
                         const on = c.availabilityDays?.includes(d);
                         return (
                           <View key={d} style={[s.day, on && s.dayOn]} accessibilityLabel={`${d} ${on ? 'présent' : 'absent'}`}>
-                            <Text style={[s.dayText, on && { color: colors.white }]}>{d}</Text>
+                            <Text style={[s.dayText, on && { color: colors.onInverse }]}>{d}</Text>
                           </View>
                         );
                       })}
@@ -195,35 +212,43 @@ export const CoachProfileSheet: React.FC<Props> = ({ coach, isMine, isOwner, onC
 };
 
 const s = StyleSheet.create({
-  cover: { height: 140, width: '100%' },
-  pad: { paddingHorizontal: 20 },
-  avatarRow: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: -42 },
-  avatarRing: { borderRadius: 50, borderWidth: 4, borderColor: J.surface, backgroundColor: J.surface },
+  cover: { height: 280, width: '100%' },
+  coverEmpty: { alignItems: 'center', justifyContent: 'center', backgroundColor: J.surface2 },
+  pad: { paddingHorizontal: 20, paddingTop: 20 },
+  avatarRow: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' },
+  avatarRing: { borderRadius: 50 },
   pills: { flexDirection: 'row', gap: 6, marginBottom: 4 },
-  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 10 },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   name: { fontSize: 22, fontWeight: '900', color: J.fg, flexShrink: 1 },
-  headline: { fontSize: 14, color: J.muted, marginTop: 2 },
+  headline: { fontSize: 15, fontWeight: '600', color: colors.brandText, marginTop: 4 },
   exp: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6 },
   expText: { fontSize: 13, fontWeight: '700', color: J.fg },
-  pending: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: J.goldSoft, borderRadius: 12, padding: 10, marginTop: 10 },
+
+  facts: { flexDirection: 'row', marginTop: 18, paddingVertical: 16, borderRadius: 20, backgroundColor: J.surface2 },
+  fact: { flex: 1, alignItems: 'center', gap: 2, paddingHorizontal: 6 },
+  factSep: { borderLeftWidth: 1, borderLeftColor: J.line },
+  factVal: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 26, lineHeight: 28, color: J.fg },
+  factLbl: { fontSize: 12, fontWeight: '500', color: J.muted, textAlign: 'center' },
+
+  pending: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: J.goldSoft, borderRadius: 14, padding: 12, marginTop: 14 },
   pendingText: { fontSize: 13, fontWeight: '700', color: J.gold },
-  ownerBtns: { flexDirection: 'row', gap: 8, marginTop: 12 },
-  h: { fontSize: 15, fontWeight: '800', color: J.fg, marginTop: 22, marginBottom: 10 },
-  bio: { fontSize: 14, lineHeight: 21, color: J.fg },
-  floor: { flexDirection: 'row', gap: 10, alignItems: 'center', backgroundColor: J.okSoft, borderRadius: 14, padding: 12, marginTop: 16 },
+  ownerBtns: { flexDirection: 'row', gap: 8, marginTop: 14 },
+  h: { marginTop: 26, marginBottom: 12 },
+  bio: { fontSize: 15, fontWeight: '500', lineHeight: 22, color: colors.textSecondary },
+  floor: { flexDirection: 'row', gap: 10, alignItems: 'center', backgroundColor: J.okSoft, borderRadius: 16, padding: 14, marginTop: 16 },
   floorText: { flex: 1, fontSize: 13, color: J.okText, lineHeight: 18 },
-  tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 10 },
-  tag: { backgroundColor: J.surface2, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5 },
-  tagText: { fontSize: 12.5, fontWeight: '700', color: J.fg },
+  tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 14 },
+  tag: { backgroundColor: J.surface2, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 },
+  tagText: { fontSize: 13, fontWeight: '700', color: J.fg },
   transImgs: { flexDirection: 'row', gap: 8 },
-  transImg: { width: '100%', aspectRatio: 1, borderRadius: 14 },
+  transImg: { width: '100%', aspectRatio: 1, borderRadius: 16 },
   transTag: { position: 'absolute', left: 8, top: 8, backgroundColor: ink(0.7), color: colors.white, fontSize: 11, fontWeight: '800', borderRadius: 8, paddingHorizontal: 7, paddingVertical: 2, overflow: 'hidden' },
   transText: { fontSize: 13, color: J.fg },
   days: { flexDirection: 'row', gap: 6 },
-  day: { flex: 1, height: 36, borderRadius: 10, backgroundColor: J.surface2, alignItems: 'center', justifyContent: 'center' },
-  dayOn: { backgroundColor: J.ok },
+  day: { flex: 1, height: 40, borderRadius: 12, backgroundColor: J.surface2, alignItems: 'center', justifyContent: 'center' },
+  dayOn: { backgroundColor: colors.text },
   dayText: { fontSize: 12, fontWeight: '800', color: J.muted },
   hours: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 10 },
   hoursText: { fontSize: 14, fontWeight: '700', color: J.fg },
-  footer: { paddingHorizontal: 16, paddingTop: 12, borderTopWidth: 1, borderTopColor: J.line, backgroundColor: J.surface },
+  footer: { paddingHorizontal: 20, paddingTop: 14, borderTopWidth: 1, borderTopColor: J.line, backgroundColor: J.surface },
 });

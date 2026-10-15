@@ -18,8 +18,10 @@ import { useScrollToTopOnReselect } from '../navigation/tabEvents';
 import { Toast } from '../components/home/Toast';
 import { Btn, Card, J, SecHead, Seg, k } from '../journal/ui/kit';
 import { haptics } from '../utils/haptics';
-import { colors } from '../theme';
+import { buttonShadow, colors } from '../theme';
 import { claimSwipe } from '../navigation/swipeGuard';
+import { Title } from '../components/ui/Title';
+import { Chip } from '../components/ui/Chip';
 
 interface Props {
   user: UserProfile;
@@ -110,13 +112,13 @@ export const CoachProfilesScreen: React.FC<Props> = ({ user, onUpdateUser }) => 
   return (
     <View style={s.screen}>
       <View style={s.header}>
-        <View style={{ flex: 1, minWidth: 0 }}>
-          <Text style={s.h1} accessibilityRole="header">Coachs</Text>
-          {!!gymName && <Text style={s.sub} numberOfLines={1}>{gymName}</Text>}
-        </View>
         <View style={s.chip} accessibilityLabel={`${live.length} coach${live.length > 1 ? 's' : ''} sur le plateau maintenant`}>
           <View style={[s.liveDot, !live.length && { backgroundColor: J.muted }]} />
-          <Text style={s.chipText}>{live.length ? `${live.length} sur le plateau` : 'Personne au plateau'}</Text>
+          <Text style={s.chipText}>{live.length ? `${live.length} au plateau` : 'Personne au plateau'}</Text>
+        </View>
+        <View style={{ alignSelf: 'stretch' }} accessible accessibilityRole="header" accessibilityLabel={`Les coachs du club${gymName ? `, ${gymName}` : ''}`}>
+          <Title variant="display" size={40} accessibilityRole="none">Les coachs</Title>
+          <Title variant="display" size={40} color={colors.brand} accessibilityRole="none">du club</Title>
         </View>
       </View>
 
@@ -187,7 +189,9 @@ export const CoachProfilesScreen: React.FC<Props> = ({ user, onUpdateUser }) => 
         )}
 
         <View style={s.filterRow}>
-          <Seg options={[['all', 'Tous'], ['personal', 'Coaching perso'], ['floor', 'Plateau']]} value={filter} onChange={setFilter} />
+          {([['all', 'Tous'], ['personal', 'Coaching perso'], ['floor', 'Plateau']] as const).map(([id, label]) => (
+            <Chip key={id} label={label} selected={filter === id} tone="brand" onPress={() => setFilter(id)} />
+          ))}
         </View>
 
         {!coaches && [0, 1].map(i => <View key={i} style={s.skeleton} />)}
@@ -333,14 +337,14 @@ const CoachSpace: React.FC<{
 
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.page },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 68, paddingVertical: 12, paddingHorizontal: 16, backgroundColor: colors.header, borderBottomWidth: 1, borderBottomColor: J.line },
+  header: { gap: 10, paddingTop: 14, paddingBottom: 8, paddingHorizontal: 16, backgroundColor: colors.header },
   h1: { fontSize: 18, fontWeight: '800', color: J.fg },
   sub: { fontSize: 11, fontWeight: '700', color: J.muted },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.card, borderRadius: 14, paddingVertical: 8, paddingHorizontal: 12 },
+  chip: { alignSelf: 'flex-end', flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 999, paddingVertical: 10, paddingHorizontal: 14 },
   liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: J.ok },
-  chipText: { fontSize: 12, fontWeight: '800', color: J.fg },
+  chipText: { fontSize: 13, fontWeight: '700', color: J.fg },
 
-  content: { padding: 12, paddingBottom: 100, gap: 12, maxWidth: 720, width: '100%', alignSelf: 'center' },
+  content: { padding: 16, paddingBottom: 100, gap: 14, maxWidth: 720, width: '100%', alignSelf: 'center' },
 
   create: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 20, backgroundColor: J.goldSoft, borderWidth: 1, borderColor: colors.gold.border },
   createIc: { width: 44, height: 44, borderRadius: 22, backgroundColor: J.goldBright, alignItems: 'center', justifyContent: 'center' },
@@ -363,11 +367,11 @@ const s = StyleSheet.create({
   liveCoach: { alignItems: 'center', gap: 4, width: 64 },
   liveName: { fontSize: 12, fontWeight: '700', color: J.fg, maxWidth: 64 },
 
-  filterRow: { alignItems: 'flex-start', marginTop: 2 },
-  skeleton: { height: 150, borderRadius: 20, backgroundColor: J.surface2 },
+  filterRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 2 },
+  skeleton: { height: 220, borderRadius: 24, backgroundColor: J.surface2 },
   empty: { alignItems: 'center', paddingVertical: 36, gap: 6 },
   emptyTitle: { fontSize: 16, fontWeight: '700', color: J.muted },
 
-  fab: { position: 'absolute', right: 16, bottom: 16, height: 48, paddingHorizontal: 18, borderRadius: 24, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: J.accent, shadowColor: colors.text, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.22, shadowRadius: 12, elevation: 6 },
+  fab: { position: 'absolute', right: 16, bottom: 16, height: 52, paddingHorizontal: 20, borderRadius: 26, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: J.accent, ...buttonShadow },
   fabText: { color: colors.white, fontSize: 15, fontWeight: '800' },
 });

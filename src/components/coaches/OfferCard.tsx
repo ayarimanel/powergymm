@@ -5,7 +5,7 @@ import { Icon } from '../ui/Icon';
 import { CoachPricingPlan } from '../../types/database';
 import { fmtTnd, planText } from '../../coaching/offers';
 import { J, tabular } from '../../journal/ui/kit';
-import { colors } from '../../theme';
+import { colors, fonts } from '../../theme';
 
 interface Props {
   offer: CoachPricingPlan;
@@ -66,14 +66,14 @@ export const OfferCard: React.FC<Props> = ({ offer, selected, onPress, onEdit, o
 };
 
 const s = StyleSheet.create({
-  card: { backgroundColor: J.surface, borderWidth: 1.5, borderColor: J.line, borderRadius: 18, padding: 14, gap: 8 },
-  cardPopular: { borderColor: J.goldBright, paddingTop: 18 },
-  cardSelected: { borderColor: J.accent, backgroundColor: J.accentSoft },
+  card: { backgroundColor: J.surface2, borderWidth: 1, borderColor: J.line, borderRadius: 20, paddingVertical: 16, paddingHorizontal: 18, gap: 6 },
+  cardPopular: { paddingTop: 20 },
+  cardSelected: { borderColor: J.accent, borderWidth: 1.5, backgroundColor: colors.brandTint },
+  title: { flex: 1, fontSize: 16, fontWeight: '800', color: J.fg },
+  price: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 26, lineHeight: 28, color: J.fg },
   popular: { position: 'absolute', top: -10, left: 14, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: J.goldBright, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
   popularText: { color: colors.white, fontSize: 10.5, fontWeight: '900' },
   top: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  title: { flex: 1, fontSize: 16, fontWeight: '800', color: J.fg },
-  price: { fontSize: 20, fontWeight: '900', color: J.fg },
   radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: J.line, alignItems: 'center', justifyContent: 'center' },
   radioOn: { borderColor: J.accent },
   radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: J.accent },

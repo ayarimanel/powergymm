@@ -4,12 +4,31 @@ import { Text, TextInput } from '../../components/ui/Text';
 import { MuscleGroup } from '../../types/database';
 import { BottomSheet, SheetScrollView } from '../../components/home/BottomSheet';
 import {
-  EXERCISES, Exercise, ExerciseKind, MUSCLES, MuscleInfo, Workout, dayLabel, fmtNum, lastPerformance, muscleById, muscleRecovery, normName,
-  personalRecord, summarizeSets,
+  EXERCISES, Exercise, ExerciseKind, MUSCLES, MuscleInfo, Recovery, Workout, agoLabel, dayLabel, fmtNum, lastPerformance, muscleById, muscleRecovery, normName,
+  periodStats, personalRecord, summarizeSets,
 } from '../journalLogic';
-import { Btn, J, Link, MuscleIcon, Pill, StatusPill, k } from './kit';
-import { colors } from '../../theme';
-import { Icon } from '../../components/ui/Icon';
+import { Btn, J, Link, Pill, k, tabular } from './kit';
+import { colors, fonts, radius } from '../../theme';
+import { Icon, IconName } from '../../components/ui/Icon';
+import { Title } from '../../components/ui/Title';
+
+/** Same icons as the muscle cards on Entraînement. */
+const MUSCLE_ICON: Record<MuscleGroup, IconName> = {
+  chest: 'barbell-outline',
+  back: 'body-outline',
+  legs: 'walk-outline',
+  shoulders: 'shield-outline',
+  arms: 'fitness-outline',
+  cardio: 'flame-outline',
+};
+const STATUS: Record<Recovery['status'], { label: (r: Recovery) => string; fg: string; bg: string }> = {
+  ready: { label: () => 'Prêt', fg: J.okText, bg: J.okSoft },
+  recovering: { label: r => `Prêt dans ${r.readyInH} h`, fg: J.recText, bg: J.recSoft },
+  tired: { label: r => `Fatigué · ${r.readyInH} h`, fg: J.tiredText, bg: J.tiredSoft },
+  never: { label: () => 'À découvrir', fg: J.muted, bg: J.surface2 },
+};
+/** "Autres exercices" shows this many before "Voir les N autres" (a search shows them all). */
+const OTHERS_SHOWN = 6;
 
 export type SheetState = { picker: true } | { muscleId: MuscleGroup; fromPicker?: boolean };
 
@@ -27,30 +46,35 @@ interface Props {
 export const MuscleSheet: React.FC<Props> = ({ sheet, history, workout, onPickMuscle, onPick, onCreate, onClose, onBack }) => {
   const [q, setQ] = useState('');
   const [creating, setCreating] = useState(false);
+  const [allOthers, setAllOthers] = useState(false);
   const muscleId = sheet && 'muscleId' in sheet ? sheet.muscleId : null;
   useEffect(() => {
     setQ('');
     setCreating(false);
+    setAllOthers(false);
   }, [muscleId, !!sheet]);
 
   let content: React.ReactNode = null;
   if (sheet && 'picker' in sheet) {
     content = (
       <>
-        <Text style={s.title} accessibilityRole="header">Ajouter un exercice</Text>
-        <Text style={k.sub}>Choisis le muscle</Text>
+        <Title variant="section">Ajouter un exercice</Title>
+        <Text style={s.meta}>Choisis le muscle</Text>
         <View style={s.pickGrid}>
-          {MUSCLES.map(m => (
-            <Pressable key={m.id} onPress={() => onPickMuscle(m.id)} accessibilityRole="button" style={({ pressed }) => [s.pick, pressed && { opacity: 0.85 }]}>
-              <MuscleIcon id={m.id} color={m.color} small />
-              <View style={{ flex: 1, alignItems: 'flex-start' }}>
-                <Text style={s.pickName}>{m.name}</Text>
-                <View style={{ alignSelf: 'flex-start' }}>
-                  <StatusPill r={muscleRecovery(history, m.id)} />
+          {MUSCLES.map(m => {
+            const r = muscleRecovery(history, m.id);
+            return (
+              <Pressable key={m.id} onPress={() => onPickMuscle(m.id)} accessibilityRole="button" style={({ pressed }) => [s.pick, pressed && { opacity: 0.85 }]}>
+                <View style={s.exIc}>
+                  <Icon name={MUSCLE_ICON[m.id]} size={22} color={J.accentText} />
                 </View>
-              </View>
-            </Pressable>
-          ))}
+                <View style={{ flex: 1, alignItems: 'flex-start' }}>
+                  <Text style={s.pickName}>{m.name}</Text>
+                  <Text style={[s.pickStatus, { color: STATUS[r.status].fg }]}>{STATUS[r.status].label(r)}</Text>
+                </View>
+              </Pressable>
+            );
+          })}
         </View>
       </>
     );
@@ -58,71 +82,154 @@ export const MuscleSheet: React.FC<Props> = ({ sheet, history, workout, onPickMu
     const m = muscleById(muscleId);
     const all = EXERCISES.filter(e => e.muscle === m.id);
     const list = all.filter(e => normName(e.name).includes(normName(q)));
+    const rec = muscleRecovery(history, m.id);
+    const st = STATUS[rec.status];
+    // Header numbers, all from the existing journal logic.
+    const best = all.reduce<number | null>((b, e) => {
+      if (e.kind === 'cardio') return b;
+      const pr = personalRecord(history, e.id);
+      return pr && (b == null || pr.kg > b) ? pr.kg : b;
+    }, null);
+    const weekSets = periodStats(history, 7, new Date()).perMuscle[m.id]?.sets ?? 0;
+
+    /** Essentials and my own exercises: a card with the record and a round "+". */
+    const card = (e: Exercise, i: number) => {
+      const last = lastPerformance(history.filter(x => x.id !== workout?.id), e.id);
+      const pr = e.kind !== 'cardio' ? personalRecord(history, e.id) : null;
+      const inSession = workout?.exercises.some(x => x.exerciseId === e.id);
+      return (
+        <Pressable key={e.id} onPress={() => onPick(e.id)} accessibilityRole="button" accessibilityLabel={e.name} style={({ pressed }) => [s.exCard, pressed && { opacity: 0.85 }]}>
+          <View style={s.exIc}>
+            <Icon name={MUSCLE_ICON[m.id]} size={22} color={J.accentText} />
+          </View>
+          <View style={s.exMain}>
+            <Text style={s.exName} numberOfLines={2}>
+              {e.name}
+              {e.custom && <Text style={s.own}> Perso </Text>}
+            </Text>
+            <Text style={s.exSub} numberOfLines={1}>{last ? `${dayLabel(last.date)} · ${summarizeSets(last.sets, e.kind)}` : 'Jamais fait'}</Text>
+          </View>
+          {inSession ? (
+            <Pill tone="ok" label="En cours" />
+          ) : (
+            <>
+              {pr && (
+                <View style={s.exPr}>
+                  <Text style={[s.exPrVal, tabular]}>{fmtNum(pr.kg)} kg</Text>
+                  <Text style={s.exPrLbl}>record</Text>
+                </View>
+              )}
+              <View style={[s.plus, i === 0 || last ? s.plusOn : s.plusOff]}>
+                <Icon name="add" size={22} color={i === 0 || last ? colors.white : J.fg} />
+              </View>
+            </>
+          )}
+        </Pressable>
+      );
+    };
+
+    /** Other exercises: a light row. */
     const row = (e: Exercise) => {
       const last = lastPerformance(history.filter(x => x.id !== workout?.id), e.id);
       const pr = e.kind !== 'cardio' ? personalRecord(history, e.id) : null;
       const inSession = workout?.exercises.some(x => x.exerciseId === e.id);
       return (
-        <Pressable key={e.id} onPress={() => onPick(e.id)} accessibilityRole="button" style={({ pressed }) => [s.ex, pressed && { opacity: 0.85 }]}>
-          <View style={s.exMain}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-              {e.base && <View accessible accessibilityLabel="Exercice de base"><Icon name="star" size={13} color={J.goldBright} /></View>}
-              <Text style={[s.exName, { flexShrink: 1 }]} numberOfLines={1}>
-                {e.name}
-                {e.custom && <Text style={s.own}> Perso </Text>}
-              </Text>
-            </View>
-            <Text style={s.exSub} numberOfLines={1}>{last ? `${dayLabel(last.date)} : ${summarizeSets(last.sets, e.kind)}` : 'Jamais fait'}</Text>
-          </View>
+        <Pressable key={e.id} onPress={() => onPick(e.id)} accessibilityRole="button" accessibilityLabel={e.name} style={({ pressed }) => [s.li, pressed && { opacity: 0.7 }]}>
+          <Text style={s.liName} numberOfLines={1}>{e.name}</Text>
           {inSession ? (
             <Pill tone="ok" label="En cours" />
-          ) : pr ? (
-            <View style={s.exPr}>
-              <Text style={s.exPrLbl}>Record</Text>
-              <Text style={s.exPrVal}>{fmtNum(pr.kg)} kg</Text>
-            </View>
           ) : (
-            <View style={s.plus}><Text style={s.plusText}>+</Text></View>
+            <>
+              <Text style={[s.liMeta, tabular]} numberOfLines={1}>{pr ? `${fmtNum(pr.kg)} kg` : last ? dayLabel(last.date) : 'Jamais fait'}</Text>
+              <View style={[s.plusSm, s.plusOff]}>
+                <Icon name="add" size={18} color={J.fg} />
+              </View>
+            </>
           )}
         </Pressable>
       );
     };
+
+    const essentials = list.filter(e => e.base);
+    const mine = list.filter(e => e.custom);
+    const others = list.filter(e => !e.base && !e.custom);
+    const shownOthers = q.trim() || allOthers ? others : others.slice(0, OTHERS_SHOWN);
+
     content = (
       <>
         <View style={s.top}>
           {sheet && 'fromPicker' in sheet && sheet.fromPicker && (
             <Pressable onPress={onBack} accessibilityRole="button" accessibilityLabel="Retour" style={s.back}>
-              <Text style={s.backText}>‹</Text>
+              <Icon name="chevron-back" size={22} color={J.fg} />
             </Pressable>
           )}
-          <MuscleIcon id={m.id} color={m.color} small />
-          <View>
-            <Text style={s.title} accessibilityRole="header">{m.name}</Text>
-            <Text style={k.sub}>{all.length} exercices</Text>
+          <View style={[s.status, { backgroundColor: st.bg }]}>
+            <View style={[s.statusDot, { backgroundColor: st.fg }]} />
+            <Text style={[s.statusText, { color: st.fg }]}>{st.label(rec)}</Text>
           </View>
         </View>
-        <TextInput style={s.search} placeholder="Chercher un exercice" placeholderTextColor={J.muted} value={q} onChangeText={setQ} returnKeyType="search" />
+        <Title variant="display" size={44}>{m.name}</Title>
+        <Text style={s.meta}>
+          {all.length} exercices{rec.last ? ` · dernière fois ${agoLabel(rec.last).toLowerCase()}` : ''}
+        </Text>
+
+        <View style={s.stats}>
+          <View style={s.stat}>
+            <Text style={[s.statNum, tabular]}>{best != null ? `${fmtNum(best)} kg` : '—'}</Text>
+            <Text style={s.statLbl}>record</Text>
+          </View>
+          <View style={s.stat}>
+            <Text style={[s.statNum, tabular]}>{weekSets}</Text>
+            <Text style={s.statLbl}>séries / 7 j</Text>
+          </View>
+        </View>
+
+        <View style={s.searchBox}>
+          <Icon name="search" size={20} color={J.muted} />
+          <TextInput style={s.search} placeholder="Chercher un exercice" placeholderTextColor={J.muted} value={q} onChangeText={setQ} returnKeyType="search" accessibilityLabel="Chercher un exercice" />
+        </View>
+
         {creating ? (
           <CreateExercise muscle={m} initialName={q} onCancel={() => setCreating(false)} onOpen={onPick} onCreate={data => onCreate({ ...data, muscle: m.id })} />
         ) : (
           <>
-            <Pressable onPress={() => setCreating(true)} accessibilityRole="button" style={s.createOpen}>
-              <View style={[s.plus, { backgroundColor: J.accent }]}><Text style={[s.plusText, { color: colors.white }]}>+</Text></View>
+            <Pressable onPress={() => setCreating(true)} accessibilityRole="button" style={({ pressed }) => [s.createOpen, pressed && { opacity: 0.85 }]}>
+              <Icon name="add" size={20} color={J.accentText} />
               <Text style={s.createOpenText}>
                 {q.trim() && !list.length ? <>Créer « <Text style={{ fontWeight: '900' }}>{q.trim()}</Text> »</> : 'Ajouter mon exercice'}
               </Text>
             </Pressable>
-            {list.some(e => e.custom) && (
+
+            {mine.length > 0 && (
               <>
-                <Text style={s.group}>Mes exercices</Text>
-                <View style={s.exList}>{list.filter(e => e.custom).map(row)}</View>
+                <View style={s.groupRow}>
+                  <Text style={s.group}>Mes exercices</Text>
+                  <Text style={s.groupN}>{mine.length}</Text>
+                </View>
+                <View style={s.cards}>{mine.map(card)}</View>
               </>
             )}
-            {list.some(e => e.base) && <View style={s.exList}>{list.filter(e => e.base).map(row)}</View>}
-            {list.some(e => !e.base && !e.custom) && (
+            {essentials.length > 0 && (
               <>
-                <Text style={s.group}>Autres exercices</Text>
-                <View style={s.exList}>{list.filter(e => !e.base && !e.custom).map(row)}</View>
+                <View style={s.groupRow}>
+                  <Text style={s.group}>Les essentiels</Text>
+                  <Text style={s.groupN}>{essentials.length}</Text>
+                </View>
+                <View style={s.cards}>{essentials.map(card)}</View>
+              </>
+            )}
+            {others.length > 0 && (
+              <>
+                <View style={s.groupRow}>
+                  <Text style={s.group}>Autres exercices</Text>
+                  <Text style={s.groupN}>{others.length}</Text>
+                </View>
+                <View>{shownOthers.map(row)}</View>
+                {shownOthers.length < others.length && (
+                  <Pressable onPress={() => setAllOthers(true)} accessibilityRole="button" style={s.more}>
+                    <Text style={s.moreText}>Voir les {others.length - shownOthers.length} autres</Text>
+                  </Pressable>
+                )}
               </>
             )}
             {!list.length && <Text style={k.empty}>Aucun exercice trouvé. Crée-le en un geste.</Text>}
@@ -178,7 +285,7 @@ const CreateExercise: React.FC<{
       </View>
       <Text style={s.lbl}>Nom de l'exercice</Text>
       <TextInput
-        style={[s.search, { backgroundColor: J.surface, marginBottom: 0 }]}
+        style={s.createInput}
         autoFocus
         maxLength={40}
         placeholder="Ex. Pull-over haltère"
@@ -214,38 +321,64 @@ const CreateExercise: React.FC<{
 };
 
 const s = StyleSheet.create({
-  body: { paddingHorizontal: 16, paddingBottom: 32, gap: 6 },
-  title: { fontSize: 18, fontWeight: '800', color: J.fg },
-  pickGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 },
-  pick: { flexBasis: '47%', flexGrow: 1, flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: J.line, backgroundColor: J.surface, borderRadius: 16, padding: 10 },
-  pickName: { fontSize: 13, fontWeight: '800', color: J.fg },
-  top: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 6 },
-  back: { width: 36, height: 36, borderRadius: 18, backgroundColor: J.surface2, alignItems: 'center', justifyContent: 'center' },
-  backText: { fontSize: 22, color: J.fg, marginTop: -2 },
-  search: { borderWidth: 1, borderColor: J.line, backgroundColor: J.surface2, color: J.fg, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 11, fontSize: 15, marginBottom: 6 },
-  createOpen: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1.5, borderStyle: 'dashed', borderColor: J.accent, backgroundColor: J.accentSoft, borderRadius: 14, paddingVertical: 10, paddingHorizontal: 12, marginBottom: 6 },
-  createOpenText: { flex: 1, color: J.accentText, fontWeight: '800', fontSize: 14 },
-  group: { fontSize: 12, fontWeight: '800', color: J.muted, marginTop: 10, marginBottom: 2 },
-  exList: { gap: 6 },
-  ex: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: J.line, backgroundColor: J.surface, borderRadius: 14, paddingVertical: 10, paddingHorizontal: 12, minHeight: 56 },
-  exMain: { flex: 1, minWidth: 0 },
-  exName: { fontSize: 14, fontWeight: '800', color: J.fg },
-  exSub: { fontSize: 12, color: J.muted },
-  star: { color: J.goldBright },
+  body: { paddingHorizontal: 20, paddingBottom: 40, gap: 8 },
+  meta: { fontSize: 14, fontWeight: '500', color: J.muted },
+
+  pickGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 12 },
+  pick: { flexBasis: '47%', flexGrow: 1, flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1, borderColor: J.line, backgroundColor: J.surface, borderRadius: 20, padding: 12 },
+  pickName: { fontSize: 15, fontWeight: '800', color: J.fg },
+  pickStatus: { fontSize: 12, fontWeight: '700', marginTop: 2 },
+
+  top: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  back: { width: 40, height: 40, borderRadius: 20, backgroundColor: J.surface2, alignItems: 'center', justifyContent: 'center' },
+  status: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999 },
+  statusDot: { width: 7, height: 7, borderRadius: 4 },
+  statusText: { fontSize: 12, fontWeight: '800', letterSpacing: 1, textTransform: 'uppercase' },
+
+  stats: { flexDirection: 'row', gap: 10, marginTop: 8 },
+  stat: { flex: 1, gap: 2, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 20, backgroundColor: J.surface, borderWidth: 1, borderColor: J.line },
+  statNum: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 26, lineHeight: 28, color: J.fg },
+  statLbl: { fontSize: 13, fontWeight: '500', color: J.muted },
+
+  searchBox: { flexDirection: 'row', alignItems: 'center', gap: 10, height: 56, paddingHorizontal: 18, marginTop: 8, borderRadius: radius.input, borderWidth: 1, borderColor: J.line, backgroundColor: J.surface },
+  search: { flex: 1, height: '100%', color: J.fg, fontSize: 15, fontWeight: '600' },
+  createOpen: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 56, marginTop: 6, borderWidth: 1.5, borderStyle: 'dashed', borderColor: J.accent, backgroundColor: colors.brandTint, borderRadius: radius.input },
+  createOpenText: { color: J.accentText, fontWeight: '800', fontSize: 15 },
+
+  groupRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 18, marginBottom: 4 },
+  group: { fontSize: 11, fontWeight: '800', letterSpacing: 1.6, textTransform: 'uppercase', color: J.muted },
+  groupN: { fontSize: 13, fontWeight: '700', color: J.muted },
+  cards: { gap: 10 },
+
+  exCard: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 20, borderWidth: 1, borderColor: J.line, backgroundColor: J.surface, minHeight: 76 },
+  exIc: { width: 48, height: 48, borderRadius: 14, backgroundColor: J.accentSoft, alignItems: 'center', justifyContent: 'center' },
+  exMain: { flex: 1, minWidth: 0, gap: 3 },
+  exName: { fontSize: 15, fontWeight: '800', color: J.fg },
+  exSub: { fontSize: 13, color: J.muted },
   own: { fontSize: 10, fontWeight: '800', backgroundColor: J.accentSoft, color: J.accentText, borderRadius: 6, overflow: 'hidden' },
   exPr: { alignItems: 'flex-end' },
-  exPrLbl: { fontSize: 10, fontWeight: '800', color: J.gold },
-  exPrVal: { fontSize: 17, fontWeight: '900', color: J.gold },
-  plus: { width: 28, height: 28, borderRadius: 14, backgroundColor: J.accentSoft, alignItems: 'center', justifyContent: 'center' },
-  plusText: { color: J.accentText, fontWeight: '900', fontSize: 16, marginTop: -1 },
-  create: { gap: 8, backgroundColor: J.surface2, borderRadius: 18, padding: 14 },
+  exPrVal: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 20, lineHeight: 22, color: J.recText },
+  exPrLbl: { fontSize: 11, fontWeight: '600', color: J.muted },
+  plus: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  plusOn: { backgroundColor: J.accent },
+  plusOff: { borderWidth: 1.5, borderColor: colors.disabled },
+  plusSm: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+
+  li: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: J.line },
+  liName: { flex: 1, fontSize: 15, fontWeight: '700', color: J.fg },
+  liMeta: { fontSize: 13, color: J.muted, maxWidth: 120 },
+  more: { alignSelf: 'center', paddingVertical: 14, paddingHorizontal: 16 },
+  moreText: { fontSize: 14, fontWeight: '700', color: colors.brand },
+
+  create: { gap: 8, backgroundColor: J.surface, borderWidth: 1, borderColor: J.line, borderRadius: 20, padding: 16, marginTop: 6 },
   createHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  createTitle: { fontSize: 14, fontWeight: '800', color: J.fg, flex: 1 },
-  lbl: { fontSize: 12, fontWeight: '800', color: J.muted, marginTop: 4 },
+  createTitle: { fontSize: 15, fontWeight: '800', color: J.fg, flex: 1 },
+  createInput: { height: 52, borderWidth: 1, borderColor: J.line, backgroundColor: J.surface2, color: J.fg, borderRadius: radius.input, paddingHorizontal: 16, fontSize: 15, fontWeight: '600' },
+  lbl: { fontSize: 11, fontWeight: '800', letterSpacing: 1.6, textTransform: 'uppercase', color: J.muted, marginTop: 6 },
   err: { fontSize: 12, color: J.tiredText, fontWeight: '700' },
-  kinds: { flexDirection: 'row', gap: 6 },
-  kind: { flex: 1, borderWidth: 1.5, borderColor: J.line, backgroundColor: J.surface, borderRadius: 12, paddingVertical: 8, paddingHorizontal: 6, alignItems: 'center', gap: 2 },
-  kindOn: { borderColor: J.accent, backgroundColor: J.accentSoft },
+  kinds: { flexDirection: 'row', gap: 8 },
+  kind: { flex: 1, borderWidth: 1, borderColor: J.line, backgroundColor: J.surface2, borderRadius: 14, paddingVertical: 10, paddingHorizontal: 6, alignItems: 'center', gap: 2 },
+  kindOn: { borderColor: J.accent, borderWidth: 1.5, backgroundColor: colors.brandTint },
   kindLabel: { fontSize: 12, fontWeight: '800', color: J.fg, textAlign: 'center' },
   kindHint: { fontSize: 11, color: J.muted },
 });

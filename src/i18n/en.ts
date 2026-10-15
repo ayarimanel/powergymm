@@ -261,5 +261,6 @@ export const EN: Record<string, string> = {
   'Tes habitudes': 'Your habits',
   'Ton code secret': 'Your secret code',
   'Disponible': 'Available',
+  'Profil': 'Profile',
   'Code solide : pas de suite ni de répétition': 'Strong code: no sequence, no repeats',
 };

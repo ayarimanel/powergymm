@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Pressable, StyleSheet, Switch, View } from 'react-native';
+import { Image, Modal, Pressable, StyleSheet, Switch, View } from 'react-native';
 import { Text, TextInput } from '../ui/Text';
 import QRCode from 'react-native-qrcode-svg';
-import { Icon } from '../ui/Icon';
+import { Icon, IconName } from '../ui/Icon';
+import { Title } from '../ui/Title';
+import { Button } from '../ui/Button';
 import { GenderType, SocialLinks, TrainingTimeSlot, UserProfile } from '../../types/database';
 import { GymProfileConfig } from '../../config/gymConfig';
 import { ClubMember, daysLeft } from '../../services/clubService';
@@ -12,9 +14,12 @@ import { SOCIAL_NETWORKS, cleanHandle, keepUsable } from '../../community/social
 import { PERMISSION_LABELS } from '../../services/permissionsService';
 import { pickImages } from '../../services/imagePicker';
 import { GENDERS, GOALS, TIMES } from '../../data/profileOptions';
-import { colors, ink } from '../../theme';
+import { buttonShadow, colors, fonts, radius } from '../../theme';
 import { BottomSheet, SheetScrollView } from '../home/BottomSheet';
 import { Avatar } from '../community/Avatar';
+import { PinBoxes } from '../ui/PinBoxes';
+import { LanguageScreen } from '../../screens/LanguageScreen';
+import { AuthService } from '../../services/authService';
 
 interface Props {
   visible: boolean;
@@ -29,6 +34,37 @@ interface Props {
 }
 
 const ROLE_LABEL = { member: 'Membre', coach: 'Coach', owner: 'Propriétaire' } as const;
+
+const sinceLabel = (iso: string) => {
+  try {
+    return new Date(iso).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  } catch {
+    return iso.slice(0, 7);
+  }
+};
+
+/** One settings row (design-ref Profil): round icon, title, value or control on the right. */
+const Row: React.FC<{ icon: IconName; title: string; sub?: string; value?: string; right?: React.ReactNode; onPress?: () => void; last?: boolean }> = ({ icon, title, sub, value, right, onPress, last }) => {
+  const inner = (
+    <>
+      <View style={styles.rowIc}>
+        <Icon name={icon} size={22} color={colors.text} />
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={styles.rowTitle}>{title}</Text>
+        {sub ? <Text style={styles.rowSub}>{sub}</Text> : null}
+      </View>
+      {value ? <Text style={styles.rowValue} numberOfLines={1}>{value}</Text> : null}
+      {right}
+      {onPress ? <Icon name="chevron-forward" size={18} color={colors.textMuted} /> : null}
+    </>
+  );
+  return onPress ? (
+    <Pressable onPress={onPress} accessibilityRole="button" style={({ pressed }) => [styles.row, last && styles.rowLast, pressed && { opacity: 0.7 }]}>{inner}</Pressable>
+  ) : (
+    <View style={[styles.row, last && styles.rowLast]}>{inner}</View>
+  );
+};
 
 const dateLabel = (iso: string) => {
   try {
@@ -62,6 +98,16 @@ export const AccountSheet: React.FC<Props> = ({ visible, onClose, user, config, 
   const [reminderMsg, setReminderMsg] = useState('');
   const [confirm, setConfirm] = useState<'logout' | 'wipe' | 'code' | null>(null);
   const [photoError, setPhotoError] = useState('');
+  /** The profile (main) or its edit form, inside the same sheet (design-ref Profil). */
+  const [view, setView] = useState<'main' | 'edit' | 'code'>('main');
+  const [langOpen, setLangOpen] = useState(false);
+  // Change my secret code (AuthService.changePin checks the current one first).
+  const [pinNow, setPinNow] = useState('');
+  const [pinNew, setPinNew] = useState('');
+  const [pinNew2, setPinNew2] = useState('');
+  const [pinErrors, setPinErrors] = useState<Record<string, string>>({});
+  const [pinBusy, setPinBusy] = useState(false);
+  const [pinDone, setPinDone] = useState(false);
 
   useEffect(() => {
     if (!visible) return;
@@ -79,6 +125,8 @@ export const AccountSheet: React.FC<Props> = ({ visible, onClose, user, config, 
     setConfirm(null);
     setPhotoError('');
     setReminderMsg('');
+    setView('main');
+    setPinDone(false);
     NotificationService.isEnabled().then(setReminders);
   }, [visible]);
 
@@ -135,11 +183,42 @@ export const AccountSheet: React.FC<Props> = ({ visible, onClose, user, config, 
     setReminderMsg(ok ? 'Rappels activés.' : 'Autorise les notifications dans les réglages du téléphone.');
   };
 
+  const openCode = () => {
+    setPinNow('');
+    setPinNew('');
+    setPinNew2('');
+    setPinErrors({});
+    setPinDone(false);
+    setView('code');
+  };
+
+  const changeCode = async () => {
+    if (!user.username) return;
+    if (pinNew.trim() !== pinNew2.trim()) return setPinErrors({ pinNew2: 'Les deux codes ne sont pas identiques.' });
+    setPinBusy(true);
+    const res = await AuthService.changePin(user.username, pinNow, pinNew);
+    setPinBusy(false);
+    if (!res.ok) return setPinErrors(res.error === 'Code actuel incorrect.' ? { pinNow: res.error } : { pinNew: res.error });
+    setPinDone(true);
+    setView('main');
+  };
+
+  /** Whole months since sign-up, for the "Mois au club" tile. */
+  const monthsAtClub = (() => {
+    const d = new Date(user.createdAt);
+    if (isNaN(d.getTime())) return 0;
+    const now = new Date();
+    return Math.max(0, (now.getFullYear() - d.getFullYear()) * 12 + now.getMonth() - d.getMonth());
+  })();
+
   // The phone number is the member's way back in after signing out.
   const canSignInAgain = (user.whatsappNumber ?? '').replace(/[^0-9]/g, '').length >= 8;
 
   const left = membership ? daysLeft(membership) : null;
   const tone = left === null ? colors.textSecondary : left < 0 ? colors.red : left <= 7 ? colors.amber : colors.green;
+
+  const socialsSet = SOCIAL_NETWORKS.filter(n => !!(user.socials ?? {})[n.key]);
+  const langLabel = LANGUAGES.find(l => l.id === lang)?.native ?? '';
 
   return (
     <BottomSheet
@@ -147,33 +226,61 @@ export const AccountSheet: React.FC<Props> = ({ visible, onClose, user, config, 
       onClose={onClose}
       snaps={[0.94]}
       header={
-        <Text style={styles.title} accessibilityRole="header">
-          Paramètres
-        </Text>
+        view !== 'main' ? (
+          <View style={styles.headRow}>
+            <Pressable onPress={() => setView('main')} accessibilityRole="button" accessibilityLabel="Retour au profil" style={styles.headBtn}>
+              <Icon name="chevron-back" size={22} color={colors.text} />
+            </Pressable>
+            <Title variant="section" style={styles.headTitle}>{view === 'code' ? 'Mon code secret' : 'Modifier mon profil'}</Title>
+            <View style={styles.headSpacer} />
+          </View>
+        ) : (
+          <Title variant="section" style={styles.title}>{t('Profil')}</Title>
+        )
       }
     >
       {() => (
         <View style={{ flex: 1 }}>
           <SheetScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-            {/* Identity */}
-            <View style={styles.identity}>
-              <Avatar name={name || user.fullName} url={avatar} size={96} />
-              <View style={{ flex: 1, gap: 8 }}>
-                <View style={styles.roleBadge}>
-                  <Text style={styles.roleText}>{ROLE_LABEL[user.role]}</Text>
+            {view === 'code' ? (
+              <>
+                <Text style={styles.codeIntro}>C’est lui qui ouvre ton compte. Ne le partage avec personne.</Text>
+                <View style={styles.pinBlock}>
+                  <PinBoxes label="Code actuel" value={pinNow} onChangeText={v => { setPinNow(v.replace(/[^0-9]/g, '').slice(0, 8)); setPinErrors({}); }} error={pinErrors.pinNow} accessibilityLabel="Code actuel" />
                 </View>
-                <Pressable onPress={choosePhoto} accessibilityRole="button" style={styles.outlineBtn}>
-                  <Icon name="camera-outline" size={18} color={colors.text} />
-                  <Text style={styles.outlineText}>{avatar ? 'Changer la photo' : 'Ajouter une photo'}</Text>
-                </Pressable>
-                {!!avatar && (
-                  <Pressable onPress={() => { setAvatar(undefined); setSaved(false); }} accessibilityRole="button" style={{ height: 32, justifyContent: 'center' }}>
-                    <Text style={{ color: colors.red.text, fontWeight: '700', fontSize: 14 }}>Retirer la photo</Text>
-                  </Pressable>
-                )}
-              </View>
-            </View>
-            {!!photoError && <Text style={styles.error}>{photoError}</Text>}
+                <View style={styles.pinBlock}>
+                  <PinBoxes label="Nouveau code · 4 à 8 chiffres" value={pinNew} onChangeText={v => { setPinNew(v.replace(/[^0-9]/g, '').slice(0, 8)); setPinErrors({}); }} error={pinErrors.pinNew} accessibilityLabel="Nouveau code secret" />
+                </View>
+                <View style={styles.pinBlock}>
+                  <PinBoxes
+                    label="Confirme le nouveau code"
+                    value={pinNew2}
+                    onChangeText={v => { setPinNew2(v.replace(/[^0-9]/g, '').slice(0, 8)); setPinErrors({}); }}
+                    slots={pinNew.length >= 4 ? pinNew.length : 6}
+                    error={pinErrors.pinNew2}
+                    accessibilityLabel="Confirme le nouveau code"
+                  />
+                </View>
+                <Button label="Changer mon code" onPress={changeCode} loading={pinBusy} disabled={pinBusy || pinNow.length < 4 || pinNew.length < 4} style={{ marginTop: 28 }} />
+              </>
+            ) : view === 'edit' ? (
+              <>
+                {/* Photo */}
+                <View style={styles.photoRow}>
+                  <Avatar name={name || user.fullName} url={avatar} size={88} />
+                  <View style={{ flex: 1, gap: 8 }}>
+                    <Pressable onPress={choosePhoto} accessibilityRole="button" style={styles.outlineBtn}>
+                      <Icon name="camera-outline" size={18} color={colors.text} />
+                      <Text style={styles.outlineText}>{avatar ? 'Changer la photo' : 'Ajouter une photo'}</Text>
+                    </Pressable>
+                    {!!avatar && (
+                      <Pressable onPress={() => { setAvatar(undefined); setSaved(false); }} accessibilityRole="button" style={{ height: 32, justifyContent: 'center' }}>
+                        <Text style={styles.removePhoto}>Retirer la photo</Text>
+                      </Pressable>
+                    )}
+                  </View>
+                </View>
+                {!!photoError && <Text style={styles.error}>{photoError}</Text>}
 
             <Text style={styles.label}>Prénom et nom</Text>
             <TextInput style={[styles.input, !!errors.name && styles.inputError]} value={name} onChangeText={t => { setName(t); setSaved(false); }} accessibilityLabel="Prénom et nom" />
@@ -248,10 +355,47 @@ export const AccountSheet: React.FC<Props> = ({ visible, onClose, user, config, 
               })}
             </View>
 
-            <Pressable onPress={save} accessibilityRole="button" style={[styles.saveBtn, saved && { backgroundColor: colors.green.bar }]}>
-              <Icon name={saved ? 'checkmark-circle' : 'save-outline'} size={20} color={colors.white} />
-              <Text style={styles.saveText}>{saved ? 'Enregistré' : 'Enregistrer'}</Text>
-            </Pressable>
+                <Pressable onPress={save} accessibilityRole="button" style={[styles.saveBtn, saved && { backgroundColor: colors.green.bar }]}>
+                  <Icon name={saved ? 'checkmark-circle' : 'save-outline'} size={20} color={colors.white} />
+                  <Text style={styles.saveText}>{saved ? 'Enregistré' : 'Enregistrer'}</Text>
+                </Pressable>
+              </>
+            ) : (
+              <>
+                {/* Identity (design-ref Profil) */}
+                <View style={styles.identity}>
+                  <View style={styles.avatarRing}>
+                    <Avatar name={user.fullName} url={user.avatarUrl} size={112} />
+                  </View>
+                  <Title variant="display" size={36} style={{ textAlign: 'center' }}>{user.fullName}</Title>
+                  <Text style={styles.since}>{ROLE_LABEL[user.role]} · depuis {sinceLabel(user.createdAt)}</Text>
+                  <View style={styles.socials}>
+                    {socialsSet.map(n => (
+                      <View key={n.key} style={styles.socialIc} accessibilityLabel={n.label}>
+                        <Icon name={n.icon as IconName} size={22} color={colors.text} />
+                      </View>
+                    ))}
+                    <Pressable onPress={() => setView('edit')} accessibilityRole="button" accessibilityLabel={t('Mes réseaux')} style={styles.socialIc}>
+                      <Icon name="add" size={22} color={colors.text} />
+                    </Pressable>
+                  </View>
+                </View>
+
+                {/* Streak tiles */}
+                <View style={styles.stats}>
+                  <View style={styles.stat}>
+                    <Text style={styles.statNum}>{user.visitStreak || 0}</Text>
+                    <Text style={styles.statLabel}>Série en cours</Text>
+                  </View>
+                  <View style={styles.stat}>
+                    <Text style={styles.statNum}>{user.bestStreak ?? user.visitStreak ?? 0}</Text>
+                    <Text style={styles.statLabel}>Record de série</Text>
+                  </View>
+                  <View style={styles.stat}>
+                    <Text style={styles.statNum}>{monthsAtClub}</Text>
+                    <Text style={styles.statLabel}>Mois au club</Text>
+                  </View>
+                </View>
 
             {/* Membership */}
             {membership && left !== null && (
@@ -268,39 +412,25 @@ export const AccountSheet: React.FC<Props> = ({ visible, onClose, user, config, 
               </Section>
             )}
 
-            {/* Language — changeable at any time, as the first screen promises. */}
-            <Section title={t('Langue')}>
-              <View style={styles.langRow}>
-                {LANGUAGES.map(l => {
-                  const on = lang === l.id;
-                  return (
-                    <Pressable
-                      key={l.id}
-                      onPress={() => setLang(l.id)}
-                      accessibilityRole="button"
-                      accessibilityState={{ selected: on }}
-                      accessibilityLabel={l.native}
-                      style={[styles.langBtn, on && styles.langBtnOn]}
-                    >
-                      <Text style={[styles.langText, on && styles.langTextOn]}>{l.native}</Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-            </Section>
-
-            {/* Reminders */}
-            <Section title={t('Rappels')}>
-              <View style={styles.switchRow}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.switchTitle}>Rappels sur mon téléphone</Text>
-                  <Text style={styles.switchSub}>Ta série du jour, ton abonnement, un muscle oublié.</Text>
+                {/* Settings rows */}
+                <View style={styles.rows}>
+                  <Row
+                    icon="notifications-outline"
+                    title={t('Rappels')}
+                    sub={
+                      reminderMsg ||
+                      (remindersSupported
+                        ? 'Ta série du jour, ton abonnement, un muscle oublié.'
+                        : 'Disponible dans l’application mobile (pas dans le navigateur).')
+                    }
+                    right={<Switch value={reminders} disabled={!remindersSupported} onValueChange={toggleReminders} trackColor={{ true: colors.green.bar, false: colors.disabled }} thumbColor={colors.white} />}
+                  />
+                  <Row icon="language-outline" title={t('Langue')} value={langLabel} onPress={() => setLangOpen(true)} />
+                  {!!user.username && user.role !== 'owner' && (
+                    <Row icon="key-outline" title="Changer mon code secret" sub={pinDone ? 'Code changé.' : undefined} onPress={openCode} />
+                  )}
+                  <Row icon="person-outline" title="Modifier mon profil" value="Photo, objectif…" onPress={() => setView('edit')} last />
                 </View>
-                <Switch value={reminders} disabled={!remindersSupported} onValueChange={toggleReminders} trackColor={{ true: colors.green.bar, false: colors.disabled }} thumbColor={colors.white} />
-              </View>
-              {!remindersSupported && <Text style={styles.note}>Disponible dans l’application mobile (pas dans le navigateur).</Text>}
-              {!!reminderMsg && <Text style={styles.note}>{reminderMsg}</Text>}
-            </Section>
 
             {/* Extra rights the owner granted me, if any */}
             {user.role !== 'owner' && PERMISSION_LABELS.some(p => user.permissions?.[p.key]) && (
@@ -350,34 +480,37 @@ export const AccountSheet: React.FC<Props> = ({ visible, onClose, user, config, 
               </Section>
             )}
 
-            {/* Account */}
-            <Section title="Compte">
-              <View style={styles.idRow}>
-                <Icon name="person-circle-outline" size={22} color={colors.textSecondary} />
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.idTitle}>{user.role === 'owner' ? 'Identifiant : admin' : user.username ? `Identifiant : @${user.username}` : 'Identifiant créé à la déconnexion'}</Text>
-                  <Text style={styles.note}>
-                    {user.role === 'owner'
-                      ? 'Pour revenir : « admin » + le mot de passe admin (Paramètres du club).'
-                      : canSignInAgain
-                        ? 'Pour revenir : ton identifiant + ton numéro de téléphone.'
-                        : 'Ajoute ton numéro WhatsApp ci-dessus et enregistre : sans lui, tu ne pourras pas te reconnecter.'}
-                  </Text>
+                {/* Account */}
+                <View style={styles.idRow}>
+                  <Icon name="person-circle-outline" size={22} color={colors.textSecondary} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.idTitle}>{user.role === 'owner' ? 'Identifiant : admin' : user.username ? `Identifiant : @${user.username}` : 'Identifiant créé à la déconnexion'}</Text>
+                    <Text style={styles.note}>
+                      {user.role === 'owner'
+                        ? 'Pour revenir : « admin » + le mot de passe admin (Paramètres du club).'
+                        : canSignInAgain
+                          ? 'Pour revenir : ton identifiant + ton numéro de téléphone.'
+                          : 'Ajoute ton numéro WhatsApp dans « Modifier mon profil » et enregistre : sans lui, tu ne pourras pas te reconnecter.'}
+                    </Text>
+                  </View>
                 </View>
-              </View>
-              <Pressable onPress={() => (confirm === 'logout' ? onLogout() : setConfirm('logout'))} accessibilityRole="button" style={[styles.ghost, confirm === 'logout' && { backgroundColor: colors.text }]}>
-                <Icon name="log-out-outline" size={20} color={confirm === 'logout' ? colors.onInverse : colors.text} />
-                <Text style={[styles.ghostText, confirm === 'logout' && { color: colors.onInverse }]}>
-                  {confirm === 'logout' ? (canSignInAgain || user.role === 'owner' ? 'Confirmer la déconnexion' : 'Se déconnecter quand même (accès perdu)') : 'Se déconnecter'}
-                </Text>
-              </Pressable>
-              <Pressable onPress={() => (confirm === 'wipe' ? onWipe() : setConfirm('wipe'))} accessibilityRole="button" style={[styles.ghost, { borderColor: colors.red.bar }, confirm === 'wipe' && { backgroundColor: colors.red.bar }]}>
-                <Icon name="trash-outline" size={20} color={confirm === 'wipe' ? colors.white : colors.red.text} />
-                <Text style={[styles.ghostText, { color: confirm === 'wipe' ? colors.white : colors.red.text }]}>{confirm === 'wipe' ? 'Confirmer : tout effacer sur ce téléphone' : 'Effacer toutes mes données'}</Text>
-              </Pressable>
-              <Text style={styles.note}>Les données sont enregistrées sur ce téléphone.</Text>
-            </Section>
+                <Pressable onPress={() => (confirm === 'logout' ? onLogout() : setConfirm('logout'))} accessibilityRole="button" style={[styles.logout, confirm === 'logout' && { backgroundColor: colors.text }]}>
+                  <Icon name="log-out-outline" size={20} color={confirm === 'logout' ? colors.onInverse : colors.text} />
+                  <Text style={[styles.logoutText, confirm === 'logout' && { color: colors.onInverse }]}>
+                    {confirm === 'logout' ? (canSignInAgain || user.role === 'owner' ? 'Confirmer la déconnexion' : 'Se déconnecter quand même (accès perdu)') : 'Se déconnecter'}
+                  </Text>
+                </Pressable>
+                <Pressable onPress={() => (confirm === 'wipe' ? onWipe() : setConfirm('wipe'))} accessibilityRole="button" style={[styles.wipe, confirm === 'wipe' && styles.wipeArmed]}>
+                  {confirm === 'wipe' && <Icon name="trash-outline" size={18} color={colors.white} />}
+                  <Text style={[styles.wipeText, confirm === 'wipe' && { color: colors.white }]}>{confirm === 'wipe' ? 'Confirmer : tout effacer sur ce téléphone' : 'Effacer toutes mes données'}</Text>
+                </Pressable>
+                <Text style={[styles.note, { textAlign: 'center' }]}>Les données sont enregistrées sur ce téléphone.</Text>
+              </>
+            )}
           </SheetScrollView>
+          <Modal visible={langOpen} animationType="slide" onRequestClose={() => setLangOpen(false)} statusBarTranslucent>
+            <LanguageScreen current={lang} onPick={setLang} onClose={() => setLangOpen(false)} />
+          </Modal>
         </View>
       )}
     </BottomSheet>
@@ -385,56 +518,85 @@ export const AccountSheet: React.FC<Props> = ({ visible, onClose, user, config, 
 };
 
 const styles = StyleSheet.create({
-  langRow: { flexDirection: 'row', gap: 10 },
-  socialRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 8 },
-  langBtn: { flex: 1, minHeight: 48, borderRadius: 24, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
-  langBtnOn: { borderColor: colors.brand, backgroundColor: colors.brandSoft },
-  langText: { fontSize: 15, fontWeight: '700', color: colors.text },
-  langTextOn: { color: colors.brandText },
-  title: { fontSize: 20, fontWeight: '800', color: colors.text },
+  title: { textAlign: 'center' },
+  headRow: { flexDirection: 'row', alignItems: 'center' },
+  headBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center' },
+  headTitle: { flex: 1, textAlign: 'center', fontSize: 22 },
+  headSpacer: { width: 40 },
   body: { padding: 20, paddingTop: 8, paddingBottom: 48 },
-  identity: { flexDirection: 'row', alignItems: 'center', gap: 16 },
-  roleBadge: { alignSelf: 'flex-start', backgroundColor: colors.gold.soft, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 3 },
-  roleText: { fontSize: 13, fontWeight: '800', color: colors.gold.text },
-  outlineBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, height: 44, paddingHorizontal: 14, borderRadius: 22, borderWidth: 1.5, borderColor: colors.text, alignSelf: 'flex-start' },
-  outlineText: { fontSize: 14, fontWeight: '800', color: colors.text },
 
-  label: { fontSize: 14, fontWeight: '700', color: colors.textSecondary, marginTop: 16, marginBottom: 8 },
-  input: { minHeight: 50, borderRadius: 14, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.bg, paddingHorizontal: 14, fontSize: 16, color: colors.text },
+  identity: { alignItems: 'center', gap: 8 },
+  avatarRing: { padding: 5, borderRadius: 999, borderWidth: 3, borderColor: colors.brand, marginBottom: 8 },
+  since: { fontSize: 14, fontWeight: '500', color: colors.textSecondary },
+  socials: { flexDirection: 'row', gap: 10, marginTop: 6 },
+  socialIc: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center' },
+
+  stats: { flexDirection: 'row', gap: 12, marginTop: 22 },
+  stat: { flex: 1, alignItems: 'center', gap: 4, paddingVertical: 16, borderRadius: 20, backgroundColor: colors.bg, borderWidth: 1, borderColor: colors.border },
+  statNum: { fontFamily: fonts.headingBlack, fontWeight: 'normal', fontSize: 32, lineHeight: 36, color: colors.brandText },
+  statLabel: { fontSize: 13, fontWeight: '500', color: colors.textSecondary },
+
+  rows: { marginTop: 22 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: colors.border },
+  rowLast: { borderBottomWidth: 0 },
+  rowIc: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center' },
+  rowTitle: { fontSize: 16, fontWeight: '700', color: colors.text },
+  rowSub: { fontSize: 13, fontWeight: '500', color: colors.textSecondary, marginTop: 2, lineHeight: 18 },
+  rowValue: { fontSize: 14, fontWeight: '500', color: colors.textSecondary, maxWidth: 140 },
+  codeIntro: { fontSize: 15, fontWeight: '500', lineHeight: 22, color: colors.textSecondary },
+  pinBlock: { marginTop: 22 },
+
+  langRow: { flexDirection: 'row', gap: 6 },
+  langBtn: { minWidth: 46, height: 34, paddingHorizontal: 10, borderRadius: 17, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
+  langBtnOn: { borderColor: colors.text, backgroundColor: colors.text },
+  langText: { fontSize: 13, fontWeight: '800', color: colors.textSecondary },
+  langTextOn: { color: colors.onInverse },
+
+  photoRow: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+  outlineBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, height: 44, paddingHorizontal: 16, borderRadius: 22, borderWidth: 1.5, borderColor: colors.disabled, alignSelf: 'flex-start' },
+  outlineText: { fontSize: 14, fontWeight: '800', color: colors.text },
+  removePhoto: { color: colors.red.text, fontWeight: '700', fontSize: 14 },
+  socialRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 8 },
+
+  label: { fontSize: 11, fontWeight: '800', letterSpacing: 1.6, textTransform: 'uppercase', color: colors.textSecondary, marginTop: 22, marginBottom: 8 },
+  input: { minHeight: 52, borderRadius: radius.input, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.bg, paddingHorizontal: 16, fontSize: 15, fontWeight: '600', color: colors.text },
   inputError: { borderColor: colors.red.bar },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { minHeight: 42, paddingHorizontal: 16, borderRadius: 21, backgroundColor: colors.track, justifyContent: 'center' },
-  chipOn: { backgroundColor: colors.text },
+  chip: { minHeight: 42, paddingHorizontal: 16, borderRadius: 21, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.bg, justifyContent: 'center' },
+  chipOn: { backgroundColor: colors.text, borderColor: colors.text },
   chipText: { fontSize: 14, fontWeight: '700', color: colors.textSecondary },
   chipTextOn: { color: colors.onInverse },
   permChip: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 34, paddingHorizontal: 12, borderRadius: 17, backgroundColor: colors.green.soft },
   permChipText: { fontSize: 13, fontWeight: '700', color: colors.green.text },
   error: { color: colors.red.text, fontSize: 13, fontWeight: '600', marginTop: 6 },
-  // Brand blue = the one primary action
-  saveBtn: { height: 52, borderRadius: 26, backgroundColor: colors.brand, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 20 },
-  saveText: { color: colors.white, fontSize: 16, fontWeight: '800' },
+  saveBtn: { height: 56, borderRadius: 999, backgroundColor: colors.brand, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 28, ...buttonShadow },
+  saveText: { color: colors.white, fontSize: 15, fontWeight: '800' },
 
-  section: { marginTop: 30 },
-  sectionTitle: { fontSize: 17, fontWeight: '800', color: colors.text, marginBottom: 12 },
-  memberCard: { padding: 16, borderRadius: 18 },
-  memberDays: { fontSize: 24, fontWeight: '900' },
+  section: { marginTop: 26 },
+  sectionTitle: { fontSize: 11, fontWeight: '800', letterSpacing: 1.6, textTransform: 'uppercase', color: colors.textSecondary, marginBottom: 12 },
+  memberCard: { padding: 16, borderRadius: 20 },
+  memberDays: { fontSize: 22, fontWeight: '800' },
   memberSub: { fontSize: 14, color: colors.textSecondary, marginTop: 2 },
-  track: { height: 8, borderRadius: 4, backgroundColor: ink(0.1), marginTop: 14, overflow: 'hidden' },
+  track: { height: 8, borderRadius: 4, backgroundColor: colors.track, marginTop: 14, overflow: 'hidden' },
   fill: { height: '100%', borderRadius: 4 },
 
-  switchRow: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 16, backgroundColor: colors.bg },
-  switchTitle: { fontSize: 15, fontWeight: '700', color: colors.text },
-  switchSub: { fontSize: 13, color: colors.textMuted, marginTop: 2, lineHeight: 18 },
   note: { fontSize: 13, color: colors.textMuted, lineHeight: 19, marginTop: 8 },
 
-  idRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: 10 },
+  idRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginTop: 28, marginBottom: 14 },
   idTitle: { fontSize: 15, fontWeight: '800', color: colors.text },
-  qrBox: { alignSelf: 'center', alignItems: 'center', gap: 10, padding: 16, borderRadius: 20, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, marginTop: 14 },
+  // The QR has to stay on white to scan: its texts are dark.
+  qrBox: { alignSelf: 'center', alignItems: 'center', gap: 10, padding: 16, borderRadius: 20, backgroundColor: colors.white, marginTop: 14 },
   qrBrand: { flexDirection: 'row', alignItems: 'center', gap: 8, maxWidth: 190 },
   qrLogo: { width: 28, height: 28, borderRadius: 14, overflow: 'hidden', backgroundColor: colors.brandSoft, alignItems: 'center', justifyContent: 'center' },
-  qrName: { fontSize: 15, fontWeight: '800', color: colors.text, flexShrink: 1 },
-  qrHint: { fontSize: 12, fontWeight: '700', color: colors.textSecondary },
+  qrName: { fontSize: 15, fontWeight: '800', color: colors.onInverse, flexShrink: 1 },
+  qrHint: { fontSize: 12, fontWeight: '700', color: colors.textMuted },
   codeText: { alignSelf: 'center', fontSize: 16, fontWeight: '800', color: colors.text, letterSpacing: 1.5, marginTop: 10 },
-  ghost: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 50, paddingHorizontal: 16, borderRadius: 25, borderWidth: 1.5, borderColor: colors.border, marginTop: 12 },
+  ghost: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 52, paddingHorizontal: 16, borderRadius: 999, borderWidth: 1.5, borderColor: colors.disabled, marginTop: 12 },
   ghostText: { fontSize: 15, fontWeight: '800', color: colors.text, textAlign: 'center' },
+
+  logout: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, minHeight: 56, paddingHorizontal: 16, borderRadius: 999, backgroundColor: colors.bg, borderWidth: 1, borderColor: colors.border },
+  logoutText: { fontSize: 15, fontWeight: '800', color: colors.text, textAlign: 'center' },
+  wipe: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 48, marginTop: 10, borderRadius: 999, paddingHorizontal: 16 },
+  wipeArmed: { backgroundColor: colors.red.bar },
+  wipeText: { fontSize: 15, fontWeight: '700', color: colors.red.text, textAlign: 'center' },
 });

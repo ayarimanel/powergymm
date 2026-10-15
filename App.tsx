@@ -32,7 +32,14 @@ import { claimSwipe, startSwipe, startsInHorizontalScroller, swipeClaimed } from
 import { haptics } from './src/utils/haptics';
 import { colors, radius, clubTheme } from './src/theme';
 import { useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold, Manrope_700Bold, Manrope_800ExtraBold } from '@expo-google-fonts/manrope';
-import { BarlowCondensed_600SemiBold, BarlowCondensed_700Bold } from '@expo-google-fonts/barlow-condensed';
+import {
+  BarlowCondensed_600SemiBold,
+  BarlowCondensed_700Bold,
+  BarlowCondensed_800ExtraBold,
+  BarlowCondensed_800ExtraBold_Italic,
+  BarlowCondensed_900Black,
+  BarlowCondensed_900Black_Italic,
+} from '@expo-google-fonts/barlow-condensed';
 
 const nativeDriver = Platform.OS !== 'web';
 
@@ -80,6 +87,10 @@ function AppInner() {
     Manrope_800ExtraBold,
     BarlowCondensed_600SemiBold,
     BarlowCondensed_700Bold,
+    BarlowCondensed_800ExtraBold,
+    BarlowCondensed_800ExtraBold_Italic,
+    BarlowCondensed_900Black,
+    BarlowCondensed_900Black_Italic,
   });
   useEffect(() => {
     if (Platform.OS === 'web' && typeof document !== 'undefined') document.title = clubTheme.clubName;

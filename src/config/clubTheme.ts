@@ -87,8 +87,13 @@ const clubTheme = {
   // ─── Typography ───
   // Family names registered by useClubFonts() in App.tsx (one family per weight, as native requires).
   fonts: {
-    heading: 'BarlowCondensed_700Bold',
+    heading: 'BarlowCondensed_800ExtraBold',
+    headingItalic: 'BarlowCondensed_800ExtraBold_Italic',
+    headingBlack: 'BarlowCondensed_900Black',
+    /** Big screen titles: 900 italic. */
+    display: 'BarlowCondensed_900Black_Italic',
     headingSemi: 'BarlowCondensed_600SemiBold',
+    headingBold: 'BarlowCondensed_700Bold',
     body: 'Manrope_400Regular',
     bodyMedium: 'Manrope_500Medium',
     bodySemi: 'Manrope_600SemiBold',

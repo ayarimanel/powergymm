@@ -45,7 +45,7 @@ export const clubFont = (style: TextProps['style']): TextStyle | null => {
   const bold = weight === 'bold' || Number(weight) >= 700;
   if (bold && size >= HEADING_MIN_SIZE) {
     return {
-      fontFamily: Number(weight) >= 800 || weight === 'bold' ? fonts.heading : fonts.headingSemi,
+      fontFamily: weight === '900' ? fonts.headingBlack : Number(weight) >= 800 || weight === 'bold' ? fonts.heading : fonts.headingSemi,
       fontWeight: 'normal',
       fontSize: Math.round(size * HEADING_SCALE),
       ...(s.lineHeight ? { lineHeight: Math.round(s.lineHeight * HEADING_SCALE) } : null),

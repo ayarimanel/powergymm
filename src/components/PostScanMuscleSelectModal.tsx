@@ -7,10 +7,11 @@ import {
   ScrollView,
 } from 'react-native';
 import { Text } from './ui/Text';
-import { Icon } from './ui/Icon';
+import { Icon, IconName } from './ui/Icon';
+import { Title } from './ui/Title';
 import { useBackHandler } from '../navigation/backStack';
 import { MuscleGroup } from '../types/database';
-import { colors, ink } from '../theme';
+import { buttonShadow, colors, ink } from '../theme';
 
 interface PostScanMuscleSelectModalProps {
   visible: boolean;
@@ -18,7 +19,7 @@ interface PostScanMuscleSelectModalProps {
   onConfirmMuscles: (selectedMuscles: MuscleGroup[]) => void;
 }
 
-const ALL_MUSCLES: { id: MuscleGroup; label: string; icon: string }[] = [
+const ALL_MUSCLES: { id: MuscleGroup; label: string; icon: IconName }[] = [
   { id: 'chest', label: 'Pectoraux', icon: 'barbell-outline' },
   { id: 'arms', label: 'Bras (Biceps & Triceps)', icon: 'fitness-outline' },
   { id: 'back', label: 'Dos', icon: 'body-outline' },
@@ -65,7 +66,7 @@ export const PostScanMuscleSelectModal: React.FC<PostScanMuscleSelectModalProps>
               <Icon name="checkmark-circle" size={28} color={colors.green.bar} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.title}>QR Code Validé !</Text>
+              <Title variant="section">QR Code Validé !</Title>
               <Text style={styles.subtitle}>Cochez les groupes musculaires de votre séance :</Text>
             </View>
           </View>
@@ -85,7 +86,7 @@ export const PostScanMuscleSelectModal: React.FC<PostScanMuscleSelectModalProps>
                     {isChecked && <Icon name="checkmark" size={16} color={colors.white} />}
                   </View>
 
-                  <Icon name={item.icon as any} size={20} color={isChecked ? colors.brandText : colors.textMuted} />
+                  <Icon name={item.icon} size={20} color={isChecked ? colors.brandText : colors.textMuted} />
                   <Text style={[styles.checkboxLabel, isChecked && styles.checkboxLabelChecked]}>
                     {item.label}
                   </Text>
@@ -96,7 +97,7 @@ export const PostScanMuscleSelectModal: React.FC<PostScanMuscleSelectModalProps>
 
           {/* Footer Submit Button */}
           <TouchableOpacity style={styles.confirmBtn} onPress={handleConfirm}>
-            <Text style={styles.confirmBtnText}>VALIDER ET OBTENIR MON STREAK</Text>
+            <Text style={styles.confirmBtnText}>Valider et obtenir mon streak</Text>
             <Icon name="arrow-forward" size={18} color={colors.white} />
           </TouchableOpacity>
         </View>
@@ -106,110 +107,31 @@ export const PostScanMuscleSelectModal: React.FC<PostScanMuscleSelectModalProps>
 };
 
 const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: ink(0.75),
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-  },
+  // Bottom sheet in the new design: card surface, big top radius, flat.
+  modalOverlay: { flex: 1, backgroundColor: ink(0.7), justifyContent: 'flex-end' },
   cardContainer: {
     backgroundColor: colors.card,
-    borderRadius: 24,
-    padding: 20,
-    maxHeight: '80%',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     borderWidth: 1,
+    borderBottomWidth: 0,
     borderColor: colors.border,
-    shadowColor: colors.brand,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 6,
+    paddingHorizontal: 20,
+    paddingTop: 22,
+    paddingBottom: 28,
+    maxHeight: '88%',
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 16,
-    paddingBottom: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.track,
-  },
-  successIconBadge: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.green.soft,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text,
-  },
-  subtitle: {
-    fontSize: 12,
-    color: colors.textMuted,
-    marginTop: 2,
-  },
-  scrollList: {
-    marginBottom: 16,
-  },
-  checkboxCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    backgroundColor: colors.bg,
-    padding: 14,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-  },
-  checkboxCardChecked: {
-    backgroundColor: colors.brandSoft,
-    borderColor: colors.brand,
-  },
-  checkboxSquare: {
-    width: 22,
-    height: 22,
-    borderRadius: 6,
-    borderWidth: 2,
-    borderColor: colors.disabled,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.card,
-  },
-  checkboxSquareChecked: {
-    backgroundColor: colors.brand,
-    borderColor: colors.brand,
-  },
-  checkboxLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
-  checkboxLabelChecked: {
-    color: colors.brandText,
-    fontWeight: 'bold',
-  },
-  confirmBtn: {
-    backgroundColor: colors.brand,
-    borderRadius: 16,
-    paddingVertical: 15,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 8,
-    shadowColor: colors.brand,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-  confirmBtnText: {
-    color: colors.white,
-    fontSize: 13,
-    fontWeight: '900',
-    letterSpacing: 0.4,
-  },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 18 },
+  successIconBadge: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.green.soft, justifyContent: 'center', alignItems: 'center' },
+  title: { fontSize: 20, fontWeight: '800', color: colors.text },
+  subtitle: { fontSize: 14, fontWeight: '500', color: colors.textSecondary, marginTop: 4, lineHeight: 20 },
+  scrollList: { flexGrow: 0 },
+  checkboxCard: { flexDirection: 'row', alignItems: 'center', gap: 14, minHeight: 60, paddingHorizontal: 16, borderRadius: 18, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.bg },
+  checkboxCardChecked: { backgroundColor: colors.brandTint, borderColor: colors.brand, borderWidth: 1.5 },
+  checkboxSquare: { width: 24, height: 24, borderRadius: 8, borderWidth: 2, borderColor: colors.disabled, justifyContent: 'center', alignItems: 'center' },
+  checkboxSquareChecked: { backgroundColor: colors.brand, borderColor: colors.brand },
+  checkboxLabel: { flex: 1, fontSize: 15, fontWeight: '700', color: colors.textSecondary },
+  checkboxLabelChecked: { color: colors.text },
+  confirmBtn: { marginTop: 20, height: 56, borderRadius: 999, backgroundColor: colors.brand, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, ...buttonShadow },
+  confirmBtnText: { color: colors.white, fontSize: 15, fontWeight: '800' },
 });

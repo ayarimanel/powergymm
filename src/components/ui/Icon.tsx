@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleProp, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
-  Activity, AlarmClock, Equal, Sun, Apple, Bike, HandFist, Sprout, ThumbsUp, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpDown, Asterisk, AtSign, Award,
+  Activity, AlarmClock, Equal, Play, Sun, Apple, Bike, HandFist, Sprout, ThumbsUp, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpDown, Asterisk, AtSign, Award,
   Bell, Box, Building, Calendar, Camera, ChartColumn, ChartLine, ChartNoAxesColumn, Check, ChevronDown,
   ChevronLeft, ChevronRight, ChevronUp, Circle, CircleAlert, CircleCheck, CircleCheckBig, CircleDot,
   CirclePlus, CircleQuestionMark, CircleUser, CircleX, ClipboardList, Clock, CloudOff, Code, Copy,
@@ -110,6 +110,7 @@ const MAP: Record<string, Lucide> = {
   person: User,
   'person-circle': CircleUser,
   pin: Pin,
+  play: Play,
   power: Power,
   pricetag: Tag,
   pricetags: Tags,

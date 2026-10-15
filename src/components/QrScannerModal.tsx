@@ -6,7 +6,8 @@ import { Icon } from './ui/Icon';
 import { useBackHandler } from '../navigation/backStack';
 import { useSwipeToDismiss } from './useSwipeToDismiss';
 import { useReduceMotion } from '../hooks/useDeviceState';
-import { colors } from '../theme';
+import { buttonShadow, colors, radius } from '../theme';
+import { Title } from './ui/Title';
 
 interface QrScannerModalProps {
   visible: boolean;
@@ -102,7 +103,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ visible, onClose
   useBackHandler(visible, onClose);
   const swipe = useSwipeToDismiss(onClose);
 
-  const frameColor = morph.interpolate({ inputRange: [0, 1], outputRange: ['rgba(255,255,255,0.9)', colors.green.bar] });
+  const frameColor = morph.interpolate({ inputRange: [0, 1], outputRange: [colors.brand, colors.green.bar] });
   const frameBg = morph.interpolate({ inputRange: [0, 1], outputRange: ['rgba(255,255,255,0)', 'rgba(34,197,94,0.18)'] });
   const translateY = scanLine.interpolate({ inputRange: [0, 1], outputRange: [14, FRAME - 18] });
 
@@ -126,7 +127,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ visible, onClose
           <Pressable onPress={onClose} accessibilityRole="button" accessibilityLabel="Fermer le scanner" style={styles.roundBtn}>
             <Icon name="close" size={26} color={colors.white} />
           </Pressable>
-          <Text style={styles.topTitle}>Valider ma présence</Text>
+          <Text style={styles.topTitle} accessibilityRole="header" accessibilityLabel="Valider ma présence">CHECK-IN</Text>
           {cameraReady ? (
             <Pressable onPress={() => setTorch(t => !t)} accessibilityRole="switch" accessibilityState={{ checked: torch }} accessibilityLabel="Lampe torche" style={[styles.roundBtn, torch && styles.roundBtnOn]}>
               <Icon name={torch ? 'flashlight' : 'flashlight-outline'} size={22} color={torch ? colors.night : colors.white} />
@@ -168,7 +169,13 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ visible, onClose
             </View>
           ) : (
             <>
-              <Animated.View style={[styles.frame, { borderColor: frameColor, backgroundColor: frameBg }]}>
+              <Title variant="display" size={40} style={styles.bigTitle}>Scanne le QR{'\n'}à l’entrée</Title>
+              <Animated.View style={[styles.frame, { backgroundColor: frameBg }]}>
+                {/* Four corner brackets (design-ref Scan): red while scanning, green once validated */}
+                <Animated.View pointerEvents="none" style={[styles.corner, styles.cTL, { borderColor: frameColor }]} />
+                <Animated.View pointerEvents="none" style={[styles.corner, styles.cTR, { borderColor: frameColor }]} />
+                <Animated.View pointerEvents="none" style={[styles.corner, styles.cBL, { borderColor: frameColor }]} />
+                <Animated.View pointerEvents="none" style={[styles.corner, styles.cBR, { borderColor: frameColor }]} />
                 {state === 'scanning' && !reduceMotion && cameraReady && <Animated.View style={[styles.scanLine, { transform: [{ translateY }] }]} />}
                 {state === 'scanning' && !cameraReady && <Icon name={cameraDenied ? 'videocam-off-outline' : 'qr-code-outline'} size={64} color="rgba(255,255,255,0.4)" />}
                 {state === 'success' && (
@@ -192,7 +199,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ visible, onClose
                   <Text style={styles.errorTitle}>QR invalide</Text>
                   <Text style={styles.errorBody}>Ce code n’est pas celui de l’accueil du club. Réessaie devant le QR de la réception.</Text>
                   <Pressable onPress={retry} accessibilityRole="button" style={styles.retryBtn}>
-                    <Icon name="refresh" size={18} color={colors.text} />
+                    <Icon name="refresh" size={18} color={colors.onInverse} />
                     <Text style={styles.retryText}>Réessayer</Text>
                   </Pressable>
                 </View>
@@ -213,33 +220,40 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ visible, onClose
   );
 };
 
+const CORNER = 56;
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.night },
-  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingTop: 44, paddingBottom: 8 },
-  topTitle: { color: colors.white, fontSize: 17, fontWeight: '700' },
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, paddingTop: 48, paddingBottom: 8 },
+  topTitle: { color: colors.brand, fontSize: 13, fontWeight: '800', letterSpacing: 3 },
   roundSpacer: { width: 44, height: 44 },
-  roundBtn: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.14)' },
+  roundBtn: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.bg },
   roundBtnOn: { backgroundColor: colors.yellow.pale },
 
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 },
-  frame: { width: FRAME, height: FRAME, borderRadius: 32, borderWidth: 3, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-  scanLine: { position: 'absolute', top: 0, left: 18, right: 18, height: 3, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.85)' },
-  hint: { color: colors.border, fontSize: 15, marginTop: 24, textAlign: 'center' },
+  bigTitle: { textAlign: 'center', marginBottom: 32 },
+  frame: { width: FRAME, height: FRAME, borderRadius: 28, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  corner: { position: 'absolute', width: CORNER, height: CORNER, borderColor: colors.brand },
+  cTL: { top: 0, left: 0, borderTopWidth: 5, borderLeftWidth: 5, borderTopLeftRadius: 28 },
+  cTR: { top: 0, right: 0, borderTopWidth: 5, borderRightWidth: 5, borderTopRightRadius: 28 },
+  cBL: { bottom: 0, left: 0, borderBottomWidth: 5, borderLeftWidth: 5, borderBottomLeftRadius: 28 },
+  cBR: { bottom: 0, right: 0, borderBottomWidth: 5, borderRightWidth: 5, borderBottomRightRadius: 28 },
+  scanLine: { position: 'absolute', top: 0, left: 18, right: 18, height: 3, borderRadius: 2, backgroundColor: colors.brand, shadowColor: colors.brand, shadowOpacity: 0.9, shadowRadius: 10, shadowOffset: { width: 0, height: 0 } },
+  hint: { color: colors.textSecondary, fontSize: 16, fontWeight: '500', lineHeight: 23, marginTop: 32, textAlign: 'center', maxWidth: 300 },
 
-  errorBox: { alignItems: 'center', marginTop: 24, maxWidth: 320 },
-  errorTitle: { color: colors.white, fontSize: 18, fontWeight: '800' },
-  errorBody: { color: colors.disabled, fontSize: 14, textAlign: 'center', marginTop: 6, lineHeight: 20 },
-  retryBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, height: 48, paddingHorizontal: 24, borderRadius: 24, backgroundColor: colors.white, marginTop: 18 },
-  retryText: { color: colors.text, fontSize: 15, fontWeight: '800' },
+  errorBox: { alignItems: 'center', marginTop: 28, maxWidth: 320 },
+  errorTitle: { color: colors.text, fontSize: 18, fontWeight: '800' },
+  errorBody: { color: colors.textSecondary, fontSize: 14, textAlign: 'center', marginTop: 6, lineHeight: 20 },
+  retryBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, height: 48, paddingHorizontal: 24, borderRadius: 999, backgroundColor: colors.text, marginTop: 18 },
+  retryText: { color: colors.onInverse, fontSize: 15, fontWeight: '800' },
 
   manualBox: { width: '100%', maxWidth: 360, alignItems: 'center' },
-  manualTitle: { color: colors.white, fontSize: 20, fontWeight: '800' },
-  manualSub: { color: colors.textMuted, fontSize: 14, marginTop: 4, marginBottom: 18, textAlign: 'center' },
-  manualInput: { width: '100%', height: 60, borderRadius: 18, borderWidth: 1.5, borderColor: colors.nightLine, backgroundColor: colors.nightSurface, color: colors.white, fontSize: 22, fontWeight: '800', textAlign: 'center', letterSpacing: 2 },
+  manualTitle: { color: colors.text, fontSize: 20, fontWeight: '800' },
+  manualSub: { color: colors.textSecondary, fontSize: 14, marginTop: 4, marginBottom: 18, textAlign: 'center' },
+  manualInput: { width: '100%', height: 60, borderRadius: radius.input, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.card, color: colors.text, fontSize: 22, fontWeight: '800', textAlign: 'center', letterSpacing: 2 },
   errorInline: { color: colors.nightDanger, fontSize: 14, fontWeight: '600', marginTop: 10 },
-  validate: { height: 52, alignSelf: 'stretch', borderRadius: 26, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center', marginTop: 16 },
-  validateText: { color: colors.white, fontSize: 16, fontWeight: '800' },
+  validate: { height: 56, alignSelf: 'stretch', borderRadius: 999, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center', marginTop: 16, ...buttonShadow },
+  validateText: { color: colors.white, fontSize: 15, fontWeight: '800' },
 
-  switchMode: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 48, marginBottom: 28, alignSelf: 'center', paddingHorizontal: 20 },
-  switchModeText: { color: colors.disabled, fontSize: 15, fontWeight: '700' },
+  switchMode: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 48, marginBottom: 32, alignSelf: 'center', paddingHorizontal: 20 },
+  switchModeText: { color: colors.textSecondary, fontSize: 15, fontWeight: '700' },
 });

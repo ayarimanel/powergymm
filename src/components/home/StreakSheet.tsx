@@ -2,11 +2,12 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
 import { Icon } from '../ui/Icon';
-import { colors } from '../../theme';
+import { colors, fonts, radius } from '../../theme';
 import { WEEK_LABELS } from '../../services/floorViewModel';
 import { WeeklyStreak } from '../../floor/weeklyStreak';
 import { BottomSheet } from './BottomSheet';
 import { Stepper } from '../floor/Stepper';
+import { Title } from '../ui/Title';
 
 interface Props {
   visible: boolean;
@@ -43,9 +44,7 @@ export const StreakSheet: React.FC<Props> = ({ visible, onClose, streak, onChang
     <BottomSheet visible={visible} onClose={onClose} snaps={[0.62]}>
       {() => (
         <View style={styles.content}>
-          <Text style={styles.title} accessibilityRole="header">
-            Ta série
-          </Text>
+          <Title variant="section" style={styles.title}>Ta série</Title>
 
           <View style={styles.statsRow}>
             <View style={styles.stat}>
@@ -78,7 +77,7 @@ export const StreakSheet: React.FC<Props> = ({ visible, onClose, streak, onChang
           </View>
 
           <View style={styles.row}>
-            <Icon name="snow-outline" size={22} color={colors.brandDark} />
+            <Icon name="snow-outline" size={22} color={colors.blue.text} />
             <View style={{ flex: 1 }}>
               <Text style={styles.rowTitle}>
                 {streak.freezesLeftThisMonth > 0 ? '1 joker dispo ce mois-ci' : 'Joker utilisé ce mois-ci'}
@@ -94,23 +93,23 @@ export const StreakSheet: React.FC<Props> = ({ visible, onClose, streak, onChang
 
 const styles = StyleSheet.create({
   content: { paddingHorizontal: 20, paddingBottom: 24 },
-  title: { fontSize: 20, fontWeight: '800', color: colors.text, marginBottom: 16 },
-  statsRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
-  stat: { flex: 1, alignItems: 'center', gap: 4 },
-  statValueRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  statValue: { fontSize: 32, fontWeight: '800', color: colors.text },
-  statLabel: { fontSize: 13, color: colors.textSecondary },
-  divider: { width: 1, height: 44, backgroundColor: colors.border },
-  sectionLabel: { fontSize: 13, fontWeight: '600', color: colors.textSecondary, marginBottom: 10 },
+  title: { marginBottom: 16 },
+  statsRow: { flexDirection: 'row', gap: 12, marginBottom: 22 },
+  stat: { flex: 1, gap: 4, padding: 16, borderRadius: radius.cardLg, backgroundColor: colors.bg, borderWidth: 1, borderColor: colors.border },
+  statValueRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  statValue: { fontFamily: fonts.headingBlack, fontWeight: 'normal', fontSize: 34, lineHeight: 38, color: colors.text },
+  statLabel: { fontSize: 13, fontWeight: '500', color: colors.textSecondary },
+  divider: { width: 0 },
+  sectionLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 1.6, textTransform: 'uppercase', color: colors.textSecondary, marginBottom: 12 },
   week: { flexDirection: 'row', justifyContent: 'space-between' },
   dayCol: { alignItems: 'center', gap: 6, flex: 1 },
-  dot: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.track, alignItems: 'center', justifyContent: 'center' },
+  dot: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.track, alignItems: 'center', justifyContent: 'center' },
   dotOn: { backgroundColor: colors.flame },
   dotToday: { borderWidth: 2, borderColor: colors.flame, backgroundColor: colors.card },
   dayLabel: { fontSize: 12, color: colors.textMuted, fontWeight: '600' },
   dayLabelToday: { color: colors.text, fontWeight: '800' },
-  hint: { fontSize: 14, color: colors.textSecondary, marginTop: 18, lineHeight: 20 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16, padding: 12, borderRadius: 14, backgroundColor: colors.bg },
+  hint: { fontSize: 14, fontWeight: '500', color: colors.textSecondary, marginTop: 18, lineHeight: 21 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 14, padding: 16, borderRadius: 18, backgroundColor: colors.bg, borderWidth: 1, borderColor: colors.border },
   rowTitle: { fontSize: 15, fontWeight: '800', color: colors.text },
-  rowSub: { fontSize: 12, color: colors.textMuted, marginTop: 1 },
+  rowSub: { fontSize: 13, fontWeight: '500', color: colors.textSecondary, marginTop: 2 },
 });

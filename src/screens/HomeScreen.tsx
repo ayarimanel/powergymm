@@ -44,7 +44,7 @@ import { useOnline } from '../hooks/useDeviceState';
 import { colors, light, radius } from '../theme';
 import { HomeHeader } from '../components/home/HomeHeader';
 import { StreakSheet } from '../components/home/StreakSheet';
-import { StreakSuccessSheet } from '../components/home/StreakSuccessSheet';
+import { ScanSuccessScreen } from '../components/home/ScanSuccessScreen';
 import { ActivitySheet } from '../components/home/ActivitySheet';
 import { ClubStatusManageSheet } from '../components/home/ClubStatusSection';
 import { ClubNewsBar, NEWS_BAR_HEIGHT } from '../components/floor/ClubNewsBar';
@@ -283,6 +283,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
 
   // After a check-in: "Tu es au club. Commencer ta séance ?" (unless a session is already running).
   const [askSession, setAskSession] = useState(false);
+  // A session already running (journal draft): the success screen then offers only "Retour".
+  const [sessionRunning, setSessionRunning] = useState(false);
+  useEffect(() => {
+    if (success) JournalStore.hasDraft(user.id).then(setSessionRunning);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [success]);
 
   const classesY = useRef(0);
   const handleNewsAction = (item: NewsItem) => {
@@ -782,15 +788,21 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
         onClose={() => setShowMusclePick(false)}
         onConfirmMuscles={onConfirmMuscles}
       />
-      <StreakSuccessSheet
+      {/* After a check-in: one screen with the streak, the crowd and "Commencer ma séance" (design-ref ScanOK).
+          Its two buttons are the old "Commencer ta séance ?" banner's two answers. */}
+      <ScanSuccessScreen
         visible={!!success}
+        firstName={firstName(user.fullName)}
         oldStreak={success?.old ?? 0}
         newStreak={success?.next ?? 0}
         isNewRun={success?.isNewRun ?? false}
-        onClose={() => {
+        crowd={snapshot ? { level: snapshot.level, count: showCounts ? snapshot.presentCount : null } : null}
+        canStart={!sessionRunning}
+        onStart={() => {
           setSuccess(null);
-          JournalStore.hasDraft(user.id).then(running => !running && setTimeout(() => setAskSession(true), 260));
+          onStartSession();
         }}
+        onHome={() => setSuccess(null)}
       />
       {askSession && (
         <View style={styles.askWrap} pointerEvents="box-none">

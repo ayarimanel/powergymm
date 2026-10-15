@@ -8,6 +8,7 @@ import { HourForecast, LEVEL_LABEL } from '../../floor/crowd';
 import { levelTint } from '../../floor/levelColors';
 import { colors, cardShadow } from '../../theme';
 import { HeatStrip } from './HeatStrip';
+import { EmojiIcon } from '../ui/EmojiIcon';
 
 interface Props {
   snapshot: FloorSnapshot;
@@ -89,7 +90,7 @@ export const MoodCard: React.FC<Props> = ({ snapshot, focusMuscle, focusLabel, f
       </Text>
     );
   } else if (checkedIn) {
-    line = <Text style={styles.line}>Tu es là 💪 · {sinceMin} min</Text>;
+    line = <Text style={styles.line}>Tu es là · {sinceMin} min</Text>;
   } else if (focusMuscle) {
     line = <Text style={styles.line}>{focusLabel} · maintenant</Text>;
   } else {
@@ -104,7 +105,10 @@ export const MoodCard: React.FC<Props> = ({ snapshot, focusMuscle, focusLabel, f
     <View style={[styles.card, { backgroundColor: tint.soft }]}>
       {snapshot.isSpecialDay && (
         <View style={styles.specialBadge}>
-          <Text style={styles.specialText}>{snapshot.specialEmoji ?? '🌙'} {snapshot.specialLabel}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+            <EmojiIcon emoji={snapshot.specialEmoji} fallback="moon" size={13} color={colors.text} />
+            <Text style={styles.specialText}>{snapshot.specialLabel}</Text>
+          </View>
         </View>
       )}
 

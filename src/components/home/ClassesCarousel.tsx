@@ -143,10 +143,10 @@ export const ClassesCarousel: React.FC<Props> = ({ classes, userId, profiles, on
           const others = Math.max(0, bc - attendeeIds.length);
 
           const btn = booked
-            ? { label: 'Réservé ✓', style: styles.btnBooked, textStyle: styles.btnBookedText }
+            ? { label: 'Réservé', style: styles.btnBooked, textStyle: styles.btnBookedText }
             : full
               ? waitl
-                ? { label: "Sur liste d'attente ✓", style: styles.btnWait, textStyle: styles.btnWaitText }
+                ? { label: "Sur liste d'attente", style: styles.btnWait, textStyle: styles.btnWaitText }
                 : { label: "Liste d'attente", style: styles.btnFull, textStyle: styles.btnFullText }
               : { label: 'Réserver', style: styles.btnPrimary, textStyle: styles.btnPrimaryText };
 
@@ -204,6 +204,7 @@ export const ClassesCarousel: React.FC<Props> = ({ classes, userId, profiles, on
                 disabled={busyId === c.id}
                 style={[styles.btn, btn.style, busyId === c.id && { opacity: 0.7 }]}
               >
+                {(booked || (full && waitl)) && <Icon name="checkmark" size={14} color={booked ? colors.green.text : colors.brand} />}
                 <Text style={[styles.btnText, btn.textStyle]}>{btn.label}</Text>
               </Pressable>
             </View>
@@ -265,7 +266,7 @@ const styles = StyleSheet.create({
   bar: { height: 6, borderRadius: 99, backgroundColor: colors.track, overflow: 'hidden' },
   barFill: { height: '100%', borderRadius: 99 },
 
-  btn: { borderRadius: 12, paddingVertical: 10, paddingHorizontal: 12, alignItems: 'center', justifyContent: 'center' },
+  btn: { flexDirection: 'row', gap: 4, borderRadius: 12, paddingVertical: 10, paddingHorizontal: 12, alignItems: 'center', justifyContent: 'center' },
   btnText: { fontSize: 13, fontWeight: '800' },
   btnPrimary: { backgroundColor: colors.brand },
   btnPrimaryText: { color: colors.white },

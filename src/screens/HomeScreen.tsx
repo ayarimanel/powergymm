@@ -185,7 +185,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
     // "Réglé ✓": tell the member once when the club fixed what he reported.
     ProblemReportService.newlyFixedFor(user.id).then(fixed => {
       if (!fixed.length) return;
-      setToast(fixed.length === 1 ? `Réglé ✓ : « ${fixed[0].message.slice(0, 40)} »` : `${fixed.length} de tes signalements sont réglés ✓`);
+      setToast(fixed.length === 1 ? `Réglé : « ${fixed[0].message.slice(0, 40)} »` : `${fixed.length} de tes signalements sont réglés`);
       ProblemReportService.markFixedSeen(user.id, fixed.map(r => r.id));
     });
   }, [user.id]);
@@ -292,7 +292,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
   const handleScanOut = async () => {
     await CheckInService.endCheckIn(user.id);
     reloadFloor();
-    setToast('Séance terminée 👍');
+    setToast('Séance terminée');
   };
 
   // "M'alerter si calme": persist a whole-gym calm alert (or turn it off)
@@ -523,7 +523,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
         contentContainerStyle={[styles.content, news.length > 0 && { paddingTop: NEWS_BAR_HEIGHT + 14 }]}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.brand} progressViewOffset={news.length ? NEWS_BAR_HEIGHT : 0} />}
       >
-        <Text style={styles.greeting}>Salut {firstName(user.fullName)} 👋</Text>
+        <Text style={styles.greeting}>Salut {firstName(user.fullName)}</Text>
 
         {isAdmin && gymConfig && (gymConfig.adminPassword || '0000') === '0000' && (
           <Pressable onPress={() => setShowAdmin(true)} accessibilityRole="button" style={styles.membershipBanner}>

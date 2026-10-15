@@ -35,9 +35,9 @@ export const StreakSheet: React.FC<Props> = ({ visible, onClose, streak, onChang
   const weekWord = (n: number) => (n > 1 ? 'semaines' : 'semaine');
 
   let hint: string;
-  if (streak.goalMetThisWeek) hint = 'Objectif de la semaine atteint ✅ Chaque séance en plus, c’est du bonus.';
-  else if (streak.current > 0) hint = `Ta série se termine dimanche 🔥 Encore ${left} séance${left > 1 ? 's' : ''} cette semaine pour la garder.`;
-  else hint = `${left} séance${left > 1 ? 's' : ''} cette semaine pour lancer ta série 🔥`;
+  if (streak.goalMetThisWeek) hint = 'Objectif de la semaine atteint. Chaque séance en plus, c’est du bonus.';
+  else if (streak.current > 0) hint = `Ta série se termine dimanche. Encore ${left} séance${left > 1 ? 's' : ''} cette semaine pour la garder.`;
+  else hint = `${left} séance${left > 1 ? 's' : ''} cette semaine pour lancer ta série.`;
 
   return (
     <BottomSheet visible={visible} onClose={onClose} snaps={[0.62]}>

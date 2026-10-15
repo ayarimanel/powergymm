@@ -26,7 +26,7 @@ const CATEGORIES: ProductCategory[] = ['Protéine', 'Gainer', 'Multivitamines', 
 
 type Filter = 'all' | 'promo' | ProductCategory;
 type Sort = 'default' | 'priceAsc' | 'priceDesc';
-const SORT_LABEL: Record<Sort, string> = { default: 'Nouveautés', priceAsc: 'Prix ↑', priceDesc: 'Prix ↓' };
+const SORT_LABEL: Record<Sort, string> = { default: 'Nouveautés', priceAsc: 'Prix croissant', priceDesc: 'Prix décroissant' };
 const NEXT_SORT: Record<Sort, Sort> = { default: 'priceAsc', priceAsc: 'priceDesc', priceDesc: 'default' };
 
 const KpiTile: React.FC<{ icon: string; value: number; label: string; tint?: { bar: string; soft: string; text: string }; onPress?: () => void }> = ({ icon, value, label, tint, onPress }) => (

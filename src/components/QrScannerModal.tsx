@@ -156,7 +156,12 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ visible, onClose
                 accessibilityLabel="Code du club"
               />
               {state === 'invalid' && <Text style={styles.errorInline}>Code invalide. Vérifie et réessaie.</Text>}
-              {state === 'success' && <Text style={[styles.errorInline, { color: colors.nightSuccess }]}>Présence validée ✓</Text>}
+              {state === 'success' && (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 10 }}>
+                  <Icon name="checkmark" size={16} color={colors.nightSuccess} />
+                  <Text style={[styles.errorInline, { color: colors.nightSuccess, marginTop: 0 }]}>Présence validée</Text>
+                </View>
+              )}
               <Pressable onPress={() => handleCode(typed)} accessibilityRole="button" style={styles.validate}>
                 <Text style={styles.validateText}>Valider</Text>
               </Pressable>

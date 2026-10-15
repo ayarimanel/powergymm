@@ -30,7 +30,7 @@ export const ReviewPrompt: React.FC<Props> = ({ visible, gymName, logoUrl, onRev
               <Icon key={i} name="star" size={26} color={colors.gold.bar} />
             ))}
           </View>
-          <Text style={styles.title} accessibilityRole="header">Une semaine chez {gymName || 'nous'} 💪</Text>
+          <Text style={styles.title} accessibilityRole="header">Une semaine chez {gymName || 'nous'}</Text>
           <Text style={styles.body}>Tu aimes le club ? Ton avis Google aide d’autres sportifs à nous trouver. Ça prend 20 secondes.</Text>
 
           <Pressable onPress={onReview} accessibilityRole="button" style={({ pressed }) => [styles.primary, pressed && { opacity: 0.9 }]}>

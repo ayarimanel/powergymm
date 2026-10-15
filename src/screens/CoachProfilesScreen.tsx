@@ -58,7 +58,7 @@ export const CoachProfilesScreen: React.FC<Props> = ({ user, onUpdateUser }) => 
     if (isCoachAccount && myProfile?.status === 'approved' && user.coachStatus !== 'approved') {
       AuthService.saveProfile({ ...user, coachStatus: 'approved', isApprovedCoach: true }).then(u => {
         onUpdateUser(u);
-        setToast('Ton profil coach est validé 🎉');
+        setToast('Ton profil coach est validé');
       });
     }
   }, [myProfile?.status, user.coachStatus]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -160,7 +160,7 @@ export const CoachProfilesScreen: React.FC<Props> = ({ user, onUpdateUser }) => 
                 onPress={() => setProfileId(c.id)}
                 onApprove={() => {
                   persist(coaches!.map(x => (x.id === c.id ? { ...x, status: 'approved' } : x)));
-                  setToast(`${c.fullName} est coach du club ✓`);
+                  setToast(`${c.fullName} est coach du club`);
                 }}
                 onRefuse={() => {
                   persist(coaches!.filter(x => x.id !== c.id));

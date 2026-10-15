@@ -13,6 +13,7 @@ import { Icon } from '../ui/Icon';
 import { colors, cardShadow } from '../../theme';
 import { useReduceMotion } from '../../hooks/useDeviceState';
 import { haptics } from '../../utils/haptics';
+import { withoutEmoji } from '../ui/displayText';
 
 const nativeDriver = Platform.OS !== 'web';
 
@@ -161,7 +162,7 @@ export const QuestionCard: React.FC<QuestionProps> = ({ title, sub, options, sel
         {options.map((o, i) => (
           <Bubble
             key={o.id}
-            label={o.label}
+            label={withoutEmoji(o.label)}
             selected={selected.includes(o.id)}
             onPress={() => onSelect(o.id)}
             index={i}

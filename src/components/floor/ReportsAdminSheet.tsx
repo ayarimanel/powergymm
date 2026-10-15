@@ -62,7 +62,7 @@ export const ReportsAdminSheet: React.FC<Props> = ({ visible, reports, phoneOf, 
           {list.length === 0 && (
             <View style={styles.empty}>
               <Icon name={tab === 'open' ? 'checkmark-done-circle-outline' : 'time-outline'} size={40} color={colors.textMuted} />
-              <Text style={styles.emptyText}>{tab === 'open' ? 'Rien à régler. Tout fonctionne 👌' : 'Aucun problème réglé pour l’instant.'}</Text>
+              <Text style={styles.emptyText}>{tab === 'open' ? 'Rien à régler. Tout fonctionne.' : 'Aucun problème réglé pour l’instant.'}</Text>
             </View>
           )}
           {list.map(r => {
@@ -80,7 +80,8 @@ export const ReportsAdminSheet: React.FC<Props> = ({ visible, reports, phoneOf, 
                   </View>
                   {r.status === 'fixed' && (
                     <View style={styles.fixedPill}>
-                      <Text style={styles.fixedPillText}>Réglé ✓</Text>
+                      <Icon name="checkmark" size={12} color={colors.green.text} />
+                      <Text style={styles.fixedPillText}>Réglé</Text>
                     </View>
                   )}
                 </View>
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
   icon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   cat: { fontSize: 15, fontWeight: '800', color: colors.text },
   meta: { fontSize: 12, color: colors.textMuted, marginTop: 1 },
-  fixedPill: { backgroundColor: colors.green.soft, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
+  fixedPill: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: colors.green.soft, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
   fixedPillText: { fontSize: 12, fontWeight: '800', color: colors.green.text },
   message: { fontSize: 14, lineHeight: 20, color: colors.text },
   photo: { width: '100%', height: 180, borderRadius: 14 },

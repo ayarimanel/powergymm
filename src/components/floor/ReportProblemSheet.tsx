@@ -136,7 +136,8 @@ export const ReportProblemSheet: React.FC<Props> = ({ visible, mine, onClose, on
                     <Text style={styles.mineSub}>{agoShort(r.createdAt)}{r.place ? ` · ${r.place}` : ''}</Text>
                   </View>
                   <View style={[styles.status, r.status === 'fixed' ? styles.statusFixed : styles.statusOpen]}>
-                    <Text style={[styles.statusText, { color: r.status === 'fixed' ? colors.green.text : colors.amber.text }]}>{r.status === 'fixed' ? 'Réglé ✓' : 'En cours'}</Text>
+                    {r.status === 'fixed' && <Icon name="checkmark" size={12} color={colors.green.text} />}
+                    <Text style={[styles.statusText, { color: r.status === 'fixed' ? colors.green.text : colors.amber.text }]}>{r.status === 'fixed' ? 'Réglé' : 'En cours'}</Text>
                   </View>
                 </View>
               ))}
@@ -171,7 +172,7 @@ const styles = StyleSheet.create({
   mineRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: colors.track },
   mineText: { fontSize: 14, fontWeight: '700', color: colors.text },
   mineSub: { fontSize: 12, color: colors.textMuted, marginTop: 1 },
-  status: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
+  status: { flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
   statusOpen: { backgroundColor: colors.amber.soft },
   statusFixed: { backgroundColor: colors.green.soft },
   statusText: { fontSize: 12, fontWeight: '800' },

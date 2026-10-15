@@ -198,7 +198,7 @@ export const StreakSuccessSheet: React.FC<Props> = ({ visible, oldStreak, newStr
             {isNewRun ? (
               <>
                 <Text style={styles.title}>Nouvelle série commencée</Text>
-                <Text style={styles.sub}>Série de 1 jour 🔥 — reviens demain pour la continuer !</Text>
+                <Text style={styles.sub}>Série de 1 jour — reviens demain pour la continuer !</Text>
               </>
             ) : (
               <>
@@ -214,7 +214,7 @@ export const StreakSuccessSheet: React.FC<Props> = ({ visible, oldStreak, newStr
                       {newStreak}
                     </AnimatedText>
                   </View>
-                  <Text style={styles.title}> {dayWord} 🔥</Text>
+                  <Text style={styles.title}> {dayWord}</Text>
                 </View>
               </>
             )}

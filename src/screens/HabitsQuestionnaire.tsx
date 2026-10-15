@@ -38,6 +38,7 @@ import {
   endOfMonthSubscription,
   estimateSubscription,
 } from '../onboarding/habitsModel';
+import { withoutEmoji } from '../components/ui/displayText';
 
 interface Props {
   firstName: string;
@@ -122,7 +123,7 @@ export const HabitsQuestionnaire: React.FC<Props> = ({ firstName, userId, rules,
     return (
       <SafeAreaView style={styles.screen}>
         <CardShell step={0} total={0} direction={direction.current} cardKey="welcome">
-          <Text style={styles.title}>Salut {firstName} 👋</Text>
+          <Text style={styles.title}>Salut {firstName}</Text>
           <Text style={styles.body}>6 petites questions pour que l'appli connaisse tes habitudes. 30 secondes, promis.</Text>
           <Pressable
             onPress={() => {
@@ -316,9 +317,9 @@ export const HabitsQuestionnaire: React.FC<Props> = ({ firstName, userId, rules,
 
   if (cardId === 'notifications') {
     const lines = [
-      { icon: '🟢', text: 'Quand la salle est calme à ton heure habituelle' },
-      { icon: '⏰', text: "Quelques jours avant la fin de ton abonnement" },
-      { icon: '📣', text: 'Les infos et promos de ton club' },
+      { icon: 'pulse-outline' as const, text: 'Quand la salle est calme à ton heure habituelle' },
+      { icon: 'alarm-outline' as const, text: "Quelques jours avant la fin de ton abonnement" },
+      { icon: 'megaphone-outline' as const, text: 'Les infos et promos de ton club' },
     ];
     return (
       <SafeAreaView style={styles.screen}>
@@ -327,7 +328,7 @@ export const HabitsQuestionnaire: React.FC<Props> = ({ firstName, userId, rules,
           <View style={styles.lines}>
             {lines.map(l => (
               <View key={l.text} style={styles.line}>
-                <Text style={styles.lineIcon}>{l.icon}</Text>
+                <Icon name={l.icon} size={20} color={colors.textSecondary} />
                 <Text style={styles.lineText}>{l.text}</Text>
               </View>
             ))}
@@ -357,11 +358,11 @@ export const HabitsQuestionnaire: React.FC<Props> = ({ firstName, userId, rules,
   return (
     <SafeAreaView style={styles.screen}>
       <CardShell step={0} total={0} direction={direction.current} cardKey="done">
-        <Text style={styles.title}>C'est prêt ✓</Text>
+        <Text style={styles.title}>C'est prêt</Text>
         <View style={styles.lines}>
           {lines.map(l => (
             <Text key={l} style={styles.summary}>
-              {l}
+              {withoutEmoji(l)}
             </Text>
           ))}
         </View>
@@ -380,7 +381,12 @@ export const HabitsQuestionnaire: React.FC<Props> = ({ firstName, userId, rules,
             <Text style={styles.suggestText}>Rejoindre la communauté Débutants</Text>
           </Pressable>
         ) : null}
-        {joined ? <Text style={styles.joined}>✓ Tu as rejoint Débutants</Text> : null}
+        {joined ? (
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 14 }}>
+            <Icon name="checkmark" size={18} color={colors.green.text} />
+            <Text style={[styles.joined, { marginTop: 0 }]}>Tu as rejoint Débutants</Text>
+          </View>
+        ) : null}
 
         <Pressable
           onPress={() => finish(profile)}

@@ -6,6 +6,7 @@ import { Community, CreatePermission, COMMUNITY_COLORS, COMMUNITY_EMOJIS } from 
 import { colors } from '../../theme';
 import { haptics } from '../../utils/haptics';
 import { BottomSheet, SheetScrollView } from '../home/BottomSheet';
+import { EmojiIcon } from '../ui/EmojiIcon';
 
 interface Props {
   visible: boolean;
@@ -61,7 +62,7 @@ export const CommunitiesSheet: React.FC<Props> = ({ visible, onClose, communitie
           {creating ? (
             <View style={{ gap: 16 }}>
               <View style={styles.previewRow}>
-                <View style={[styles.previewIcon, { backgroundColor: color }]}><Text style={styles.previewEmoji}>{emoji}</Text></View>
+                <View style={[styles.previewIcon, { backgroundColor: color }]}><EmojiIcon emoji={emoji} size={26} color={colors.white} /></View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.previewName}>{name.trim() || 'Nom de la communauté'}</Text>
                   <Text style={styles.previewSub}>{permission.official ? 'Communauté vérifiée du club' : 'Communauté de membre'}</Text>
@@ -82,7 +83,7 @@ export const CommunitiesSheet: React.FC<Props> = ({ visible, onClose, communitie
                 <View style={styles.picker}>
                   {COMMUNITY_EMOJIS.map(e => (
                     <Pressable key={e} onPress={() => setEmoji(e)} style={[styles.emojiCell, emoji === e && styles.emojiCellOn]}>
-                      <Text style={styles.emojiTxt}>{e}</Text>
+                      <EmojiIcon emoji={e} size={20} color={emoji === e ? colors.brandText : colors.text} />
                     </Pressable>
                   ))}
                 </View>
@@ -122,7 +123,7 @@ export const CommunitiesSheet: React.FC<Props> = ({ visible, onClose, communitie
                 return (
                   <View key={c.id} style={styles.card}>
                     <Pressable onPress={() => onSelect(c.id)} accessibilityRole="button" style={styles.cardMain}>
-                      <View style={[styles.icon, { backgroundColor: c.color }]}><Text style={styles.iconEmoji}>{c.emoji}</Text></View>
+                      <View style={[styles.icon, { backgroundColor: c.color }]}><EmojiIcon emoji={c.emoji} size={20} color={colors.white} /></View>
                       <View style={{ flex: 1, minWidth: 0 }}>
                         <View style={styles.nameRow}>
                           <Text style={styles.name} numberOfLines={1}>{c.name}</Text>

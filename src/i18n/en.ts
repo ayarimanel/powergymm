@@ -162,7 +162,7 @@ export const EN: Record<string, string> = {
   'Chercher un membre': 'Search for a member',
   'Chercher un membre du club': 'Search club members',
   'Déjà membre': 'Already a member',
-  'Invité ✓': 'Invited ✓',
+  'Invité': 'Invited',
   'Aucun membre trouvé.': 'No members found.',
   'Personne pour l’instant.': 'Nobody yet.',
   Fondateur: 'Founder',

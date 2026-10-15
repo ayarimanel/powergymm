@@ -8,6 +8,7 @@ import {
 } from '../journalLogic';
 import { Btn, Card, J, Link, MuscleIcon, SecHead, Seg, k, tabular } from './kit';
 import { colors } from '../../theme';
+import { Icon } from '../../components/ui/Icon';
 
 interface Props {
   workout: Workout;
@@ -75,7 +76,7 @@ export const Logger: React.FC<Props> = ({ workout, ex, history, onBack, onToggle
       {hint && !hintUsed && nDone === 0 && (
         <View style={[s.hint, hint.type === 'keep' && { backgroundColor: J.accentSoft }]}>
           <View style={[s.hintIc, hint.type === 'keep' && { backgroundColor: J.accent }]}>
-            <Text style={s.hintIcText}>{hint.type === 'up' ? '↑' : hint.type === 'keep' ? '=' : '+'}</Text>
+            <Icon name={hint.type === 'up' ? 'arrow-up' : hint.type === 'keep' ? 'reorder-two' : 'add'} size={16} color={colors.white} />
           </View>
           <Text style={s.hintText}>{hint.text}</Text>
           <Btn small variant="dark" label="Appliquer" onPress={applyHint} />
@@ -120,7 +121,7 @@ export const Logger: React.FC<Props> = ({ workout, ex, history, onBack, onToggle
                 accessibilityLabel={x.done ? 'Série validée' : 'Valider la série'}
                 style={[s.check, x.done && s.checkOn, x.done && x.pr && s.checkPr]}
               >
-                <Text style={[s.checkText, x.done && { color: colors.white }]}>✓</Text>
+                <Icon name="checkmark" size={16} color={x.done ? colors.white : 'transparent'} />
               </Pressable>
             </View>
           );

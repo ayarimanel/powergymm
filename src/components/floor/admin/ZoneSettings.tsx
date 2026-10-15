@@ -26,9 +26,9 @@ const LevelPill: React.FC<{ count: number; t: { calmMax: number; busyMin: number
   const tint = levelTint(level);
   return (
     <View style={[styles.pill, { backgroundColor: tint.soft }]}>
-      <Text style={[styles.pillText, { color: tint.text }]}>
-        {count} → {LEVEL_LABEL[level]}
-      </Text>
+      <Text style={[styles.pillText, { color: tint.text }]}>{count}</Text>
+      <Icon name="arrow-forward" size={12} color={tint.text} />
+      <Text style={[styles.pillText, { color: tint.text }]}>{LEVEL_LABEL[level]}</Text>
     </View>
   );
 };
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
   rowLabel: { fontSize: 14, fontWeight: '600', color: colors.textSecondary },
   hint: { fontSize: 12, color: colors.textMuted, lineHeight: 17 },
-  pill: { alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10 },
+  pill: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10 },
   pillText: { fontSize: 12, fontWeight: '800' },
   saveBtn: { height: 46, borderRadius: 23, backgroundColor: colors.text, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   saveText: { color: colors.white, fontSize: 15, fontWeight: '800' },

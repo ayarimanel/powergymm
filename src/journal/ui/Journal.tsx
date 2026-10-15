@@ -150,7 +150,7 @@ export const Journal: React.FC<Props> = ({ history, customExercises, draft, onDr
       exercises: active.exercises.map(e => ({ ...e, sets: doneSets(e) })).filter(e => e.sets.length),
     };
     if (!cleaned.exercises.length) {
-      say('Valide au moins une série (✓) avant de terminer');
+      say('Valide au moins une série avant de terminer');
       return;
     }
     try {

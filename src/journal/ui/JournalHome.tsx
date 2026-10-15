@@ -10,6 +10,7 @@ import {
 import { Btn, Card, Dot, J, Kpis, Link, MuscleGlyph, MuscleIcon, SecHead, Seg, StatusPill, k, tabular } from './kit';
 import { colors } from '../../theme';
 import { claimSwipe } from '../../navigation/swipeGuard';
+import { Icon } from '../../components/ui/Icon';
 
 interface Props {
   history: Workout[];
@@ -74,7 +75,7 @@ export const JournalHome: React.FC<Props> = ({ history, saved, active, now, selD
                 style={[s.wd, d.future && { opacity: 0.45 }]}
               >
                 <View style={[s.wdDot, d.trained && s.wdDone, d.isToday && s.wdToday, sel && s.wdSel]}>
-                  <Text style={[s.wdNum, d.trained && { color: colors.white }, tabular]}>{d.trained ? '✓' : d.date.getDate()}</Text>
+                  {d.trained ? <Icon name="checkmark" size={15} color={colors.white} /> : <Text style={[s.wdNum, tabular]}>{d.date.getDate()}</Text>}
                 </View>
                 <Text style={[s.wdL, d.isToday && { color: J.fg }]}>{d.letter}</Text>
               </Pressable>

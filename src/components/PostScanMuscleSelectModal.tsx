@@ -65,7 +65,7 @@ export const PostScanMuscleSelectModal: React.FC<PostScanMuscleSelectModalProps>
               <Icon name="checkmark-circle" size={28} color={colors.green.bar} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.title}>QR Code Validé ! ✅</Text>
+              <Text style={styles.title}>QR Code Validé !</Text>
               <Text style={styles.subtitle}>Cochez les groupes musculaires de votre séance :</Text>
             </View>
           </View>
@@ -96,7 +96,7 @@ export const PostScanMuscleSelectModal: React.FC<PostScanMuscleSelectModalProps>
 
           {/* Footer Submit Button */}
           <TouchableOpacity style={styles.confirmBtn} onPress={handleConfirm}>
-            <Text style={styles.confirmBtnText}>VALIDER ET OBTENIR MON STREAK 🔥</Text>
+            <Text style={styles.confirmBtnText}>VALIDER ET OBTENIR MON STREAK</Text>
             <Icon name="arrow-forward" size={18} color={colors.white} />
           </TouchableOpacity>
         </View>

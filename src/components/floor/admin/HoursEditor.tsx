@@ -6,6 +6,7 @@ import { FloorSettings, SpecialDay, WeeklyHours } from '../../../types/floor';
 import { colors } from '../../../theme';
 import { localDateStr } from '../../../floor/crowd';
 import { Stepper } from '../Stepper';
+import { EmojiIcon } from '../../ui/EmojiIcon';
 
 const DAYS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
@@ -84,7 +85,7 @@ export const HoursEditor: React.FC<Props> = ({ settings, onSave }) => {
       {upcoming.length === 0 && <Text style={styles.empty}>Aucun jour spécial à venir.</Text>}
       {upcoming.map(s => (
         <View key={s.date} style={styles.specialRow}>
-          <Text style={styles.specialEmoji}>{s.emoji ?? '📅'}</Text>
+          <EmojiIcon emoji={s.emoji} fallback="calendar" size={22} color={colors.textSecondary} />
           <View style={{ flex: 1 }}>
             <Text style={styles.specialTitle}>{s.label}</Text>
             <Text style={styles.specialSub}>

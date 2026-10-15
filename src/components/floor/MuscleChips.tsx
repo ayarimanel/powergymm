@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
 import { MuscleGroup } from '../../types/database';
 import { MuscleLevel } from '../../floor/useFloorSnapshot';
@@ -15,7 +15,7 @@ interface Props {
   onSelect: (muscle: MuscleGroup | null) => void;
 }
 
-const DOT: Record<string, string> = { calme: '🟢', moyen: '🟠', plein: '🔴' };
+const DOT: Record<string, string> = { calme: colors.green.bar, moyen: colors.amber.bar, plein: colors.red.bar };
 
 /** One horizontal row of zone chips; the member's own muscle (if checked in) is bigger and first. */
 export const MuscleChips: React.FC<Props> = ({ muscles, myMuscle, selected, onSelect }) => (
@@ -41,7 +41,7 @@ export const MuscleChips: React.FC<Props> = ({ muscles, myMuscle, selected, onSe
             pressed && { opacity: 0.85 },
           ]}
         >
-          <Text style={styles.dot}>{DOT[m.level]}</Text>
+          <View style={[styles.dot, { backgroundColor: DOT[m.level] }]} />
           <Text style={[styles.label, mine && styles.labelMine, active && { color: tint.text }]}>
             {mine ? `Ton ${m.label.toLowerCase()}` : m.label}
           </Text>
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   chipMine: { height: 42, paddingHorizontal: 16, borderColor: colors.text },
-  dot: { fontSize: 12 },
+  dot: { width: 8, height: 8, borderRadius: 4 },
   label: { fontSize: 14, fontWeight: '700', color: colors.textSecondary },
   labelMine: { fontSize: 15, fontWeight: '800', color: colors.text },
 });

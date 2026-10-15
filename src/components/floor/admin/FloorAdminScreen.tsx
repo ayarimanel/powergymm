@@ -228,7 +228,7 @@ export const FloorAdminScreen: React.FC<Props> = ({ visible, onClose, gymId, cap
         );
       case 'zones':
         return (
-          <Section title="Réglages des zones" note="Nombre de postes par zone → seuils calme / moyen / plein. Aperçu avec les présents actuels.">
+          <Section title="Réglages des zones" note="Le nombre de postes par zone fixe les seuils calme / moyen / plein. Aperçu avec les présents actuels.">
             <ZoneSettings settings={data.settings} capacity={data.capacity} live={data.zones} presentCount={data.presentCount} onSave={saveSettings} />
           </Section>
         );

@@ -5,6 +5,7 @@ import { Icon } from '../ui/Icon';
 import { Community } from '../../services/communitiesService';
 import { colors } from '../../theme';
 import { haptics } from '../../utils/haptics';
+import { EmojiIcon } from '../ui/EmojiIcon';
 
 interface Props {
   communities: Community[]; // joined ones shown in the bar
@@ -41,7 +42,7 @@ export const CommunitiesBar: React.FC<Props> = ({ communities, activeId, onSelec
             accessibilityState={{ selected: on }}
             style={[styles.chip, on && { backgroundColor: c.color, borderColor: c.color }]}
           >
-            <Text style={styles.emoji}>{c.emoji}</Text>
+            <EmojiIcon emoji={c.emoji} size={15} color={colors.text} />
             <Text style={[styles.chipText, on && styles.chipTextOnDark]} numberOfLines={1}>{c.name}</Text>
             {c.official && <Icon name="checkmark-circle" size={13} color={on ? colors.white : colors.brand} />}
           </Pressable>

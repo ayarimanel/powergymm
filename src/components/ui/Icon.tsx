@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleProp, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
-  Activity, Apple, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpDown, Asterisk, AtSign, Award,
+  Activity, AlarmClock, Equal, Apple, Bike, HandFist, Sprout, ThumbsUp, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpDown, Asterisk, AtSign, Award,
   Bell, Box, Building, Calendar, Camera, ChartColumn, ChartLine, ChartNoAxesColumn, Check, ChevronDown,
   ChevronLeft, ChevronRight, ChevronUp, Circle, CircleAlert, CircleCheck, CircleCheckBig, CircleDot,
   CirclePlus, CircleQuestionMark, CircleUser, CircleX, ClipboardList, Clock, CloudOff, Code, Copy,
@@ -24,6 +24,7 @@ type Lucide = typeof Check;
 /** Ionicons base name (without -outline / -sharp) → closest Lucide icon. */
 const MAP: Record<string, Lucide> = {
   add: Plus,
+  alarm: AlarmClock,
   'add-circle': CirclePlus,
   alert: CircleAlert,
   'alert-circle': CircleAlert,
@@ -40,6 +41,7 @@ const MAP: Record<string, Lucide> = {
   barbell: Dumbbell,
   basket: ShoppingBasket,
   body: PersonStanding,
+  bicycle: Bike,
   bulb: Lightbulb,
   business: Building,
   calendar: Calendar,
@@ -68,6 +70,7 @@ const MAP: Record<string, Lucide> = {
   cube: Box,
   download: Download,
   'ellipsis-horizontal': Ellipsis,
+  ellipse: Circle,
   eye: Eye,
   'eye-off': EyeOff,
   female: Venus,
@@ -77,6 +80,7 @@ const MAP: Record<string, Lucide> = {
   flash: Zap,
   flashlight: Flashlight,
   grid: LayoutGrid,
+  'hand-left': HandFist,
   heart: Heart,
   'help-circle': CircleQuestionMark,
   home: House,
@@ -85,6 +89,7 @@ const MAP: Record<string, Lucide> = {
   images: Images,
   'information-circle': Info,
   key: KeyRound,
+  leaf: Sprout,
   keypad: Grid3x3,
   language: Languages,
   link: Link,
@@ -114,6 +119,7 @@ const MAP: Record<string, Lucide> = {
   'radio-button-off': Circle,
   'radio-button-on': CircleDot,
   refresh: RefreshCw,
+  'reorder-two': Equal,
   remove: Minus,
   resize: Maximize2,
   restaurant: Utensils,
@@ -137,6 +143,7 @@ const MAP: Record<string, Lucide> = {
   time: Clock,
   timer: Timer,
   trash: Trash,
+  'thumbs-up': ThumbsUp,
   'trending-up': TrendingUp,
   trophy: Trophy,
   'videocam-off': VideoOff,

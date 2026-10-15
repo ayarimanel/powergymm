@@ -103,12 +103,14 @@ export const MurPostCard: React.FC<Props> = ({ post: p, community: c, liked, can
 
       {/* actions */}
       <View style={styles.acts}>
-        <Pressable onPress={onLike} accessibilityRole="button" style={[styles.act, liked && styles.actOn]}>
-          <Text style={[styles.actText, liked && { color: colors.gold.deep }]}>{isReaction ? '👏' : liked ? '♥' : '♡'} {isReaction ? 'Féliciter' : "J'aime"} · {n}</Text>
+        <Pressable onPress={onLike} accessibilityRole="button" style={[styles.act, styles.actRow, liked && styles.actOn]}>
+          <Icon name="heart" size={14} color={liked ? colors.gold.deep : colors.textMuted} />
+          <Text style={[styles.actText, liked && { color: colors.gold.deep }]}>{isReaction ? 'Féliciter' : "J'aime"} · {n}</Text>
         </Pressable>
-        <Pressable onPress={onReply} accessibilityRole="button" accessibilityLabel={p.kind === 'question' ? 'Répondre' : 'Commenter'} style={styles.act}>
+        <Pressable onPress={onReply} accessibilityRole="button" accessibilityLabel={p.kind === 'question' ? 'Répondre' : 'Commenter'} style={[styles.act, styles.actRow]}>
+          <Icon name="chatbubble-outline" size={14} color={colors.textMuted} />
           <Text style={styles.actText}>
-            💬 {p.kind === 'question' ? 'Répondre' : 'Commenter'}
+            {p.kind === 'question' ? 'Répondre' : 'Commenter'}
             {nComments ? ` · ${nComments}` : ''}
           </Text>
         </Pressable>
@@ -158,6 +160,7 @@ const styles = StyleSheet.create({
   moreComments: { fontSize: 12, fontWeight: '700', color: colors.textMuted },
   acts: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   act: { borderWidth: 1, borderColor: colors.border, backgroundColor: colors.card, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
+  actRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   actOn: { backgroundColor: colors.gold.soft, borderColor: 'transparent' },
   actText: { fontSize: 12, fontWeight: '800', color: colors.textMuted },
 });

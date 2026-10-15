@@ -6,6 +6,7 @@ import { haptics } from '../../utils/haptics';
 import { ExerciseLines } from './JournalHome';
 import { Btn, Card, Dot, J, Kpis, Link, Pill, k, tabular, tint } from './kit';
 import { colors } from '../../theme';
+import { Icon } from '../../components/ui/Icon';
 
 export const mmss = (s: number) => `${Math.floor(s / 60)}:${String(Math.max(0, Math.floor(s % 60))).padStart(2, '0')}`;
 const nativeDriver = Platform.OS !== 'web';
@@ -148,7 +149,7 @@ export const Summary: React.FC<{ workout: Workout; onClose: () => void }> = ({ w
     <View style={s.stack}>
       <Card style={s.done}>
         <Animated.View style={[s.doneIc, { transform: [{ scale: pop }] }]}>
-          <Text style={s.doneIcText}>✓</Text>
+          <Icon name="checkmark" size={28} color={colors.white} />
         </Animated.View>
         <Text style={s.doneTitle}>Séance enregistrée</Text>
         <View style={s.chips}>

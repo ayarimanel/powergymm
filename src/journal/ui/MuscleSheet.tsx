@@ -9,6 +9,7 @@ import {
 } from '../journalLogic';
 import { Btn, J, Link, MuscleIcon, Pill, StatusPill, k } from './kit';
 import { colors } from '../../theme';
+import { Icon } from '../../components/ui/Icon';
 
 export type SheetState = { picker: true } | { muscleId: MuscleGroup; fromPicker?: boolean };
 
@@ -64,11 +65,13 @@ export const MuscleSheet: React.FC<Props> = ({ sheet, history, workout, onPickMu
       return (
         <Pressable key={e.id} onPress={() => onPick(e.id)} accessibilityRole="button" style={({ pressed }) => [s.ex, pressed && { opacity: 0.85 }]}>
           <View style={s.exMain}>
-            <Text style={s.exName} numberOfLines={1}>
-              {e.base && <Text style={s.star} accessibilityLabel="Exercice de base">★ </Text>}
-              {e.name}
-              {e.custom && <Text style={s.own}> Perso </Text>}
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              {e.base && <View accessible accessibilityLabel="Exercice de base"><Icon name="star" size={13} color={J.goldBright} /></View>}
+              <Text style={[s.exName, { flexShrink: 1 }]} numberOfLines={1}>
+                {e.name}
+                {e.custom && <Text style={s.own}> Perso </Text>}
+              </Text>
+            </View>
             <Text style={s.exSub} numberOfLines={1}>{last ? `${dayLabel(last.date)} : ${summarizeSets(last.sets, e.kind)}` : 'Jamais fait'}</Text>
           </View>
           {inSession ? (

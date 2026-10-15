@@ -17,6 +17,7 @@ import { useT } from '../../../i18n';
 import { colors } from '../../../theme';
 import { BottomSheet, SheetScrollView } from '../../home/BottomSheet';
 import { Avatar } from '../Avatar';
+import { Icon } from '../../ui/Icon';
 
 interface Props {
   visible: boolean;
@@ -88,7 +89,10 @@ export const InviteSheet: React.FC<Props> = ({ visible, community: c, profiles, 
                 </View>
 
                 {blocked ? null : done ? (
-                  <Text style={styles.done}>{t('Invité ✓')}</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                    <Icon name="checkmark" size={16} color={colors.green.text} />
+                    <Text style={styles.done}>{t('Invité')}</Text>
+                  </View>
                 ) : (
                   <Pressable
                     onPress={() => {

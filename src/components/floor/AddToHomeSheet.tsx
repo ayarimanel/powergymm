@@ -31,7 +31,7 @@ export const AddToHomeSheet: React.FC<Props> = ({ visible, onClose }) => {
       {() => (
         <View style={styles.content}>
           <Text style={styles.title} accessibilityRole="header">
-            Ajoute l’app à ton écran d’accueil 📲
+            Ajoute l’app à ton écran d’accueil
           </Text>
           <Text style={styles.sub}>Pour scanner plus vite à l’entrée et voir l’affluence en un coup d’œil.</Text>
 

@@ -8,6 +8,7 @@ import { colors, ink } from '../../theme';
 import { pickImages } from '../../services/imagePicker';
 import { BottomSheet, SheetScrollView } from '../home/BottomSheet';
 import { ProductImage } from '../shop/ProductImage';
+import { EmojiIcon } from '../ui/EmojiIcon';
 
 export interface PostDraft {
   category: PostCategory;
@@ -143,7 +144,7 @@ export const ComposerSheet: React.FC<Props> = ({ visible, initialCategory = 'wor
                         accessibilityState={{ selected: on }}
                         style={[styles.circle, on && { backgroundColor: c.color, borderColor: c.color }]}
                       >
-                        <Text style={styles.circleEmoji}>{c.emoji}</Text>
+                        <EmojiIcon emoji={c.emoji} size={15} color={on ? colors.white : colors.text} />
                         <Text style={[styles.circleText, on && { color: colors.white }]}>{c.name}</Text>
                       </Pressable>
                     );

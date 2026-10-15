@@ -119,7 +119,7 @@ export const ActivitySheet: React.FC<Props> = ({ visible, onClose, events, seenA
     } else {
       content = (
         <>
-          <Bold>{r.actor}</Bold> a validé ton record 🏆 Le badge doré est à toi.
+          <Bold>{r.actor}</Bold> a validé ton record. Le badge doré est à toi.
         </>
       );
     }

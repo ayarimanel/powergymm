@@ -85,7 +85,7 @@ export const PostScanMuscleSelectModal: React.FC<PostScanMuscleSelectModalProps>
                     {isChecked && <Ionicons name="checkmark" size={16} color={colors.white} />}
                   </View>
 
-                  <Ionicons name={item.icon as any} size={20} color={isChecked ? colors.brand : colors.textMuted} />
+                  <Ionicons name={item.icon as any} size={20} color={isChecked ? colors.brandText : colors.textMuted} />
                   <Text style={[styles.checkboxLabel, isChecked && styles.checkboxLabelChecked]}>
                     {item.label}
                   </Text>
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   cardContainer: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderRadius: 24,
     padding: 20,
     maxHeight: '80%',
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#D1FAE5',
+    backgroundColor: colors.green.soft,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     borderColor: colors.disabled,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
   },
   checkboxSquareChecked: {
     backgroundColor: colors.brand,
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   checkboxLabelChecked: {
-    color: colors.brand,
+    color: colors.brandText,
     fontWeight: 'bold',
   },
   confirmBtn: {

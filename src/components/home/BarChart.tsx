@@ -172,7 +172,7 @@ export const BarChart: React.FC<Props> = ({ points, closingHour, isOpen }) => {
 const styles = StyleSheet.create({
   tagRow: { flexDirection: 'row', height: 30, marginTop: 4 },
   nowTag: { position: 'absolute', top: 0, alignItems: 'center', backgroundColor: colors.text, borderRadius: 10, paddingVertical: 3 },
-  nowTagText: { color: colors.white, fontSize: 12, fontWeight: '800' },
+  nowTagText: { color: colors.onInverse, fontSize: 12, fontWeight: '800' },
   bubble: {
     position: 'absolute',
     top: 0,
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   bubbleDot: { width: 8, height: 8, borderRadius: 4 },
-  bubbleText: { color: colors.white, fontSize: 12, fontWeight: '800' },
+  bubbleText: { color: colors.onInverse, fontSize: 12, fontWeight: '800' },
 
   yLabel: { position: 'absolute', left: 0, fontSize: 12, lineHeight: 16, color: colors.textMuted, fontWeight: '600' },
   grid: { position: 'absolute', left: 0, right: 0, height: 1, backgroundColor: colors.track },
@@ -194,5 +194,5 @@ const styles = StyleSheet.create({
   xAxis: { height: 26, marginTop: 6 },
   xLabel: { position: 'absolute', top: 3, width: LABEL_W, fontSize: 12, color: colors.textMuted, fontWeight: '600' },
   clock: { position: 'absolute', top: 0, height: 22, borderRadius: 11, backgroundColor: colors.text, alignItems: 'center', justifyContent: 'center' },
-  clockText: { color: colors.white, fontSize: 12, fontWeight: '800' },
+  clockText: { color: colors.onInverse, fontSize: 12, fontWeight: '800' },
 });

@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: 12, paddingVertical: 10 },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
   name: { fontSize: 14, fontWeight: '800', color: colors.text },
-  you: { fontSize: 11, fontWeight: '800', color: colors.brand, backgroundColor: colors.brandSoft, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1, overflow: 'hidden' },
+  you: { fontSize: 11, fontWeight: '800', color: colors.brandText, backgroundColor: colors.brandSoft, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1, overflow: 'hidden' },
   time: { fontSize: 12, color: colors.textMuted },
   text: { fontSize: 15, lineHeight: 21, color: colors.text, marginTop: 2 },
   commentLikeBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6, alignSelf: 'flex-start', paddingVertical: 2 },

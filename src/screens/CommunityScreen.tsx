@@ -565,7 +565,7 @@ export const CommunityScreen: React.FC<Props> = ({ user, onOpenAccount }) => {
                       </View>
                     </View>
                     <View style={[styles.drowBtn, s === 'pending' ? styles.drowBtnOff : styles.drowBtnSoft]}>
-                      <Text style={[styles.drowBtnText, { color: s === 'pending' ? colors.textMuted : colors.brand }]}>{label}</Text>
+                      <Text style={[styles.drowBtnText, { color: s === 'pending' ? colors.textMuted : colors.brandText }]}>{label}</Text>
                     </View>
                   </Pressable>
                 );
@@ -736,7 +736,7 @@ const ManageTab: React.FC<{
                 <Text style={styles.drowName}>{c.name}</Text>
                 <Text style={styles.drowSub}>Ton rôle : {RANK_TAG[stat(c.id)] ?? 'Membre'} · {membersLabel(c.members)}</Text>
               </View>
-              <View style={[styles.drowBtn, styles.drowBtnSoft]}><Text style={[styles.drowBtnText, { color: colors.brand }]}>Ouvrir</Text></View>
+              <View style={[styles.drowBtn, styles.drowBtnSoft]}><Text style={[styles.drowBtnText, { color: colors.brandText }]}>Ouvrir</Text></View>
             </Pressable>
           );
         })}
@@ -795,7 +795,7 @@ const styles = StyleSheet.create({
   drowPressed: { backgroundColor: colors.bg },
   mineTitle: { flexDirection: 'row', alignItems: 'center', gap: 6, minWidth: 0 },
   rankTag: { borderRadius: radius.pill, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: colors.brandSoft },
-  rankTagText: { fontSize: 11, fontWeight: '800', color: colors.brand },
+  rankTagText: { fontSize: 11, fontWeight: '800', color: colors.brandText },
   waitPill: { minWidth: 22, height: 22, borderRadius: 11, paddingHorizontal: 6, backgroundColor: colors.notification, alignItems: 'center', justifyContent: 'center' },
   waitPillText: { fontSize: 12, fontWeight: '800', color: colors.onBrand },
   createCard: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: radius.card, borderWidth: 1.5, borderStyle: 'dashed', borderColor: colors.brand, backgroundColor: colors.brandSoft, marginTop: 4 },

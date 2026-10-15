@@ -324,7 +324,7 @@ export const AccountSheet: React.FC<Props> = ({ visible, onClose, user, config, 
                 <View style={styles.qrBox}>
                   <View style={styles.qrBrand}>
                     <View style={styles.qrLogo}>
-                      {config.logoUrl ? <Image source={{ uri: config.logoUrl }} style={StyleSheet.absoluteFill} /> : <Ionicons name="barbell" size={16} color={colors.brand} />}
+                      {config.logoUrl ? <Image source={{ uri: config.logoUrl }} style={StyleSheet.absoluteFill} /> : <Ionicons name="barbell" size={16} color={colors.brandText} />}
                     </View>
                     <Text style={styles.qrName} numberOfLines={1}>{config.name}</Text>
                   </View>
@@ -344,8 +344,8 @@ export const AccountSheet: React.FC<Props> = ({ visible, onClose, user, config, 
                   accessibilityRole="button"
                   style={[styles.ghost, confirm === 'code' && { backgroundColor: colors.text }]}
                 >
-                  <Ionicons name="refresh" size={18} color={confirm === 'code' ? colors.white : colors.text} />
-                  <Text style={[styles.ghostText, confirm === 'code' && { color: colors.white }]}>{confirm === 'code' ? 'Confirmer : les anciens QR ne marcheront plus' : 'Générer un nouveau code'}</Text>
+                  <Ionicons name="refresh" size={18} color={confirm === 'code' ? colors.onInverse : colors.text} />
+                  <Text style={[styles.ghostText, confirm === 'code' && { color: colors.onInverse }]}>{confirm === 'code' ? 'Confirmer : les anciens QR ne marcheront plus' : 'Générer un nouveau code'}</Text>
                 </Pressable>
               </Section>
             )}
@@ -366,8 +366,8 @@ export const AccountSheet: React.FC<Props> = ({ visible, onClose, user, config, 
                 </View>
               </View>
               <Pressable onPress={() => (confirm === 'logout' ? onLogout() : setConfirm('logout'))} accessibilityRole="button" style={[styles.ghost, confirm === 'logout' && { backgroundColor: colors.text }]}>
-                <Ionicons name="log-out-outline" size={20} color={confirm === 'logout' ? colors.white : colors.text} />
-                <Text style={[styles.ghostText, confirm === 'logout' && { color: colors.white }]}>
+                <Ionicons name="log-out-outline" size={20} color={confirm === 'logout' ? colors.onInverse : colors.text} />
+                <Text style={[styles.ghostText, confirm === 'logout' && { color: colors.onInverse }]}>
                   {confirm === 'logout' ? (canSignInAgain || user.role === 'owner' ? 'Confirmer la déconnexion' : 'Se déconnecter quand même (accès perdu)') : 'Se déconnecter'}
                 </Text>
               </Pressable>
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
   langBtn: { flex: 1, minHeight: 48, borderRadius: 24, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
   langBtnOn: { borderColor: colors.brand, backgroundColor: colors.brandSoft },
   langText: { fontSize: 15, fontWeight: '700', color: colors.text },
-  langTextOn: { color: colors.brand },
+  langTextOn: { color: colors.brandText },
   title: { fontSize: 20, fontWeight: '800', color: colors.text },
   body: { padding: 20, paddingTop: 8, paddingBottom: 48 },
   identity: { flexDirection: 'row', alignItems: 'center', gap: 16 },
@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
   chip: { minHeight: 42, paddingHorizontal: 16, borderRadius: 21, backgroundColor: colors.track, justifyContent: 'center' },
   chipOn: { backgroundColor: colors.text },
   chipText: { fontSize: 14, fontWeight: '700', color: colors.textSecondary },
-  chipTextOn: { color: colors.white },
+  chipTextOn: { color: colors.onInverse },
   permChip: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 34, paddingHorizontal: 12, borderRadius: 17, backgroundColor: colors.green.soft },
   permChipText: { fontSize: 13, fontWeight: '700', color: colors.green.text },
   error: { color: colors.red.text, fontSize: 13, fontWeight: '600', marginTop: 6 },

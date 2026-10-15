@@ -44,7 +44,7 @@ const ActionBtn: React.FC<{ label: string; onPress: () => void; kind?: 'dark' | 
     <Text
       style={[
         styles.actionText,
-        kind === 'dark' && { color: colors.white },
+        kind === 'dark' && { color: colors.onInverse },
         kind === 'danger' && { color: colors.red.text },
       ]}
     >
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
   tab: { paddingHorizontal: 14, height: 36, borderRadius: 18, justifyContent: 'center', backgroundColor: colors.track },
   tabOn: { backgroundColor: colors.text },
   tabText: { fontSize: 14, fontWeight: '700', color: colors.textSecondary },
-  tabTextOn: { color: colors.white },
+  tabTextOn: { color: colors.onInverse },
 
   empty: { alignItems: 'center', paddingVertical: 36, gap: 8 },
   emptyTitle: { fontSize: 16, fontWeight: '700', color: colors.textSecondary, textAlign: 'center' },

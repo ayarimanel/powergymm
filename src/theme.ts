@@ -10,6 +10,8 @@ export const colors = {
   brand: c.primary,
   brandDark: c.primaryDark,
   brandSoft: c.primaryLight,
+  /** Red text and icons sitting on brandSoft (the brand red alone is too dark there). */
+  brandText: c.primaryText,
   onBrand: c.textOnPrimary,
   bg: c.surface,
   /** Screen background, behind the cards. */
@@ -24,29 +26,38 @@ export const colors = {
   textMuted: c.textTertiary,
   track: c.surfaceHover,
   pastBar: c.barChartDefault,
-  disabled: '#C4C4C4',
+  disabled: '#3A3A3F',
+  /** Text and icons on a light fill (selected chips, tags, toasts: background = colors.text). */
+  onInverse: c.page,
   white: '#FFFFFF',
   black: '#000000',
   tabActive: c.tabActive,
   tabInactive: c.tabInactive,
   notification: c.notification,
 
-  // Level colors: `bar` for fills (>=3:1), `text` for copy (>=4.5:1 on white), `soft` for pill backgrounds
+  // Level colors: `bar` for fills (>=3:1), `text` for copy (>=4.5:1 on the card color), `soft` for dark tinted pill backgrounds
   green: { bar: c.success, text: c.successText, soft: c.successLight },
   amber: { bar: c.warning, text: c.warningText, soft: c.warningLight },
   red: { bar: c.danger, text: c.dangerText, soft: c.dangerLight },
 
   // Golden records (coach-validated)
-  gold: { bg: '#FFF8E1', soft: '#FDECB0', border: '#F2C94C', bar: '#E9B824', deep: '#B7791F', text: '#6B4300', ink: '#3A2A00' },
+  gold: { bg: '#1F1A0C', soft: '#3A2E0E', border: '#8A6A1A', bar: '#E9B824', deep: '#F2C94C', text: '#F5D67A', ink: '#3A2A00', bright: '#F5D77A' },
 
   flame: '#EA580C',
-  flameSoft: '#FFEDD5',
-  flameText: '#9A3412',
+  flameSoft: '#33190C',
+  flameText: '#FB923C',
+  flameLight: '#FDBA74',
+  flamePale: '#FED7AA',
 
   // Community accents (Mur bubbles, muscle tiles)
-  pink: { bar: '#D6336C', text: '#B02356', soft: '#FCE4EE' },
-  violet: { bar: '#7048E8', text: '#5A34C7', soft: '#ECE6FD' },
-  teal: { bar: '#0C8599', text: '#0A6E80', soft: '#DFF4F7' },
+  pink: { bar: '#D6336C', text: '#F472A8', soft: '#33141F' },
+  violet: { bar: '#7048E8', text: '#A78BFA', soft: '#211A3A' },
+  teal: { bar: '#0C8599', text: '#3BC9DB', soft: '#0E2A2E' },
+  blue: { bar: '#3B82F6', text: '#60A5FA', soft: '#111E33' },
+  coral: { bar: '#FF6B6B', text: '#FF8787', soft: '#33161A' },
+  lime: { soft: '#1A2A10' },
+  yellow: { bar: '#FBBF24', soft: '#2E2810', pale: '#FDE68A' },
+  cyan: '#06B6D4',
 
   // Dark surfaces (QR scanner, login)
   night: c.loginBackground,
@@ -61,7 +72,9 @@ export const colors = {
 };
 
 /** The club's ink at a given opacity: overlays, scrims, photo labels. */
-export const ink = (alpha: number) => `rgba(17,17,17,${alpha})`;
+export const ink = (alpha: number) => `rgba(0,0,0,${alpha})`;
+/** White at a given opacity: text and lines over photos and dark overlays. */
+export const light = (alpha: number) => `rgba(255,255,255,${alpha})`;
 /** The club's primary color at a given opacity: glows, button shadows. */
 export const brandAlpha = (alpha: number) => `rgba(${c.primaryRgb},${alpha})`;
 
@@ -75,7 +88,7 @@ export type Level = 'green' | 'amber' | 'red';
 export type CommunityColor = 'accent' | 'teal' | 'calm' | 'pink' | 'gold' | 'mid' | 'violet' | 'busy';
 export const communityTint = (c: CommunityColor): { bar: string; soft: string; text: string } => {
   switch (c) {
-    case 'accent': return { bar: colors.brand, soft: colors.brandSoft, text: colors.brand };
+    case 'accent': return { bar: colors.brand, soft: colors.brandSoft, text: colors.brandText };
     case 'teal': return colors.teal;
     case 'calm': return { bar: colors.green.bar, soft: colors.green.soft, text: colors.green.text };
     case 'pink': return colors.pink;
@@ -86,27 +99,28 @@ export const communityTint = (c: CommunityColor): { bar: string; soft: string; t
   }
 };
 
+/** Cards are flat (surface + 1px border): no shadow. Kept so existing spreads still work. */
 export const cardShadow = {
   shadowColor: colors.black,
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.06,
-  shadowRadius: 8,
-  elevation: 2,
+  shadowOffset: { width: 0, height: 0 },
+  shadowOpacity: 0,
+  shadowRadius: 0,
+  elevation: 0,
 } as const;
 
 /** The red glow under the club's primary buttons. */
 export const buttonShadow = {
   shadowColor: colors.brand,
-  shadowOffset: { width: 0, height: 4 },
-  shadowOpacity: 0.25,
-  shadowRadius: 10,
-  elevation: 4,
+  shadowOffset: { width: 0, height: 8 },
+  shadowOpacity: 0.35,
+  shadowRadius: 24,
+  elevation: 8,
 } as const;
 
 export const card = {
   backgroundColor: colors.card,
   borderRadius: radius.card,
   borderWidth: 1,
-  borderColor: colors.divider,
+  borderColor: colors.border,
   ...cardShadow,
 } as const;

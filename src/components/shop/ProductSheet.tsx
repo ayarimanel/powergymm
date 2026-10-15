@@ -132,8 +132,8 @@ export const ProductSheet: React.FC<Props> = ({ product, isOwner, onClose, onRes
                     {confirmDelete && <Text style={styles.deleteArmedText}>Confirmer</Text>}
                   </Pressable>
                   <Pressable onPress={() => onEdit(p)} accessibilityRole="button" style={styles.editBtn}>
-                    <Ionicons name="create-outline" size={20} color={colors.white} />
-                    <Text style={styles.footerBtnText}>Modifier le produit</Text>
+                    <Ionicons name="create-outline" size={20} color={colors.onInverse} />
+                    <Text style={[styles.footerBtnText, { color: colors.onInverse }]}>Modifier le produit</Text>
                   </Pressable>
                 </View>
               ) : (

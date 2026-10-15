@@ -357,7 +357,7 @@ const s = StyleSheet.create({
   toggleTitle: { fontSize: 14, fontWeight: '800', color: J.fg },
   offersBox: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: J.accentSoft, borderRadius: 16, padding: 12 },
   offersIc: { width: 40, height: 40, borderRadius: 20, backgroundColor: J.surface, alignItems: 'center', justifyContent: 'center' },
-  offersGo: { fontSize: 13, fontWeight: '800', color: J.accent },
+  offersGo: { fontSize: 13, fontWeight: '800', color: J.accentText },
   profileBox: { backgroundColor: J.surface2 },
 
   liveCoach: { alignItems: 'center', gap: 4, width: 64 },

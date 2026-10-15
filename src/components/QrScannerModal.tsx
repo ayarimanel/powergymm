@@ -129,7 +129,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ visible, onClose
           <Text style={styles.topTitle}>Valider ma présence</Text>
           {cameraReady ? (
             <Pressable onPress={() => setTorch(t => !t)} accessibilityRole="switch" accessibilityState={{ checked: torch }} accessibilityLabel="Lampe torche" style={[styles.roundBtn, torch && styles.roundBtnOn]}>
-              <Ionicons name={torch ? 'flashlight' : 'flashlight-outline'} size={22} color={torch ? colors.text : colors.white} />
+              <Ionicons name={torch ? 'flashlight' : 'flashlight-outline'} size={22} color={torch ? colors.night : colors.white} />
             </Pressable>
           ) : (
             <View style={styles.roundSpacer} />
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   topTitle: { color: colors.white, fontSize: 17, fontWeight: '700' },
   roundSpacer: { width: 44, height: 44 },
   roundBtn: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.14)' },
-  roundBtnOn: { backgroundColor: '#FDE68A' },
+  roundBtnOn: { backgroundColor: colors.yellow.pale },
 
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 },
   frame: { width: FRAME, height: FRAME, borderRadius: 32, borderWidth: 3, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },

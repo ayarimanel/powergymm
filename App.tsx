@@ -301,7 +301,7 @@ function AppInner() {
 
   return (
     <View {...edgeSwipe.panHandlers} style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.header} />
+      <StatusBar barStyle="light-content" backgroundColor={colors.header} />
 
       {/* Main Active Screen */}
       <Animated.View
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 8,
-    backgroundColor: colors.white,
+    backgroundColor: colors.header,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },

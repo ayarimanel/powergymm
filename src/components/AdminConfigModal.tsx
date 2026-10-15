@@ -122,7 +122,7 @@ export const AdminConfigModal: React.FC<Props> = ({ visible, config, onClose, on
             <Text style={styles.label}>Logo du club</Text>
             <View style={styles.logoRow}>
               <View style={styles.logoBox}>
-                {logoUrl ? <Image source={{ uri: logoUrl }} style={styles.logoImg} /> : <Ionicons name="barbell" size={22} color={colors.brand} />}
+                {logoUrl ? <Image source={{ uri: logoUrl }} style={styles.logoImg} /> : <Ionicons name="barbell" size={22} color={colors.brandText} />}
               </View>
               <Pressable onPress={pickLogo} accessibilityRole="button" style={styles.logoBtn}>
                 <Ionicons name="image-outline" size={18} color={colors.text} />
@@ -262,5 +262,5 @@ const styles = StyleSheet.create({
   previewLink: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', marginTop: 10 },
   previewText: { fontSize: 14, fontWeight: '800', color: colors.brand },
   saveBtn: { backgroundColor: colors.text, borderRadius: 14, height: 48, alignItems: 'center', justifyContent: 'center', marginTop: 20 },
-  saveText: { color: colors.white, fontSize: 15, fontWeight: '800' },
+  saveText: { color: colors.onInverse, fontSize: 15, fontWeight: '800' },
 });

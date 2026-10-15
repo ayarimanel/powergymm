@@ -204,8 +204,8 @@ const s = StyleSheet.create({
 
   active: { position: 'absolute', left: 12, right: 12, bottom: 12, zIndex: 40, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 18, paddingVertical: 10, paddingHorizontal: 12, backgroundColor: J.fg, shadowColor: colors.black, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.25, shadowRadius: 20, elevation: 8 },
   live: { width: 10, height: 10, borderRadius: 5, backgroundColor: J.tired },
-  activeTitle: { color: colors.white, fontSize: 13, fontWeight: '800' },
-  activeSub: { color: 'rgba(255,255,255,0.75)', fontSize: 11 },
+  activeTitle: { color: colors.onInverse, fontSize: 13, fontWeight: '800' },
+  activeSub: { color: colors.textMuted, fontSize: 11 },
   activeGo: { backgroundColor: J.accent, borderRadius: 12, paddingVertical: 8, paddingHorizontal: 12 },
   activeGoText: { color: colors.white, fontWeight: '800', fontSize: 12 },
 
@@ -228,5 +228,5 @@ const s = StyleSheet.create({
   prVal: { fontSize: 13, fontWeight: '800', color: J.fg },
 
   toast: { position: 'absolute', alignSelf: 'center', bottom: 90, zIndex: 80, backgroundColor: J.fg, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 12, maxWidth: '88%' },
-  toastText: { color: colors.white, fontSize: 12, fontWeight: '800', textAlign: 'center' },
+  toastText: { color: colors.onInverse, fontSize: 12, fontWeight: '800', textAlign: 'center' },
 });

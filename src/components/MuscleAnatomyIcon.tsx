@@ -14,12 +14,12 @@ export const MuscleAnatomyIcon: React.FC<MuscleAnatomyIconProps> = ({
   size = 48 
 }) => {
   const PALETTES: Record<string, { bg: string; body: string; accent: string }> = {
-    chest: { bg: '#FFF1F2', body: colors.text, accent: '#FF6B6B' },
-    back: { bg: '#EFF6FF', body: colors.text, accent: '#3B82F6' },
-    shoulders: { bg: '#FEF9C3', body: colors.text, accent: colors.amber.bar },
-    arms: { bg: '#ECFCCB', body: colors.text, accent: colors.green.bar },
-    legs: { bg: '#ECFEFF', body: colors.text, accent: '#06B6D4' },
-    cardio: { bg: '#FFF7ED', body: colors.text, accent: '#FB923C' },
+    chest: { bg: colors.coral.soft, body: colors.text, accent: colors.coral.bar },
+    back: { bg: colors.blue.soft, body: colors.text, accent: colors.blue.bar },
+    shoulders: { bg: colors.yellow.soft, body: colors.text, accent: colors.amber.bar },
+    arms: { bg: colors.lime.soft, body: colors.text, accent: colors.green.bar },
+    legs: { bg: colors.teal.soft, body: colors.text, accent: colors.cyan },
+    cardio: { bg: colors.flameSoft, body: colors.text, accent: colors.flameText },
   };
 
   const palette = PALETTES[muscleGroup] || { bg: colors.brandSoft, body: colors.textSecondary, accent: colors.red.bar };

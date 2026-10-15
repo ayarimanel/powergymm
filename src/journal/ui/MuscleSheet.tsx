@@ -198,7 +198,7 @@ const CreateExercise: React.FC<{
           const on = kind === kd.id;
           return (
             <Pressable key={kd.id} onPress={() => setKind(kd.id)} accessibilityRole="radio" accessibilityState={{ checked: on }} style={[s.kind, on && s.kindOn]}>
-              <Text style={[s.kindLabel, on && { color: J.accent }]}>{kd.label}</Text>
+              <Text style={[s.kindLabel, on && { color: J.accentText }]}>{kd.label}</Text>
               <Text style={s.kindHint}>{kd.hint}</Text>
             </Pressable>
           );
@@ -221,7 +221,7 @@ const s = StyleSheet.create({
   backText: { fontSize: 22, color: J.fg, marginTop: -2 },
   search: { borderWidth: 1, borderColor: J.line, backgroundColor: J.surface2, color: J.fg, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 11, fontSize: 15, marginBottom: 6 },
   createOpen: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1.5, borderStyle: 'dashed', borderColor: J.accent, backgroundColor: J.accentSoft, borderRadius: 14, paddingVertical: 10, paddingHorizontal: 12, marginBottom: 6 },
-  createOpenText: { flex: 1, color: J.accent, fontWeight: '800', fontSize: 14 },
+  createOpenText: { flex: 1, color: J.accentText, fontWeight: '800', fontSize: 14 },
   group: { fontSize: 12, fontWeight: '800', color: J.muted, marginTop: 10, marginBottom: 2 },
   exList: { gap: 6 },
   ex: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: J.line, backgroundColor: J.surface, borderRadius: 14, paddingVertical: 10, paddingHorizontal: 12, minHeight: 56 },
@@ -229,12 +229,12 @@ const s = StyleSheet.create({
   exName: { fontSize: 14, fontWeight: '800', color: J.fg },
   exSub: { fontSize: 12, color: J.muted },
   star: { color: J.goldBright },
-  own: { fontSize: 10, fontWeight: '800', backgroundColor: J.accentSoft, color: J.accent, borderRadius: 6, overflow: 'hidden' },
+  own: { fontSize: 10, fontWeight: '800', backgroundColor: J.accentSoft, color: J.accentText, borderRadius: 6, overflow: 'hidden' },
   exPr: { alignItems: 'flex-end' },
   exPrLbl: { fontSize: 10, fontWeight: '800', color: J.gold },
   exPrVal: { fontSize: 17, fontWeight: '900', color: J.gold },
   plus: { width: 28, height: 28, borderRadius: 14, backgroundColor: J.accentSoft, alignItems: 'center', justifyContent: 'center' },
-  plusText: { color: J.accent, fontWeight: '900', fontSize: 16, marginTop: -1 },
+  plusText: { color: J.accentText, fontWeight: '900', fontSize: 16, marginTop: -1 },
   create: { gap: 8, backgroundColor: J.surface2, borderRadius: 18, padding: 14 },
   createHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   createTitle: { fontSize: 14, fontWeight: '800', color: J.fg, flex: 1 },

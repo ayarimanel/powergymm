@@ -177,7 +177,7 @@ export const ClubConsoleSheet: React.FC<Props> = ({ visible, onClose, floor, mem
                     accessibilityRole="button"
                     style={[styles.renew, { backgroundColor: colors.text }]}
                   >
-                    <Text style={[styles.renewText, { color: colors.white }]}>Confirmer</Text>
+                    <Text style={[styles.renewText, { color: colors.onInverse }]}>Confirmer</Text>
                   </Pressable>
                 ) : (
                   <Pressable onPress={() => setConfirmRenew(m.id)} accessibilityRole="button" style={styles.renew}>
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
   name: { fontSize: 15, fontWeight: '800', color: colors.text },
   rowSub: { fontSize: 13, fontWeight: '700', marginTop: 1 },
   wa: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 40, paddingHorizontal: 14, borderRadius: 20, borderWidth: 1.5, borderColor: colors.whatsapp },
-  waText: { fontSize: 14, fontWeight: '800', color: '#0F6B5F' },
+  waText: { fontSize: 14, fontWeight: '800', color: colors.whatsapp },
   waIcon: { width: 40, height: 40, borderRadius: 20, borderWidth: 1.5, borderColor: colors.whatsapp, alignItems: 'center', justifyContent: 'center' },
   renew: { height: 40, paddingHorizontal: 14, borderRadius: 20, backgroundColor: colors.track, alignItems: 'center', justifyContent: 'center' },
   renewText: { fontSize: 14, fontWeight: '800', color: colors.text },

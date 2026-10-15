@@ -303,7 +303,7 @@ const s = StyleSheet.create({
   suggIc: { width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
   suggIcText: { color: colors.white, fontWeight: '800' },
   suggText: { flex: 1, fontSize: 13, color: J.fg, lineHeight: 18 },
-  chev: { fontSize: 22, color: J.accent, fontWeight: '700' },
+  chev: { fontSize: 22, color: J.accentText, fontWeight: '700' },
 
   bodyMap: { flexDirection: 'row', gap: 6 },
   fig: { flex: 1, alignItems: 'center', gap: 4 },

@@ -16,6 +16,7 @@ export const J = {
   muted: colors.textMuted,
   accent: colors.brand,
   accentSoft: colors.brandSoft,
+  accentText: colors.brandText,
   ok: colors.green.bar,
   okText: colors.green.text,
   okSoft: colors.green.soft,
@@ -25,18 +26,19 @@ export const J = {
   tired: colors.red.bar,
   tiredText: colors.red.text,
   tiredSoft: colors.red.soft,
-  gold: '#B07800',
-  goldBright: '#C98A00',
-  goldSoft: '#FFF3D1',
+  gold: colors.gold.text,
+  goldBright: colors.gold.bar,
+  goldSoft: colors.gold.soft,
 };
 
 export const tabular = { fontVariant: ['tabular-nums'] as TextStyle['fontVariant'] };
 
-/** Mixes a hex color with white: the "color-mix(… 16 %, surface)" of the CSS. */
+/** Mixes a hex color with the card surface: the "color-mix(… 16 %, surface)" of the CSS. */
 export const tint = (hex: string, pct: number) => {
   const n = parseInt(hex.slice(1), 16);
-  const mix = (c: number) => Math.round(c * (pct / 100) + 255 * (1 - pct / 100));
-  return `rgb(${mix((n >> 16) & 255)},${mix((n >> 8) & 255)},${mix(n & 255)})`;
+  const base = parseInt(colors.card.slice(1), 16);
+  const mix = (c: number, b: number) => Math.round(c * (pct / 100) + b * (1 - pct / 100));
+  return `rgb(${mix((n >> 16) & 255, (base >> 16) & 255)},${mix((n >> 8) & 255, (base >> 8) & 255)},${mix(n & 255, base & 255)})`;
 };
 
 type BtnVariant = 'primary' | 'soft' | 'ghost' | 'danger' | 'dark';
@@ -157,7 +159,7 @@ export const k = StyleSheet.create({
   btn_dark: { backgroundColor: J.fg },
   btnText: { fontWeight: '800', fontSize: 14 },
   btnText_primary: { color: colors.white },
-  btnText_soft: { color: J.accent },
+  btnText_soft: { color: J.accentText },
   btnText_ghost: { color: J.fg },
   btnText_danger: { color: colors.white },
   btnText_dark: { color: J.surface },

@@ -24,7 +24,7 @@ const nativeDriver = Platform.OS !== 'web';
 export const NEWS_BAR_HEIGHT = 56;
 
 export const NEWS_TYPES: Record<NewsType, { label: string; icon: string; solid: string; soft: string; text: string }> = {
-  info: { label: 'Info', icon: 'information-circle', solid: colors.brand, soft: colors.brandSoft, text: colors.brandDark },
+  info: { label: 'Info', icon: 'information-circle', solid: colors.brand, soft: colors.brandSoft, text: colors.brandText },
   promo: { label: 'Promo', icon: 'pricetag', solid: colors.pink.bar, soft: colors.pink.soft, text: colors.pink.text },
   event: { label: 'Événement', icon: 'calendar', solid: colors.amber.bar, soft: colors.amber.soft, text: colors.amber.text },
   coach: { label: 'Coach', icon: 'person', solid: colors.violet.bar, soft: colors.violet.soft, text: colors.violet.text },

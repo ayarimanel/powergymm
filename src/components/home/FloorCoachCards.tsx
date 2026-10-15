@@ -49,26 +49,26 @@ export const OnFloorCoaches: React.FC<OnFloorProps> = ({ coaches, onOpen }) => {
 export const ConsoleCard: React.FC<{ todo: number; onOpen: () => void }> = ({ todo, onOpen }) => (
   <Pressable onPress={onOpen} accessibilityRole="button" accessibilityLabel={`Console du club, ${todo} à traiter`} style={({ pressed }) => [styles.card, styles.consoleCard, pressed && { opacity: 0.9 }]}>
     <View style={styles.row}>
-      <View style={[styles.iconCircle, { backgroundColor: 'rgba(255,255,255,0.12)' }]}>
-        <Ionicons name="stats-chart" size={22} color={colors.white} />
+      <View style={[styles.iconCircle, { backgroundColor: colors.track }]}>
+        <Ionicons name="stats-chart" size={22} color={colors.text} />
       </View>
       <View style={{ flex: 1 }}>
-        <Text style={[styles.title, { color: colors.white }]}>Console du club</Text>
-        <Text style={[styles.sub, { color: colors.disabled }]}>Affluence, relances, abonnements</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Console du club</Text>
+        <Text style={[styles.sub, { color: colors.textSecondary }]}>Affluence, relances, abonnements</Text>
       </View>
       {todo > 0 && (
         <View style={styles.badge}>
           <Text style={styles.badgeText}>{todo} à traiter</Text>
         </View>
       )}
-      <Ionicons name="chevron-forward" size={20} color={colors.disabled} />
+      <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
     </View>
   </Pressable>
 );
 
 const styles = StyleSheet.create({
   card: { ...card, padding: 14 },
-  consoleCard: { backgroundColor: colors.text, borderColor: colors.text },
+  consoleCard: { backgroundColor: colors.card, borderColor: colors.border },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   avatars: { flexDirection: 'row', paddingRight: 8 },
   avatarWrap: { marginRight: -12, borderWidth: 2, borderColor: colors.card, borderRadius: 24 },
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 16, fontWeight: '800', color: colors.text },
   sub: { fontSize: 14, color: colors.textSecondary, marginTop: 2, lineHeight: 19 },
   helpBtn: { height: 48, borderRadius: 24, backgroundColor: colors.text, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 14 },
-  helpText: { fontSize: 15, fontWeight: '800', color: colors.white },
+  helpText: { fontSize: 15, fontWeight: '800', color: colors.onInverse },
   badge: { backgroundColor: colors.red.bar, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
   badgeText: { fontSize: 12, fontWeight: '800', color: colors.white },
 });

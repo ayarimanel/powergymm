@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 3,
   },
-  nowTagText: { color: colors.white, fontSize: 11, fontWeight: '800' },
+  nowTagText: { color: colors.onInverse, fontSize: 11, fontWeight: '800' },
 
   chartRow: { flexDirection: 'row' },
   yAxis: { width: 46 },

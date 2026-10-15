@@ -168,7 +168,7 @@ export const OnboardingScreen: React.FC<Props> = ({ onCompleteOnboarding }) => {
   const toggleMuscle = (id: MuscleGroup) => setMuscles(prev => (prev.includes(id) ? prev.filter(m => m !== id) : [...prev, id]));
 
   const Logo = (
-    <Image source={clubTheme.logo} style={styles.logo} resizeMode="contain" accessibilityLabel={clubName} />
+    <Image source={clubTheme.logoOnDark} style={styles.logo} resizeMode="contain" accessibilityLabel={clubName} />
   );
 
   // The cover: dark, full-bleed, its own layout.

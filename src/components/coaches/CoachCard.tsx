@@ -90,7 +90,7 @@ const s = StyleSheet.create({
   top: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   name: { fontSize: 16, fontWeight: '800', color: J.fg, flexShrink: 1 },
-  me: { fontSize: 10.5, fontWeight: '900', color: J.accent, backgroundColor: J.accentSoft, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1, overflow: 'hidden' },
+  me: { fontSize: 10.5, fontWeight: '900', color: J.accentText, backgroundColor: J.accentSoft, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1, overflow: 'hidden' },
   headline: { fontSize: 13, color: J.muted, marginTop: 1 },
   pills: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 2 },
   tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },

@@ -50,5 +50,5 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 14,
   },
-  text: { color: colors.white, fontSize: 14, fontWeight: '600' },
+  text: { color: colors.onInverse, fontSize: 14, fontWeight: '600' },
 });

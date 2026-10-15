@@ -228,7 +228,7 @@ export const LineChart: React.FC<Props> = ({ points, openingHour, closingHour, i
                     {/* now marker */}
                     <Line x1={nowPt.x} x2={nowPt.x} y1={nowPt.y} y2={yOf(0)} stroke={ink(0.3)} strokeWidth="1" strokeDasharray="3 3" />
                     <Circle cx={nowPt.x} cy={nowPt.y} r="10" fill={colors[clubLevel(nowPct)].bar} fillOpacity="0.22" />
-                    <Circle cx={nowPt.x} cy={nowPt.y} r="5.5" fill={colors[clubLevel(nowPct)].bar} stroke={colors.white} strokeWidth="2.5" />
+                    <Circle cx={nowPt.x} cy={nowPt.y} r="5.5" fill={colors[clubLevel(nowPct)].bar} stroke={colors.card} strokeWidth="2.5" />
                   </>
                 ) : (
                   <>
@@ -242,7 +242,7 @@ export const LineChart: React.FC<Props> = ({ points, openingHour, closingHour, i
                 {sp && (
                   <>
                     <Line x1={sp.x} x2={sp.x} y1={PAD_T} y2={yOf(0)} stroke={colors.text} strokeOpacity="0.35" strokeWidth="1" />
-                    <Circle cx={sp.x} cy={sp.y} r="6" fill={colors[clubLevel(sp.p.percentage)].bar} stroke={colors.white} strokeWidth="2.5" />
+                    <Circle cx={sp.x} cy={sp.y} r="6" fill={colors[clubLevel(sp.p.percentage)].bar} stroke={colors.card} strokeWidth="2.5" />
                   </>
                 )}
               </Svg>
@@ -286,7 +286,7 @@ export const LineChart: React.FC<Props> = ({ points, openingHour, closingHour, i
 const styles = StyleSheet.create({
   tagRow: { flexDirection: 'row', height: 30, marginTop: 4 },
   nowTag: { position: 'absolute', top: 0, alignItems: 'center', backgroundColor: colors.text, borderRadius: 10, paddingVertical: 3 },
-  nowTagText: { color: colors.white, fontSize: 12, fontWeight: '800' },
+  nowTagText: { color: colors.onInverse, fontSize: 12, fontWeight: '800' },
   bubble: {
     position: 'absolute',
     top: 0,
@@ -300,11 +300,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   bubbleDot: { width: 8, height: 8, borderRadius: 4 },
-  bubbleText: { color: colors.white, fontSize: 12, fontWeight: '800' },
+  bubbleText: { color: colors.onInverse, fontSize: 12, fontWeight: '800' },
 
   yLabel: { position: 'absolute', left: 0, fontSize: 12, lineHeight: 16, color: colors.textMuted, fontWeight: '600' },
   xAxis: { height: 26, marginTop: 6 },
   xLabel: { position: 'absolute', top: 3, width: LABEL_W, fontSize: 12, color: colors.textMuted, fontWeight: '600' },
   clock: { position: 'absolute', top: 0, height: 22, borderRadius: 11, backgroundColor: colors.text, alignItems: 'center', justifyContent: 'center' },
-  clockText: { color: colors.white, fontSize: 12, fontWeight: '800' },
+  clockText: { color: colors.onInverse, fontSize: 12, fontWeight: '800' },
 });

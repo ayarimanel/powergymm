@@ -4,12 +4,12 @@ import { Text } from '../ui/Text';
 import { colors } from '../../theme';
 
 const PALETTE = [
-  { bg: colors.brandSoft, fg: colors.brandDark },
-  { bg: colors.green.soft, fg: '#166534' },
-  { bg: '#FCE7F3', fg: '#9D174D' },
-  { bg: '#EDE9FE', fg: '#5B21B6' },
+  { bg: colors.brandSoft, fg: colors.red.text },
+  { bg: colors.green.soft, fg: colors.green.text },
+  { bg: colors.pink.soft, fg: colors.pink.text },
+  { bg: colors.violet.soft, fg: colors.violet.text },
   { bg: colors.flameSoft, fg: colors.flameText },
-  { bg: '#CCFBF1', fg: '#115E59' },
+  { bg: colors.teal.soft, fg: colors.teal.text },
 ];
 
 const hash = (s: string) => [...s].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
@@ -80,5 +80,5 @@ export const CoachBadge: React.FC = () => (
 
 const styles = StyleSheet.create({
   coach: { backgroundColor: colors.text, borderRadius: 8, paddingHorizontal: 7, paddingVertical: 1 },
-  coachText: { color: '#FBBF24', fontSize: 12, fontWeight: '800' },
+  coachText: { color: colors.onInverse, fontSize: 12, fontWeight: '800' },
 });

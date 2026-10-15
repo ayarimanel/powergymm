@@ -155,10 +155,10 @@ export const CreateCommunitySheet: React.FC<Props> = ({ visible, takenIds, found
               <Ionicons
                 name={on ? 'radio-button-on' : 'radio-button-off'}
                 size={20}
-                color={on ? colors.brand : colors.textMuted}
+                color={on ? colors.brandText : colors.textMuted}
               />
               <View style={{ flex: 1 }}>
-                <Text style={[styles.optionLabel, on && { color: colors.brand }]}>{t.label}</Text>
+                <Text style={[styles.optionLabel, on && { color: colors.brandText }]}>{t.label}</Text>
                 <Text style={styles.optionSub}>{t.sub}</Text>
               </View>
             </Pressable>

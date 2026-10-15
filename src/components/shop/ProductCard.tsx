@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   soldOutPill: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: colors.text, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 6 },
-  soldOutText: { color: colors.white, fontSize: 13, fontWeight: '800' },
+  soldOutText: { color: colors.onInverse, fontSize: 13, fontWeight: '800' },
 
   lowStock: {
     position: 'absolute',

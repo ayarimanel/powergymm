@@ -50,7 +50,7 @@ export const ReportsAdminSheet: React.FC<Props> = ({ visible, reports, phoneOf, 
               ] as const
             ).map(([id, label]) => (
               <Pressable key={id} onPress={() => setTab(id)} accessibilityRole="tab" accessibilityState={{ selected: tab === id }} style={[styles.tab, tab === id && styles.tabOn]}>
-                <Text style={[styles.tabText, tab === id && { color: colors.white }]}>{label}</Text>
+                <Text style={[styles.tabText, tab === id && { color: colors.onInverse }]}>{label}</Text>
               </Pressable>
             ))}
           </View>

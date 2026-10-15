@@ -326,7 +326,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
 
 const styles = StyleSheet.create({
   root: { flex: 1, justifyContent: 'flex-end', alignItems: 'center' },
-  backdrop: { backgroundColor: colors.text },
+  backdrop: { backgroundColor: colors.black },
   sheet: {
     backgroundColor: colors.card,
     borderTopLeftRadius: 28,

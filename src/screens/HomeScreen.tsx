@@ -38,7 +38,7 @@ import { ClubBan, MemberAdminService } from '../services/memberAdminService';
 import { ClubGrowthCard } from '../components/home/ClubGrowthCard';
 import { useT } from '../i18n';
 import { useOnline } from '../hooks/useDeviceState';
-import { colors } from '../theme';
+import { colors, light } from '../theme';
 import { HomeHeader } from '../components/home/HomeHeader';
 import { StreakSheet } from '../components/home/StreakSheet';
 import { StreakSuccessSheet } from '../components/home/StreakSuccessSheet';
@@ -495,7 +495,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
 
   return (
     <View style={styles.screen}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.header} />
+      <StatusBar barStyle="light-content" backgroundColor={colors.header} />
 
       <HomeHeader
         gymName={gymConfig?.name ?? ''}
@@ -879,7 +879,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
 const styles = StyleSheet.create({
   announce: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.brand, borderRadius: 18, padding: 16, marginBottom: 14 },
   announceTitle: { color: colors.white, fontSize: 16, fontWeight: '800' },
-  announceSub: { color: colors.brandSoft, fontSize: 12, marginTop: 2 },
+  announceSub: { color: light(0.8), fontSize: 12, marginTop: 2 },
   screen: { flex: 1, backgroundColor: colors.page },
   body: { flex: 1 },
   askWrap: { position: 'absolute', left: 12, right: 12, bottom: 16, zIndex: 50 },

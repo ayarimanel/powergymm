@@ -103,11 +103,11 @@ export const PrStoryViewer: React.FC<Props> = ({ records, profiles, startIndex, 
 
         <View style={styles.header}>
           <View style={styles.pill}>
-            <Ionicons name="trophy" size={14} color={colors.gold.ink} />
+            <Ionicons name="trophy" size={14} color={colors.gold.bright} />
             <Text style={styles.pillText}>Record</Text>
           </View>
           <Pressable onPress={onClose} hitSlop={12} accessibilityRole="button" accessibilityLabel="Fermer">
-            <Ionicons name="close" size={28} color={colors.gold.ink} />
+            <Ionicons name="close" size={28} color={colors.gold.bright} />
           </Pressable>
         </View>
 
@@ -137,7 +137,7 @@ export const PrStoryViewer: React.FC<Props> = ({ records, profiles, startIndex, 
           {!!pr.caption && <Text style={styles.caption}>{pr.caption}</Text>}
 
           <View style={styles.statusRow}>
-            <Ionicons name={approved ? 'shield-checkmark' : 'hourglass-outline'} size={18} color={colors.gold.ink} />
+            <Ionicons name={approved ? 'shield-checkmark' : 'hourglass-outline'} size={18} color={colors.gold.bright} />
             <Text style={styles.statusText}>
               {approved ? `Validé par ${pr.prApproval?.approvedByName ?? 'un coach'}` : 'En attente de validation'}
             </Text>
@@ -145,7 +145,7 @@ export const PrStoryViewer: React.FC<Props> = ({ records, profiles, startIndex, 
 
           <Pressable onPress={() => onOpenPost(pr.id)} accessibilityRole="button" style={styles.openBtn}>
             <Text style={styles.openBtnText}>Voir la publication</Text>
-            <Ionicons name="arrow-forward" size={16} color={colors.gold.ink} />
+            <Ionicons name="arrow-forward" size={16} color={colors.gold.bright} />
           </Pressable>
         </View>
 
@@ -160,31 +160,31 @@ export const PrStoryViewer: React.FC<Props> = ({ records, profiles, startIndex, 
   );
 };
 
-const GOLD_BG = '#F5D77A';
+const GOLD_BG = colors.gold.bg;
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: GOLD_BG, paddingHorizontal: 16 },
   bars: { flexDirection: 'row', gap: 4 },
-  barTrack: { flex: 1, height: 3, borderRadius: 2, backgroundColor: 'rgba(58,42,0,0.25)', overflow: 'hidden' },
-  barFill: { height: '100%', backgroundColor: colors.gold.ink },
+  barTrack: { flex: 1, height: 3, borderRadius: 2, backgroundColor: colors.gold.soft, overflow: 'hidden' },
+  barFill: { height: '100%', backgroundColor: colors.gold.bar },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 14, zIndex: 2 },
-  pill: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.5)' },
-  pillText: { color: colors.gold.ink, fontSize: 13, fontWeight: '800' },
+  pill: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12, backgroundColor: colors.gold.soft },
+  pillText: { color: colors.text, fontSize: 13, fontWeight: '800' },
   body: { flex: 1, justifyContent: 'center', gap: 14 },
   authorRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  author: { fontSize: 17, fontWeight: '800', color: colors.gold.ink },
+  author: { fontSize: 17, fontWeight: '800', color: colors.text },
   time: { fontSize: 13, color: colors.gold.text, marginTop: 1 },
-  exercise: { fontSize: 22, fontWeight: '800', color: colors.gold.ink, marginTop: 4 },
+  exercise: { fontSize: 22, fontWeight: '800', color: colors.text, marginTop: 4 },
   bigRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
-  big: { fontSize: 88, lineHeight: 90, fontWeight: '900', color: colors.gold.ink },
+  big: { fontSize: 88, lineHeight: 90, fontWeight: '900', color: colors.gold.bright },
   bigUnit: { fontSize: 28, fontWeight: '900', color: colors.gold.text, marginBottom: 14 },
   reps: { fontSize: 28, fontWeight: '800', color: colors.gold.text, marginBottom: 14, marginLeft: 4 },
   deltaChip: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', backgroundColor: colors.green.soft, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 14 },
   deltaText: { fontSize: 14, fontWeight: '800', color: colors.green.text },
-  caption: { fontSize: 16, color: colors.gold.ink, lineHeight: 23 },
+  caption: { fontSize: 16, color: colors.text, lineHeight: 23 },
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  statusText: { fontSize: 14, fontWeight: '700', color: colors.gold.ink },
-  openBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, alignSelf: 'flex-start', backgroundColor: 'rgba(255,255,255,0.6)', paddingHorizontal: 16, height: 44, borderRadius: 22, marginTop: 4 },
-  openBtnText: { fontSize: 14, fontWeight: '800', color: colors.gold.ink },
+  statusText: { fontSize: 14, fontWeight: '700', color: colors.text },
+  openBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, alignSelf: 'flex-start', backgroundColor: colors.gold.soft, paddingHorizontal: 16, height: 44, borderRadius: 22, marginTop: 4 },
+  openBtnText: { fontSize: 14, fontWeight: '800', color: colors.text },
   tapRow: { flex: 1, flexDirection: 'row', marginTop: 120, marginBottom: 220 },
 });

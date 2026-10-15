@@ -25,7 +25,7 @@ export const LanguageScreen: React.FC<Props> = ({ onPick, current, onClose }) =>
   <SafeAreaView style={styles.screen}>
     <View style={styles.body}>
       <View style={styles.badge}>
-        <Ionicons name="language-outline" size={30} color={colors.brand} />
+        <Ionicons name="language-outline" size={30} color={colors.brandText} />
       </View>
 
       {/* Both languages, so nobody has to read the other one to choose. */}
@@ -47,8 +47,8 @@ export const LanguageScreen: React.FC<Props> = ({ onPick, current, onClose }) =>
               accessibilityLabel={l.native}
               style={({ pressed }) => [styles.option, on && styles.optionOn, pressed && { opacity: 0.9 }]}
             >
-              <Text style={[styles.optionText, on && { color: colors.brand }]}>{l.native}</Text>
-              {on ? <Ionicons name="checkmark-circle" size={22} color={colors.brand} /> : null}
+              <Text style={[styles.optionText, on && { color: colors.brandText }]}>{l.native}</Text>
+              {on ? <Ionicons name="checkmark-circle" size={22} color={colors.brandText} /> : null}
             </Pressable>
           );
         })}

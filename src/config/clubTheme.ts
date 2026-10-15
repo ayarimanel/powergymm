@@ -9,7 +9,7 @@ const clubTheme = {
   // ─── Identity ───
   clubName: 'Power Gym Tunis',
   clubSlogan: 'Plus qu’une salle,\nUne communauté',
-  /** Full logo, black lettering: for light backgrounds (header, sheets). */
+  /** Full logo, black lettering: for light backgrounds only (the app is now dark: use logoOnDark). */
   get logo() { return require('../../assets/brand/logo-powergym.png'); },
   /** Same logo with white lettering: for dark backgrounds (login). */
   get logoOnDark() { return require('../../assets/brand/logo-powergym-white.png'); },
@@ -25,61 +25,62 @@ const clubTheme = {
     // Primary = the gym's signature color (Power Gym = red)
     primary: '#E31E24',
     primaryDark: '#C41A20', // pressed states
-    primaryLight: '#FDE8E8', // tints for backgrounds, badges, active tab pill
+    primaryLight: '#3A1214', // tints for backgrounds, badges, active tab pill
+    primaryText: '#FF5A5F', // red text/icons on primaryLight (>=4.5:1)
     primaryRgb: '227, 30, 36',
 
     // Surfaces
-    /** Top bars of every screen: a light grey, lighter than the page. */
-    header: '#EFEFF2',
-    /** Behind the cards: a deeper grey than the header, so white cards stand out. */
-    page: '#E3E3E8',
-    background: '#FFFFFF',
-    surface: '#F5F5F5', // page background behind cards, input backgrounds
-    surfaceHover: '#EEEEEE',
-    surfaceActive: '#E5E5E5',
-    border: '#E0E0E0',
-    divider: '#F0F0F0',
+    /** Top bars of every screen: same near-black as the page. */
+    header: '#0B0B0C',
+    /** Behind the cards. */
+    page: '#0B0B0C',
+    background: '#141416', // cards
+    surface: '#1C1C1F', // input backgrounds, secondary surfaces
+    surfaceHover: '#26262A', // tracks
+    surfaceActive: '#2E2E33',
+    border: '#2A2A2E',
+    divider: '#232327',
 
     // Text
-    textPrimary: '#1A1A1A',
-    textSecondary: '#666666',
-    textTertiary: '#8A8A8A', // #999 fails contrast on white; this is the readable twin
+    textPrimary: '#F5F5F5',
+    textSecondary: '#A1A1A6',
+    textTertiary: '#6B6B70',
     textOnPrimary: '#FFFFFF',
     textInverse: '#FFFFFF',
 
     // Status
     success: '#22C55E',
-    successText: '#15803D',
-    successLight: '#DCFCE7',
-    warning: '#F59E0B',
-    warningText: '#B45309',
-    warningLight: '#FEF3C7',
+    successText: '#4ADE80', // >=4.5:1 on the card color
+    successLight: '#12291B', // dark tinted backgrounds
+    warning: '#F5A524',
+    warningText: '#F5A524',
+    warningLight: '#2E2210',
     danger: '#EF4444',
-    dangerText: '#B91C1C',
-    dangerLight: '#FEE2E2',
+    dangerText: '#F87171',
+    dangerLight: '#351416',
 
     // Specific
     notification: '#E31E24',
     tabActive: '#E31E24',
-    tabInactive: '#8A8A8A',
-    barChartDefault: '#E0E0E0',
+    tabInactive: '#6B6B70',
+    barChartDefault: '#26262A',
     barChartNow: '#E31E24',
 
     // Login screen (always dark, whatever the device theme)
     loginBackground: '#0B0B0C',
 
-    // Dark palette, ready for when the app gets a dark mode
+    // Dark palette (the app is now dark; kept for compatibility)
     dark: {
-      background: '#121212',
-      surface: '#1E1E1E',
-      surfaceHover: '#2A2A2A',
-      surfaceActive: '#333333',
-      border: '#333333',
-      divider: '#262626',
+      background: '#141416',
+      surface: '#1C1C1F',
+      surfaceHover: '#26262A',
+      surfaceActive: '#2E2E33',
+      border: '#2A2A2E',
+      divider: '#232327',
       textPrimary: '#F5F5F5',
-      textSecondary: '#AAAAAA',
-      textTertiary: '#777777',
-      primaryLight: '#3D1516',
+      textSecondary: '#A1A1A6',
+      textTertiary: '#6B6B70',
+      primaryLight: '#3A1214',
     },
   },
 

@@ -23,11 +23,11 @@ export const ReviewPrompt: React.FC<Props> = ({ visible, gymName, logoUrl, onRev
       <View style={styles.overlay}>
         <View style={styles.card} accessibilityViewIsModal>
           <View style={styles.logo}>
-            {logoUrl ? <Image source={{ uri: logoUrl }} style={StyleSheet.absoluteFill} /> : <Ionicons name="barbell" size={26} color={colors.brand} />}
+            {logoUrl ? <Image source={{ uri: logoUrl }} style={StyleSheet.absoluteFill} /> : <Ionicons name="barbell" size={26} color={colors.brandText} />}
           </View>
           <View style={styles.stars} accessibilityLabel="5 étoiles">
             {[0, 1, 2, 3, 4].map(i => (
-              <Ionicons key={i} name="star" size={26} color="#F5B301" />
+              <Ionicons key={i} name="star" size={26} color={colors.gold.bar} />
             ))}
           </View>
           <Text style={styles.title} accessibilityRole="header">Une semaine chez {gymName || 'nous'} 💪</Text>

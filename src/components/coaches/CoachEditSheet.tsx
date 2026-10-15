@@ -229,7 +229,7 @@ export const CoachEditSheet: React.FC<Props> = ({ visible, mode, coach, me, isOw
               <View style={{ flexDirection: 'row', gap: 8 }}>
                 <TextInput style={[styles.input, { flex: 1 }]} value={specInput} onChangeText={setSpecInput} placeholder="Ex : Prise de masse" placeholderTextColor={colors.textMuted} onSubmitEditing={addSpec} returnKeyType="done" />
                 <Pressable onPress={addSpec} accessibilityRole="button" accessibilityLabel="Ajouter" style={styles.addBtn}>
-                  <Ionicons name="add" size={22} color={colors.white} />
+                  <Ionicons name="add" size={22} color={colors.onInverse} />
                 </Pressable>
               </View>
               {specialties.length > 0 && (
@@ -257,7 +257,7 @@ export const CoachEditSheet: React.FC<Props> = ({ visible, mode, coach, me, isOw
             {!!errors.kind && <Text style={styles.error}>{errors.kind}</Text>}
             {personal && (
               <View style={styles.offersNote}>
-                <Ionicons name="pricetags-outline" size={18} color={colors.brand} />
+                <Ionicons name="pricetags-outline" size={18} color={colors.brandText} />
                 <Text style={styles.offersNoteText}>
                   {coach?.pricingPlans?.length
                     ? 'Ton plan et ton prix se modifient dans « Mes plans ».'
@@ -273,7 +273,7 @@ export const CoachEditSheet: React.FC<Props> = ({ visible, mode, coach, me, isOw
                 const on = days.includes(d);
                 return (
                   <Pressable key={d} onPress={() => setDays(prev => (on ? prev.filter(x => x !== d) : [...prev, d]))} accessibilityRole="button" accessibilityState={{ selected: on }} style={[styles.day, on && styles.dayOn]}>
-                    <Text style={[styles.dayText, on && { color: colors.white }]}>{d}</Text>
+                    <Text style={[styles.dayText, on && { color: colors.onInverse }]}>{d}</Text>
                   </Pressable>
                 );
               })}

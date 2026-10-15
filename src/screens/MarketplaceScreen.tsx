@@ -160,7 +160,7 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.logo}>
-          <Ionicons name="bag-handle" size={16} color={colors.brand} />
+          <Ionicons name="bag-handle" size={16} color={colors.brandText} />
         </View>
         <View style={{ flex: 1, minWidth: 0 }}>
           <Text style={styles.title} numberOfLines={1}>Boutique</Text>

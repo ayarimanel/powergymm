@@ -127,7 +127,7 @@ export const CrowdFlipCard: React.FC<Props> = ({ renderGym, renderMuscles }) => 
         accessibilityRole="button"
         style={({ pressed }) => [styles.flipBtn, pressed && { opacity: 0.8 }]}
       >
-        <Ionicons name="sync-outline" size={16} color={colors.brand} />
+        <Ionicons name="sync-outline" size={16} color={colors.brandText} />
         <Text style={styles.flipText}>{side === 'gym' ? 'Voir quels muscles sont pris' : 'Revenir à toute la salle'}</Text>
         {side === 'gym' && !seenBack && (
           <View style={styles.newTag}>
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   legendText: { fontSize: 11, color: colors.textMuted },
   legendWord: { fontWeight: '800', color: colors.textSecondary },
   flipBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 42, borderRadius: radius.pill, backgroundColor: colors.brandSoft },
-  flipText: { fontSize: 13, fontWeight: '800', color: colors.brand },
+  flipText: { fontSize: 13, fontWeight: '800', color: colors.brandText },
   newTag: { backgroundColor: colors.brand, borderRadius: radius.pill, paddingHorizontal: 7, paddingVertical: 2 },
   newTagText: { fontSize: 10, fontWeight: '800', color: colors.onBrand },
 });

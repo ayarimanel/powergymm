@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
   },
   chipOn: { backgroundColor: colors.text, borderColor: colors.text },
   chipText: { fontSize: 14, fontWeight: '600', color: colors.textSecondary },
-  chipTextOn: { color: colors.white },
+  chipTextOn: { color: colors.onInverse },
 
   switchRow: {
     flexDirection: 'row',

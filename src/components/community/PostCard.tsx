@@ -175,7 +175,7 @@ const RecordCard: React.FC<PostCardProps> = ({ post, profiles, me, liked, canApp
       <View style={styles.goldTop}>
         {/* medal */}
         <View style={[styles.medal, !approved && styles.medalPending]}>
-          <Ionicons name="trophy" size={22} color={approved ? colors.gold.text : colors.gold.deep} />
+          <Ionicons name="trophy" size={22} color={approved ? colors.gold.ink : colors.gold.deep} />
           {approved && (
             <View style={styles.medalCheck}>
               <Ionicons name="checkmark" size={11} color={colors.white} />
@@ -242,8 +242,8 @@ const RecordCard: React.FC<PostCardProps> = ({ post, profiles, me, liked, canApp
           accessibilityLabel="Féliciter"
           style={({ pressed }) => [styles.congrats, liked && styles.congratsOn, pressed && { opacity: 0.8 }]}
         >
-          <Ionicons name={liked ? 'heart' : 'heart-outline'} size={18} color={colors.gold.text} />
-          <Text style={styles.congratsText}>
+          <Ionicons name={liked ? 'heart' : 'heart-outline'} size={18} color={liked ? colors.gold.ink : colors.gold.text} />
+          <Text style={[styles.congratsText, liked && { color: colors.gold.ink }]}>
             {liked ? 'Félicité' : 'Féliciter'} · {post.likesCount}
           </Text>
         </Pressable>
@@ -262,13 +262,13 @@ const RecordCard: React.FC<PostCardProps> = ({ post, profiles, me, liked, canApp
                 <Text style={styles.smallGhostText}>Annuler</Text>
               </Pressable>
               <Pressable onPress={() => onApprove(post)} accessibilityRole="button" style={styles.validateBtn}>
-                <Ionicons name="checkmark" size={16} color={colors.gold.text} />
+                <Ionicons name="checkmark" size={16} color={colors.gold.ink} />
                 <Text style={styles.validateText}>Confirmer</Text>
               </Pressable>
             </View>
           ) : (
             <Pressable onPress={() => setConfirming(true)} accessibilityRole="button" style={styles.validateBtn}>
-              <Ionicons name="shield-checkmark-outline" size={16} color={colors.gold.text} />
+              <Ionicons name="shield-checkmark-outline" size={16} color={colors.gold.ink} />
               <Text style={styles.validateText}>Valider</Text>
             </Pressable>
           ))}
@@ -562,10 +562,10 @@ const styles = StyleSheet.create({
 
   goldChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
   sealChip: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 30, paddingHorizontal: 10, borderRadius: 15, backgroundColor: colors.gold.bar },
-  sealText: { fontSize: 13, fontWeight: '800', color: colors.gold.text },
+  sealText: { fontSize: 13, fontWeight: '800', color: colors.gold.ink },
   pendingChip: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 30, paddingHorizontal: 10, borderRadius: 15, backgroundColor: colors.gold.soft },
   pendingText: { fontSize: 13, fontWeight: '700', color: colors.gold.text },
-  deltaChip: { flexDirection: 'row', alignItems: 'center', gap: 4, height: 30, paddingHorizontal: 10, borderRadius: 15, backgroundColor: colors.white },
+  deltaChip: { flexDirection: 'row', alignItems: 'center', gap: 4, height: 30, paddingHorizontal: 10, borderRadius: 15, backgroundColor: colors.card },
   deltaText: { fontSize: 13, fontWeight: '800', color: colors.green.text },
 
   goldCaption: { fontSize: 14, lineHeight: 20, color: colors.gold.text, marginTop: 10 },
@@ -595,5 +595,5 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: colors.gold.bar,
   },
-  validateText: { fontSize: 14, fontWeight: '800', color: colors.gold.text },
+  validateText: { fontSize: 14, fontWeight: '800', color: colors.gold.ink },
 });

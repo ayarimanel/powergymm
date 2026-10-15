@@ -54,7 +54,7 @@ export const HomeHeader: React.FC<Props> = ({
     <View style={styles.center}>
       {/* The club's full logo is its name: no text next to it. */}
       <Image
-        source={clubTheme.logo}
+        source={clubTheme.logoOnDark}
         style={styles.logo}
         resizeMode="contain"
         accessible

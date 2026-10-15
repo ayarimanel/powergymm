@@ -46,7 +46,7 @@ export const ScanFab: React.FC<Props> = ({ checkedInToday, onPress, collapsed, o
       collapsed={collapsed}
       onPress={onPress}
       accessibilityLabel="Présence validée aujourd’hui"
-      trailing={<Ionicons name="flame" size={18} color="#FED7AA" />}
+      trailing={<Ionicons name="flame" size={18} color={colors.flamePale} />}
     />
   ) : (
     <CollapsibleFab inline icon="qr-code" label="Scan" collapsed={collapsed} onPress={onPress} accessibilityLabel="Scanner le QR code" />

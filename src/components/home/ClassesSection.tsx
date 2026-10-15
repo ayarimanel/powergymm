@@ -73,7 +73,7 @@ export const ClassesSection: React.FC<SectionProps> = ({ classes, userId, isOwne
                   accessibilityLabel={booked ? `Annuler ma réservation ${c.title}` : `Réserver ${c.title}`}
                   style={[styles.btn, booked && styles.btnOn, full && styles.btnOff]}
                 >
-                  <Ionicons name={booked ? 'checkmark' : 'add'} size={18} color={booked ? colors.green.text : full ? colors.textMuted : colors.brand} />
+                  <Ionicons name={booked ? 'checkmark' : 'add'} size={18} color={booked ? colors.green.text : full ? colors.textMuted : colors.brandText} />
                   <Text style={[styles.btnText, booked && { color: colors.green.text }, full && { color: colors.textMuted }]}>{booked ? 'Réservé' : 'Réserver'}</Text>
                 </Pressable>
               )}
@@ -187,7 +187,7 @@ export const ClassesManageSheet: React.FC<ManageProps> = ({ visible, classes, on
           <View style={styles.days}>
             {DAYS.map(d => (
               <Pressable key={d} onPress={() => setDay(d)} accessibilityRole="button" accessibilityState={{ selected: day === d }} style={[styles.day, day === d && styles.dayOn]}>
-                <Text style={[styles.dayText, day === d && { color: colors.white }]}>{d}</Text>
+                <Text style={[styles.dayText, day === d && { color: colors.onInverse }]}>{d}</Text>
               </Pressable>
             ))}
           </View>
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   btn: { flexDirection: 'row', alignItems: 'center', gap: 4, height: 40, paddingHorizontal: 14, borderRadius: 20, backgroundColor: colors.brandSoft },
   btnOn: { backgroundColor: colors.green.soft },
   btnOff: { backgroundColor: colors.track },
-  btnText: { fontSize: 14, fontWeight: '800', color: colors.brandDark },
+  btnText: { fontSize: 14, fontWeight: '800', color: colors.brandText },
   more: { height: 40, alignItems: 'center', justifyContent: 'center' },
   moreText: { fontSize: 14, fontWeight: '700', color: colors.textSecondary },
 

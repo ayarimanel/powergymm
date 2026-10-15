@@ -167,8 +167,8 @@ export const ComposerSheet: React.FC<Props> = ({ visible, initialCategory = 'wor
                     accessibilityState={{ selected: on }}
                     style={[styles.type, on && (t.id === 'pr' ? styles.typeOnGold : styles.typeOn)]}
                   >
-                    <Ionicons name={t.icon as any} size={18} color={on ? (t.id === 'pr' ? colors.gold.text : colors.white) : colors.textSecondary} />
-                    <Text style={[styles.typeText, on && { color: t.id === 'pr' ? colors.gold.text : colors.white }]}>{t.label}</Text>
+                    <Ionicons name={t.icon as any} size={18} color={on ? (t.id === 'pr' ? colors.gold.ink : colors.onInverse) : colors.textSecondary} />
+                    <Text style={[styles.typeText, on && { color: t.id === 'pr' ? colors.gold.ink : colors.onInverse }]}>{t.label}</Text>
                   </Pressable>
                 );
               })}
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
   note: { flexDirection: 'row', gap: 8, alignItems: 'flex-start', marginTop: 12 },
   noteText: { flex: 1, fontSize: 13, color: colors.gold.text, lineHeight: 18, fontWeight: '600' },
   starter: { height: 36, paddingHorizontal: 12, borderRadius: 18, backgroundColor: colors.brandSoft, justifyContent: 'center' },
-  starterText: { fontSize: 13, fontWeight: '700', color: colors.brandDark },
+  starterText: { fontSize: 13, fontWeight: '700', color: colors.brandText },
 
   thumbWrap: { width: 96, height: 96 },
   thumb: { width: 96, height: 96, borderRadius: 14 },

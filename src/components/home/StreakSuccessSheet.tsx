@@ -24,7 +24,7 @@ const T_POP_AT = 1150;
 const AUTO_DISMISS = 2500;
 const AUTO_DISMISS_MILESTONE = 3500;
 
-const PARTICLE_COLORS = ['#FB923C', colors.amber.bar, '#FDBA74', colors.red.bar];
+const PARTICLE_COLORS = [colors.flameText, colors.amber.bar, colors.flameLight, colors.red.bar];
 const NUM_H = 46;
 
 export const StreakSuccessSheet: React.FC<Props> = ({ visible, oldStreak, newStreak, isNewRun, onClose }) => {
@@ -269,7 +269,7 @@ export const StreakSuccessSheet: React.FC<Props> = ({ visible, oldStreak, newStr
 
 const styles = StyleSheet.create({
   root: { flex: 1, justifyContent: 'flex-end', alignItems: 'center' },
-  backdrop: { backgroundColor: colors.text },
+  backdrop: { backgroundColor: colors.black },
   sheet: {
     width: '100%',
     maxWidth: 560,
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
   handle: { width: 40, height: 5, borderRadius: 3, backgroundColor: colors.disabled, marginBottom: 8 },
 
   flameStage: { width: 200, height: 150, alignItems: 'center', justifyContent: 'center' },
-  glow: { position: 'absolute', width: 150, height: 150, borderRadius: 75, backgroundColor: '#FED7AA' },
+  glow: { position: 'absolute', width: 150, height: 150, borderRadius: 75, backgroundColor: colors.flameSoft },
 
   counterRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 26, lineHeight: NUM_H, fontWeight: '800', color: colors.text, textAlign: 'center' },

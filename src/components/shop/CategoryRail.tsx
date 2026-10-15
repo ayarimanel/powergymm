@@ -59,7 +59,7 @@ const AllBubble: React.FC<{ on: boolean; count: number; onPress: () => void; del
   return (
     <Pressable onPress={() => { haptics.select(); onPress(); }} accessibilityRole="button" accessibilityState={{ selected: on }} style={styles.item}>
       <Animated.View style={[styles.circle, styles.allCircle, on && styles.allCircleOn, { transform: [{ scale }] }]}>
-        <Ionicons name="apps" size={24} color={on ? colors.white : colors.text} />
+        <Ionicons name="apps" size={24} color={on ? colors.onInverse : colors.text} />
       </Animated.View>
       <Text style={[styles.label, on && { color: colors.text, fontWeight: '800' }]}>Tout</Text>
     </Pressable>
@@ -113,6 +113,6 @@ const styles = StyleSheet.create({
   allCircle: { width: SIZE, height: SIZE, borderRadius: SIZE / 2, backgroundColor: colors.card, borderWidth: 2, borderColor: colors.border, borderStyle: 'dashed' },
   allCircleOn: { backgroundColor: colors.text, borderColor: colors.text, borderStyle: 'solid' },
   count: { position: 'absolute', top: -3, right: -3, minWidth: 20, height: 20, paddingHorizontal: 5, borderRadius: 10, backgroundColor: colors.text, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: colors.header },
-  countText: { color: colors.white, fontSize: 10, fontWeight: '800' },
+  countText: { color: colors.onInverse, fontSize: 10, fontWeight: '800' },
   label: { fontSize: 11, color: colors.textMuted, fontWeight: '700', textAlign: 'center', maxWidth: 72 },
 });

@@ -130,7 +130,7 @@ export const ProfileSheet: React.FC<ProfileProps> = ({ userId, isMe, profiles, p
                 <SheetScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
                   {validated.map(p => (
                     <View key={p.id} style={styles.medalChip}>
-                      <Ionicons name="shield-checkmark" size={16} color={colors.gold.text} />
+                      <Ionicons name="shield-checkmark" size={16} color={colors.gold.ink} />
                       <Text style={styles.medalText}>
                         {p.prDetails!.exercise} · {p.prDetails!.weightKg} kg
                       </Text>
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     borderRadius: 17,
     backgroundColor: colors.gold.bar,
   },
-  medalText: { fontSize: 13, fontWeight: '800', color: colors.gold.text },
+  medalText: { fontSize: 13, fontWeight: '800', color: colors.gold.ink },
 
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
   tile: { width: '32.6%', aspectRatio: 1, borderRadius: 8, overflow: 'hidden', backgroundColor: colors.track },

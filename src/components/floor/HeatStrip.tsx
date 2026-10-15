@@ -183,7 +183,7 @@ export const HeatStrip: React.FC<Props> = ({ hourly, nowHour, bestHour, isOpen, 
           accessibilityLabel={`Me prévenir à ${remindHourLabel}`}
           style={({ pressed }) => [styles.remindPill, pressed && { opacity: 0.85 }]}
         >
-          <Ionicons name="notifications" size={14} color={colors.white} />
+          <Ionicons name="notifications" size={14} color={colors.onInverse} />
           <Text style={styles.remindText}>Me prévenir · {remindHourLabel}</Text>
         </Pressable>
       )}
@@ -222,5 +222,5 @@ const styles = StyleSheet.create({
     borderRadius: 17,
     backgroundColor: colors.text,
   },
-  remindText: { color: colors.white, fontSize: 13, fontWeight: '800' },
+  remindText: { color: colors.onInverse, fontSize: 13, fontWeight: '800' },
 });

@@ -172,7 +172,7 @@ export const FloorAdminScreen: React.FC<Props> = ({ visible, onClose, gymId, cap
             <Section title="Heures creuses">
               {quiet ? (
                 <View style={styles.highlight}>
-                  <Ionicons name="bulb-outline" size={20} color={colors.brand} />
+                  <Ionicons name="bulb-outline" size={20} color={colors.brandText} />
                   <Text style={styles.highlightText}>{quiet.text}</Text>
                 </View>
               ) : (
@@ -305,8 +305,8 @@ export const FloorAdminScreen: React.FC<Props> = ({ visible, onClose, gymId, cap
             const on = tab === t.id;
             return (
               <Pressable key={t.id} onPress={() => setTab(t.id)} accessibilityRole="tab" accessibilityState={{ selected: on }} style={[styles.tab, on && styles.tabOn]}>
-                <Ionicons name={t.icon as any} size={16} color={on ? colors.white : colors.textSecondary} />
-                <Text style={[styles.tabText, on && { color: colors.white }]}>{t.label}</Text>
+                <Ionicons name={t.icon as any} size={16} color={on ? colors.onInverse : colors.textSecondary} />
+                <Text style={[styles.tabText, on && { color: colors.onInverse }]}>{t.label}</Text>
               </Pressable>
             );
           })}

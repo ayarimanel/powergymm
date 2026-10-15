@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, Easing, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import React from 'react';
+import { Pressable, ScrollView, StyleSheet } from 'react-native';
 import { Text } from '../ui/Text';
-import { Icon } from '../ui/Icon';
-import { CATEGORY_META, PROMO_TINT, ProductCategory } from '../../shop/categoryMeta';
+import { Icon, IconName } from '../ui/Icon';
+import { CATEGORY_META, ProductCategory } from '../../shop/categoryMeta';
 import { colors } from '../../theme';
 import { haptics } from '../../utils/haptics';
 import { claimSwipe } from '../../navigation/swipeGuard';
@@ -15,104 +15,40 @@ interface Props {
   onSelect: (f: Filter) => void;
 }
 
-const nativeDriver = Platform.OS !== 'web';
-const SIZE = 62;
-
-const Bubble: React.FC<{
-  label: string;
-  icon: string;
-  count: number;
-  on: boolean;
-  bar: string;
-  soft: string;
-  text: string;
-  delay: number;
-  onPress: () => void;
-}> = ({ label, icon, count, on, bar, soft, text, delay, onPress }) => {
-  const pop = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    Animated.timing(pop, { toValue: 1, duration: 380, delay, easing: Easing.out(Easing.back(1.4)), useNativeDriver: nativeDriver }).start();
-  }, [pop, delay]);
-  const scale = pop.interpolate({ inputRange: [0, 1], outputRange: [0.6, 1] });
-
-  return (
-    <Pressable onPress={() => { haptics.select(); onPress(); }} accessibilityRole="button" accessibilityLabel={`${label}, ${count} produit${count > 1 ? 's' : ''}`} style={styles.item}>
-      <Animated.View style={[styles.circle, { width: SIZE, height: SIZE, borderRadius: SIZE / 2, backgroundColor: soft, borderColor: on ? bar : 'transparent', transform: [{ scale }] }]}>
-        <Icon name={icon as any} size={26} color={bar} />
-        {count > 0 && (
-          <View style={styles.count}>
-            <Text style={styles.countText}>{count}</Text>
-          </View>
-        )}
-      </Animated.View>
-      <Text style={[styles.label, on && { color: text, fontWeight: '800' }]} numberOfLines={1}>{label}</Text>
-    </Pressable>
-  );
-};
-
-const AllBubble: React.FC<{ on: boolean; count: number; onPress: () => void; delay: number }> = ({ on, count, onPress, delay }) => {
-  const pop = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    Animated.timing(pop, { toValue: 1, duration: 380, delay, easing: Easing.out(Easing.back(1.4)), useNativeDriver: nativeDriver }).start();
-  }, [pop, delay]);
-  const scale = pop.interpolate({ inputRange: [0, 1], outputRange: [0.6, 1] });
-  return (
-    <Pressable onPress={() => { haptics.select(); onPress(); }} accessibilityRole="button" accessibilityState={{ selected: on }} style={styles.item}>
-      <Animated.View style={[styles.circle, styles.allCircle, on && styles.allCircleOn, { transform: [{ scale }] }]}>
-        <Icon name="apps" size={24} color={on ? colors.onInverse : colors.text} />
-      </Animated.View>
-      <Text style={[styles.label, on && { color: colors.text, fontWeight: '800' }]}>Tout</Text>
-    </Pressable>
-  );
-};
+/** Category chips (design-ref Boutique): "Tout", "Promos", then each category; the selected one is red. */
+const Chip: React.FC<{ label: string; icon?: IconName; count: number; on: boolean; onPress: () => void }> = ({ label, icon, count, on, onPress }) => (
+  <Pressable
+    onPress={() => {
+      haptics.select();
+      onPress();
+    }}
+    accessibilityRole="button"
+    accessibilityState={{ selected: on }}
+    accessibilityLabel={`${label}, ${count} produit${count > 1 ? 's' : ''}`}
+    style={({ pressed }) => [styles.chip, on && styles.chipOn, pressed && { opacity: 0.85 }]}
+  >
+    {icon ? <Icon name={icon} size={16} color={on ? colors.white : colors.textSecondary} /> : null}
+    <Text style={[styles.label, on && styles.labelOn]} numberOfLines={1}>{label}</Text>
+  </Pressable>
+);
 
 export const CategoryRail: React.FC<Props> = ({ active, counts, onSelect }) => {
-  const cats: [ProductCategory, ReturnType<typeof getMeta>][] = (Object.keys(CATEGORY_META) as ProductCategory[]).map(c => [c, getMeta(c)]);
-  const promoCount = counts.promo;
-
+  const cats = Object.keys(CATEGORY_META) as ProductCategory[];
   return (
     <ScrollView horizontal onTouchStart={claimSwipe} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
-      <AllBubble on={active === 'all'} count={counts.all} onPress={() => onSelect('all')} delay={0} />
-      {promoCount > 0 && (
-        <Bubble
-          label="Promos"
-          icon="pricetag"
-          count={promoCount}
-          on={active === 'promo'}
-          bar={PROMO_TINT.bar}
-          soft={PROMO_TINT.soft}
-          text={PROMO_TINT.text}
-          delay={70}
-          onPress={() => onSelect('promo')}
-        />
-      )}
-      {cats.map(([c, meta], i) => (
-        <Bubble
-          key={c}
-          label={meta.short}
-          icon={meta.icon}
-          count={counts[c] ?? 0}
-          on={active === c}
-          bar={meta.tint.bar}
-          soft={meta.tint.soft}
-          text={meta.tint.text}
-          delay={(promoCount > 0 ? 140 : 70) + i * 60}
-          onPress={() => onSelect(c)}
-        />
+      <Chip label="Tout" count={counts.all} on={active === 'all'} onPress={() => onSelect('all')} />
+      {counts.promo > 0 && <Chip label="Promos" icon="pricetag-outline" count={counts.promo} on={active === 'promo'} onPress={() => onSelect('promo')} />}
+      {cats.map(c => (
+        <Chip key={c} label={CATEGORY_META[c].short} icon={CATEGORY_META[c].icon as IconName} count={counts[c] ?? 0} on={active === c} onPress={() => onSelect(c)} />
       ))}
     </ScrollView>
   );
 };
 
-const getMeta = (c: ProductCategory) => CATEGORY_META[c];
-
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', gap: 14, paddingHorizontal: 16, paddingVertical: 12, alignItems: 'flex-start' },
-  item: { alignItems: 'center', gap: 6, width: 66 },
-  circle: { alignItems: 'center', justifyContent: 'center', borderWidth: 2 },
-  allCircle: { width: SIZE, height: SIZE, borderRadius: SIZE / 2, backgroundColor: colors.card, borderWidth: 2, borderColor: colors.border, borderStyle: 'dashed' },
-  allCircleOn: { backgroundColor: colors.text, borderColor: colors.text, borderStyle: 'solid' },
-  count: { position: 'absolute', top: -3, right: -3, minWidth: 20, height: 20, paddingHorizontal: 5, borderRadius: 10, backgroundColor: colors.text, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: colors.header },
-  countText: { color: colors.onInverse, fontSize: 10, fontWeight: '800' },
-  label: { fontSize: 11, color: colors.textMuted, fontWeight: '700', textAlign: 'center', maxWidth: 72 },
+  row: { flexDirection: 'row', gap: 8, paddingHorizontal: 16, paddingVertical: 4 },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 40, paddingHorizontal: 16, borderRadius: 999, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
+  chipOn: { backgroundColor: colors.brand, borderColor: colors.brand },
+  label: { fontSize: 14, fontWeight: '700', color: colors.textSecondary },
+  labelOn: { color: colors.white },
 });

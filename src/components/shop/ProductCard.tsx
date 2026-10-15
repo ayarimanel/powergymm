@@ -3,12 +3,12 @@ import { Pressable, StyleSheet, Switch, View } from 'react-native';
 import { Text } from '../ui/Text';
 import { Icon } from '../ui/Icon';
 import { MarketplaceProduct } from '../../types/database';
-import { card, colors } from '../../theme';
+import { colors, fonts, ink } from '../../theme';
 import { discountPct, formatPrice } from '../../services/shopService';
 import { CATEGORY_META, ProductCategory } from '../../shop/categoryMeta';
+import { ProductImage } from './ProductImage';
 
 const metaFor = (c: string) => CATEGORY_META[c as ProductCategory] ?? CATEGORY_META['Accessoires'];
-import { ProductImage } from './ProductImage';
 
 interface Props {
   product: MarketplaceProduct;
@@ -18,10 +18,10 @@ interface Props {
   onToggleStock: (inStock: boolean) => void;
 }
 
+/** One product (design-ref Boutique): photo, category, name, price, and a round "+" that opens it. */
 export const ProductCard: React.FC<Props> = ({ product: p, isOwner, onPress, onEdit, onToggleStock }) => {
   const pct = discountPct(p);
   const meta = metaFor(p.category);
-  const saved = p.originalPriceTnd ? p.originalPriceTnd - p.priceTnd : 0;
 
   return (
     <View style={styles.card}>
@@ -29,16 +29,10 @@ export const ProductCard: React.FC<Props> = ({ product: p, isOwner, onPress, onE
         onPress={onPress}
         accessibilityRole="button"
         accessibilityLabel={`${p.name}, ${formatPrice(p.priceTnd)}${p.inStock ? '' : ', rupture de stock'}`}
-        style={({ pressed }) => pressed && { opacity: 0.85 }}
+        style={({ pressed }) => pressed && { opacity: 0.88 }}
       >
         <View style={styles.imageBox}>
-          <ProductImage uri={p.imageUrls[0]} style={styles.image} />
-
-          {/* Category pill (subtle, per-category color) */}
-          <View style={[styles.catPill, { backgroundColor: meta.tint.soft }]}>
-            <Icon name={meta.icon as any} size={11} color={meta.tint.bar} />
-            <Text style={[styles.catPillText, { color: meta.tint.text }]}>{meta.short}</Text>
-          </View>
+          <ProductImage uri={p.imageUrls[0]} style={[styles.image, !p.inStock && { opacity: 0.4 }]} />
 
           {pct > 0 && (
             <View style={styles.promo}>
@@ -49,7 +43,7 @@ export const ProductCard: React.FC<Props> = ({ product: p, isOwner, onPress, onE
           {!p.inStock && (
             <View style={styles.soldOutVeil}>
               <View style={styles.soldOutPill}>
-                <Icon name="close-circle" size={14} color={colors.white} />
+                <Icon name="close-circle" size={14} color={colors.onInverse} />
                 <Text style={styles.soldOutText}>Rupture</Text>
               </View>
             </View>
@@ -64,26 +58,25 @@ export const ProductCard: React.FC<Props> = ({ product: p, isOwner, onPress, onE
         </View>
 
         <View style={styles.body}>
-          <Text style={styles.name} numberOfLines={2}>{p.name}</Text>
+          <Text style={styles.category} numberOfLines={1}>{p.category}</Text>
+          <Text style={[styles.name, !p.inStock && { color: colors.textSecondary }]} numberOfLines={2}>{p.name}</Text>
           <View style={styles.priceRow}>
-            <Text style={[styles.price, pct > 0 && { color: colors.red.text }]}>{formatPrice(p.priceTnd)}</Text>
-            {pct > 0 && <Text style={styles.oldPrice}>{formatPrice(p.originalPriceTnd!)}</Text>}
+            <View style={styles.prices}>
+              <Text style={[styles.price, !p.inStock && { color: colors.textSecondary }]}>{formatPrice(p.priceTnd)}</Text>
+              {pct > 0 && <Text style={styles.oldPrice}>{formatPrice(p.originalPriceTnd!)}</Text>}
+            </View>
+            {p.inStock && !isOwner && (
+              <View style={styles.plus} pointerEvents="none">
+                <Icon name="add" size={22} color={colors.white} />
+              </View>
+            )}
           </View>
-          {pct > 0 && saved > 0 && (
-            <Text style={styles.saved}>Économise {formatPrice(saved)}</Text>
-          )}
         </View>
       </Pressable>
 
       {isOwner && (
-        <Pressable
-          onPress={onEdit}
-          hitSlop={6}
-          accessibilityRole="button"
-          accessibilityLabel={`Modifier ${p.name}`}
-          style={styles.editBtn}
-        >
-          <Icon name="create-outline" size={18} color={colors.text} />
+        <Pressable onPress={onEdit} hitSlop={6} accessibilityRole="button" accessibilityLabel={`Modifier ${p.name}`} style={styles.editBtn}>
+          <Icon name="create-outline" size={18} color={colors.white} />
         </Pressable>
       )}
       {isOwner && (
@@ -103,89 +96,31 @@ export const ProductCard: React.FC<Props> = ({ product: p, isOwner, onPress, onE
 };
 
 const styles = StyleSheet.create({
-  card: { ...card, width: '48.5%', overflow: 'hidden', borderRadius: 20 },
-  imageBox: { position: 'relative', backgroundColor: colors.track },
-  image: { width: '100%', aspectRatio: 1.05 },
+  card: { width: '48.5%', padding: 8, borderRadius: 20, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
+  imageBox: { position: 'relative', borderRadius: 14, overflow: 'hidden', backgroundColor: colors.track },
+  image: { width: '100%', aspectRatio: 1 },
 
-  catPill: {
-    position: 'absolute',
-    top: 8,
-    left: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 7,
-    paddingVertical: 3,
-    borderRadius: 10,
-  },
-  catPillText: { fontSize: 10, fontWeight: '800', letterSpacing: 0.3, textTransform: 'uppercase' },
-
-  promo: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: colors.red.bar,
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    shadowColor: colors.red.bar,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
-    elevation: 3,
-  },
+  promo: { position: 'absolute', top: 8, left: 8, backgroundColor: colors.brand, borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2 },
   promoText: { color: colors.white, fontSize: 12, fontWeight: '800' },
 
-  soldOutVeil: {
-    position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: 'rgba(255,255,255,0.72)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  soldOutPill: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: colors.text, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 6 },
+  soldOutVeil: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' },
+  soldOutPill: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: colors.text, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
   soldOutText: { color: colors.onInverse, fontSize: 13, fontWeight: '800' },
 
-  lowStock: {
-    position: 'absolute',
-    bottom: 8, left: 8,
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    backgroundColor: colors.amber.soft,
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-  },
+  lowStock: { position: 'absolute', bottom: 8, left: 8, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.amber.soft, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
   lowStockText: { color: colors.amber.text, fontSize: 11, fontWeight: '800' },
 
-  editBtn: {
-    position: 'absolute',
-    top: 6,
-    right: 6,
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  editBtn: { position: 'absolute', top: 14, right: 14, width: 36, height: 36, borderRadius: 18, backgroundColor: ink(0.6), alignItems: 'center', justifyContent: 'center' },
 
-  body: { padding: 12, gap: 4 },
-  name: { fontSize: 14, fontWeight: '800', color: colors.text, minHeight: 36, lineHeight: 18 },
-  priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 6, flexWrap: 'wrap' },
-  price: { fontSize: 17, fontWeight: '900', color: colors.text },
+  body: { paddingHorizontal: 4, paddingTop: 10, paddingBottom: 2, gap: 4 },
+  category: { fontSize: 10, fontWeight: '800', letterSpacing: 1.2, textTransform: 'uppercase', color: colors.textMuted },
+  name: { fontSize: 14, fontWeight: '700', color: colors.text, minHeight: 36, lineHeight: 18 },
+  priceRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 6, marginTop: 2 },
+  prices: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'baseline', gap: 6, flexWrap: 'wrap' },
+  price: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 22, lineHeight: 24, color: colors.brandText },
   oldPrice: { fontSize: 12, color: colors.textMuted, textDecorationLine: 'line-through', fontWeight: '600' },
-  saved: { fontSize: 11, fontWeight: '700', color: colors.green.text },
+  plus: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center' },
 
-  stockRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginHorizontal: 12,
-    marginBottom: 12,
-    marginTop: 4,
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: colors.track,
-  },
+  stockRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 4, marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: colors.border },
   stockLabel: { fontSize: 13, fontWeight: '600', color: colors.textSecondary },
 });

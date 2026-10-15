@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Platform, Pressable, StyleSheet, View } from 'react-native';
+import React from 'react';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
-import { Icon } from '../ui/Icon';
 import { MarketplaceProduct } from '../../types/database';
 import { discountPct, formatPrice } from '../../services/shopService';
-import { colors } from '../../theme';
-import { cardShadow } from '../../theme';
+import { colors, fonts } from '../../theme';
+import { claimSwipe } from '../../navigation/swipeGuard';
 import { ProductImage } from './ProductImage';
 
 interface Props {
@@ -13,97 +12,45 @@ interface Props {
   onPress: (p: MarketplaceProduct) => void;
 }
 
-const nativeDriver = Platform.OS !== 'web';
-const ROTATE_MS = 5000;
-
-/** Auto-rotating carousel of promo products — the "wow" hero at the top, like the Floor live card. */
+/** "En solde" (design-ref Boutique): a row of sale cards you swipe sideways. */
 export const PromoHero: React.FC<Props> = ({ products, onPress }) => {
-  const [index, setIndex] = useState(0);
-  const fade = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    if (products.length < 2) return;
-    const id = setInterval(() => {
-      Animated.sequence([
-        Animated.timing(fade, { toValue: 0, duration: 240, easing: Easing.in(Easing.ease), useNativeDriver: nativeDriver }),
-      ]).start(() => {
-        setIndex(i => (i + 1) % products.length);
-        Animated.timing(fade, { toValue: 1, duration: 260, easing: Easing.out(Easing.ease), useNativeDriver: nativeDriver }).start();
-      });
-    }, ROTATE_MS);
-    return () => clearInterval(id);
-  }, [products.length, fade]);
-
   if (products.length === 0) return null;
-  const p = products[Math.min(index, products.length - 1)];
-  const pct = discountPct(p);
-  const saved = p.originalPriceTnd ? p.originalPriceTnd - p.priceTnd : 0;
-
   return (
-    <View style={styles.wrap}>
-      <View style={styles.tagRow}>
-        <View style={styles.tag}>
-          <Icon name="flash" size={12} color={colors.red.text} />
-          <Text style={styles.tagText}>PROMO DU MOMENT</Text>
-        </View>
-        {products.length > 1 && (
-          <View style={styles.dots}>
-            {products.map((_, i) => (
-              <View key={i} style={[styles.dot, i === index && styles.dotOn]} />
-            ))}
-          </View>
-        )}
-      </View>
-
-      <Pressable onPress={() => onPress(p)} accessibilityRole="button" accessibilityLabel={`${p.name}, -${pct}%`} style={({ pressed }) => [styles.card, pressed && { opacity: 0.9 }]}>
-        <Animated.View style={{ opacity: fade, flexDirection: 'row', gap: 14, alignItems: 'center', padding: 14 }}>
-          <View style={styles.imageWrap}>
-            <ProductImage uri={p.imageUrls[0]} style={styles.image} />
-            <View style={styles.pctBadge}><Text style={styles.pctBadgeText}>-{pct}%</Text></View>
-          </View>
-
-          <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
-            <Text style={styles.category}>{p.category}</Text>
-            <Text style={styles.name} numberOfLines={2}>{p.name}</Text>
-            <View style={styles.priceRow}>
-              <Text style={styles.price}>{formatPrice(p.priceTnd)}</Text>
-              <Text style={styles.oldPrice}>{formatPrice(p.originalPriceTnd!)}</Text>
+    <ScrollView horizontal onTouchStart={claimSwipe} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
+      {products.map(p => {
+        const pct = discountPct(p);
+        const saved = p.originalPriceTnd ? p.originalPriceTnd - p.priceTnd : 0;
+        return (
+          <Pressable key={p.id} onPress={() => onPress(p)} accessibilityRole="button" accessibilityLabel={`${p.name}, -${pct}%`} style={({ pressed }) => [styles.card, pressed && { opacity: 0.88 }]}>
+            <View style={styles.imageWrap}>
+              <ProductImage uri={p.imageUrls[0]} style={styles.image} />
             </View>
-            {saved > 0 && (
-              <View style={styles.savedRow}>
-                <Icon name="checkmark-circle" size={13} color={colors.green.text} />
-                <Text style={styles.savedText}>Tu économises {formatPrice(saved)}</Text>
+            <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
+              <View style={styles.pct}><Text style={styles.pctText}>-{pct}%</Text></View>
+              <Text style={styles.name} numberOfLines={1}>{p.name}</Text>
+              <View style={styles.priceRow}>
+                <Text style={styles.price}>{formatPrice(p.priceTnd)}</Text>
+                <Text style={styles.oldPrice}>{formatPrice(p.originalPriceTnd!)}</Text>
               </View>
-            )}
-          </View>
-
-          <Icon name="chevron-forward" size={22} color={colors.textMuted} />
-        </Animated.View>
-      </Pressable>
-    </View>
+              {saved > 0 && <Text style={styles.saved} numberOfLines={1}>Tu économises {formatPrice(saved)}</Text>}
+            </View>
+          </Pressable>
+        );
+      })}
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  wrap: { gap: 8 },
-  tagRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4 },
-  tag: { flexDirection: 'row', alignItems: 'center', gap: 5, height: 22, paddingHorizontal: 8, borderRadius: 11, backgroundColor: colors.red.soft },
-  tagText: { fontSize: 10, fontWeight: '800', color: colors.red.text, letterSpacing: 0.5 },
-  dots: { flexDirection: 'row', gap: 4 },
-  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.border },
-  dotOn: { backgroundColor: colors.red.bar, width: 16 },
-
-  card: { backgroundColor: colors.card, borderRadius: 22, borderWidth: 1, borderColor: colors.red.soft, ...cardShadow },
-  imageWrap: { width: 96, height: 96, borderRadius: 16, overflow: 'hidden', backgroundColor: colors.track },
+  row: { gap: 12, paddingRight: 16 },
+  card: { width: 290, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, borderRadius: 20, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
+  imageWrap: { width: 96, height: 96, borderRadius: 14, overflow: 'hidden', backgroundColor: colors.track },
   image: { width: '100%', height: '100%' },
-  pctBadge: { position: 'absolute', top: 6, left: 6, backgroundColor: colors.red.bar, borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2 },
-  pctBadgeText: { color: colors.white, fontSize: 11, fontWeight: '800' },
-
-  category: { fontSize: 11, fontWeight: '700', color: colors.textMuted, textTransform: 'uppercase', letterSpacing: 0.5 },
-  name: { fontSize: 15, fontWeight: '800', color: colors.text, lineHeight: 19 },
-  priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 8, marginTop: 2 },
-  price: { fontSize: 22, fontWeight: '900', color: colors.red.text },
+  pct: { alignSelf: 'flex-start', backgroundColor: colors.brand, borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2 },
+  pctText: { color: colors.white, fontSize: 12, fontWeight: '800' },
+  name: { fontSize: 15, fontWeight: '700', color: colors.text },
+  priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 8 },
+  price: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 26, lineHeight: 28, color: colors.brandText },
   oldPrice: { fontSize: 13, color: colors.textMuted, textDecorationLine: 'line-through' },
-  savedRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 2 },
-  savedText: { fontSize: 12, fontWeight: '700', color: colors.green.text },
+  saved: { fontSize: 13, fontWeight: '600', color: colors.green.text },
 });

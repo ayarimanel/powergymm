@@ -40,8 +40,8 @@ export const OrdersPill: React.FC<Props> = ({ reservations, onPress }) => {
 };
 
 const styles = StyleSheet.create({
-  card: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.card, borderWidth: 1, borderRadius: 16, padding: 12 },
-  iconWrap: { width: 42, height: 42, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  title: { fontSize: 14, fontWeight: '800', color: colors.text },
-  sub: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
+  card: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: colors.card, borderWidth: 1, borderRadius: 20, padding: 14 },
+  iconWrap: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: 15, fontWeight: '800', color: colors.text },
+  sub: { fontSize: 13, color: colors.textSecondary, marginTop: 2 },
 });

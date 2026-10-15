@@ -6,7 +6,10 @@ import { MarketplaceProduct, ProductReservation, ReservationStatus, ShopCategory
 import { GymConfigService } from '../config/gymConfig';
 import { ShopService, isActive } from '../services/shopService';
 import { hasPermission } from '../services/permissionsService';
-import { colors } from '../theme';
+import { buttonShadow, colors, fonts, radius } from '../theme';
+import { Avatar } from '../components/community/Avatar';
+import { Title } from '../components/ui/Title';
+import { SectionHeader } from '../components/ui/SectionHeader';
 import { ProductCard } from '../components/shop/ProductCard';
 import { ProductSheet } from '../components/shop/ProductSheet';
 import { ReservationsSheet } from '../components/shop/ReservationsSheet';
@@ -157,18 +160,15 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
 
   return (
     <View style={styles.screen}>
-      {/* Header */}
+      {/* Header (design-ref Boutique): who I am · the club shop · my reservations */}
       <View style={styles.header}>
-        <View style={styles.logo}>
-          <Icon name="bag-handle" size={16} color={colors.brandText} />
+        <View style={styles.avatarRing}>
+          <Avatar name={user.fullName} url={user.avatarUrl} size={42} />
         </View>
         <View style={{ flex: 1, minWidth: 0 }}>
-          <Text style={styles.title} numberOfLines={1}>Boutique</Text>
-          {!!gymName && <Text style={styles.subtitle} numberOfLines={1}>{gymName}</Text>}
+          <Text style={styles.subtitle} numberOfLines={1}>Boutique du club</Text>
+          <Text style={styles.title} numberOfLines={1}>{gymName || 'Boutique'}</Text>
         </View>
-        <Pressable onPress={() => setShowSearch(v => !v)} accessibilityRole="button" accessibilityLabel="Rechercher" style={styles.headerBtn}>
-          <Icon name={showSearch ? 'close' : 'search-outline'} size={22} color={colors.text} />
-        </Pressable>
         <Pressable
           onPress={() => setShowOrders(true)}
           accessibilityRole="button"
@@ -182,27 +182,24 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
         </Pressable>
       </View>
 
-      {showSearch && (
-        <View style={styles.searchWrap}>
-          <Icon name="search-outline" size={18} color={colors.textMuted} />
-          <TextInput
-            style={styles.searchInput}
-            value={query}
-            onChangeText={setQuery}
-            placeholder="Chercher un produit…"
-            placeholderTextColor={colors.textMuted}
-            autoFocus
-            accessibilityLabel="Chercher un produit"
-          />
-          {!!query && (
-            <Pressable onPress={() => setQuery('')} hitSlop={10} accessibilityRole="button" accessibilityLabel="Effacer la recherche">
-              <Icon name="close-circle" size={18} color={colors.textMuted} />
-            </Pressable>
-          )}
-        </View>
-      )}
+      <View style={styles.searchWrap}>
+        <Icon name="search-outline" size={20} color={colors.textMuted} />
+        <TextInput
+          style={styles.searchInput}
+          value={query}
+          onChangeText={setQuery}
+          placeholder="Protéine, gainer, ceinture…"
+          placeholderTextColor={colors.textMuted}
+          accessibilityLabel="Chercher un produit"
+        />
+        {!!query && (
+          <Pressable onPress={() => setQuery('')} hitSlop={10} accessibilityRole="button" accessibilityLabel="Effacer la recherche">
+            <Icon name="close-circle" size={18} color={colors.textMuted} />
+          </Pressable>
+        )}
+      </View>
 
-      {/* Category rail (colored bubbles) — sticky-feeling section */}
+      {/* Categories as chips */}
       <View style={styles.railWrap}>
         <CategoryRail active={filter} counts={counts} onSelect={setFilter} />
       </View>
@@ -213,9 +210,12 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
           <OrdersPill reservations={myActiveReservations} onPress={() => setShowOrders(true)} />
         )}
 
-        {/* Promo hero */}
+        {/* En solde */}
         {filter === 'all' && !query && promoProducts.length > 0 && (
-          <PromoHero products={promoProducts} onPress={p => setActiveId(p.id)} />
+          <View style={{ gap: 14 }}>
+            <SectionHeader title="En solde" actionLabel="Tout voir" onAction={() => setFilter('promo')} />
+            <PromoHero products={promoProducts} onPress={p => setActiveId(p.id)} />
+          </View>
         )}
 
         {/* Owner KPIs */}
@@ -231,9 +231,7 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
         {/* Section header */}
         <View style={styles.sectionRow}>
           <View style={styles.sectionTitleWrap}>
-            {activeCategoryTint && <View style={[styles.sectionDot, { backgroundColor: activeCategoryTint.bar }]} />}
-            {filter === 'promo' && <Icon name="pricetag" size={14} color={colors.red.text} />}
-            <Text style={styles.sectionTitle}>{activeSectionTitle}</Text>
+            <Title variant="section" numberOfLines={1} style={{ flexShrink: 1 }}>{activeSectionTitle}</Title>
             <Text style={styles.sectionCount}>· {filtered.length}</Text>
           </View>
           <Pressable onPress={() => setSort(NEXT_SORT[sort])} accessibilityRole="button" accessibilityLabel={`Trier : ${SORT_LABEL[sort]}`} style={styles.sortBtn}>
@@ -323,51 +321,50 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.page },
 
-  header: { height: 68, flexDirection: 'row', alignItems: 'center', gap: 6, paddingLeft: 16, paddingRight: 8, backgroundColor: colors.header },
-  logo: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.brandSoft, alignItems: 'center', justifyContent: 'center', marginRight: 4 },
-  title: { fontSize: 17, fontWeight: '800', color: colors.text, lineHeight: 20 },
-  subtitle: { fontSize: 12, color: colors.textMuted, lineHeight: 14 },
-  headerBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22 },
-  badge: { position: 'absolute', top: 6, right: 6, minWidth: 16, height: 16, paddingHorizontal: 3, borderRadius: 8, backgroundColor: colors.red.bar, alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: colors.card },
-  badgeText: { color: colors.white, fontSize: 9, fontWeight: '800' },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 10, backgroundColor: colors.header },
+  avatarRing: { width: 50, height: 50, borderRadius: 25, borderWidth: 1.5, borderColor: colors.brand, alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: 18, fontWeight: '800', color: colors.text, lineHeight: 22 },
+  subtitle: { fontSize: 13, fontWeight: '500', color: colors.textSecondary, lineHeight: 16 },
+  headerBtn: { width: 46, height: 46, alignItems: 'center', justifyContent: 'center', borderRadius: 23, backgroundColor: colors.bg },
+  badge: { position: 'absolute', top: 2, right: 2, minWidth: 18, height: 18, paddingHorizontal: 4, borderRadius: 9, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: colors.page },
+  badgeText: { color: colors.white, fontSize: 10, fontWeight: '800' },
 
-  searchWrap: { flexDirection: 'row', alignItems: 'center', gap: 8, height: 44, marginHorizontal: 16, marginTop: 10, paddingHorizontal: 14, borderRadius: 22, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
-  searchInput: { flex: 1, fontSize: 15, color: colors.text, height: '100%' as any },
+  searchWrap: { flexDirection: 'row', alignItems: 'center', gap: 10, height: 52, marginHorizontal: 16, marginBottom: 12, paddingHorizontal: 16, borderRadius: radius.input, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
+  searchInput: { flex: 1, fontSize: 15, fontWeight: '500', color: colors.text, height: '100%' as any },
 
-  // Same grey as the header: header and categories read as one top block.
-  railWrap: { backgroundColor: colors.header, borderBottomWidth: 1, borderBottomColor: colors.border },
+  railWrap: { paddingBottom: 8 },
 
-  content: { padding: 16, paddingBottom: 96, gap: 14, maxWidth: 720, width: '100%', alignSelf: 'center' },
+  content: { padding: 16, paddingBottom: 96, gap: 18, maxWidth: 720, width: '100%', alignSelf: 'center' },
 
   kpis: { flexDirection: 'row', gap: 8 },
-  kpi: { flex: 1, alignItems: 'center', paddingVertical: 12, paddingHorizontal: 6, borderRadius: 14, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, gap: 2 },
-  kpiValue: { fontSize: 20, fontWeight: '900', color: colors.text },
+  kpi: { flex: 1, alignItems: 'center', paddingVertical: 12, paddingHorizontal: 6, borderRadius: 18, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, gap: 2 },
+  kpiValue: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 24, color: colors.text },
   kpiLabel: { fontSize: 11, color: colors.textMuted, fontWeight: '700' },
 
-  sectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4 },
-  sectionTitleWrap: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  sectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+  sectionTitleWrap: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'baseline', gap: 6 },
   sectionDot: { width: 8, height: 8, borderRadius: 4 },
   sectionTitle: { fontSize: 15, fontWeight: '800', color: colors.text },
-  sectionCount: { fontSize: 14, fontWeight: '700', color: colors.textMuted },
-  sortBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, height: 32, paddingHorizontal: 10, borderRadius: 16, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
-  sortText: { fontSize: 12, color: colors.textSecondary, fontWeight: '700' },
+  sectionCount: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 22, color: colors.textMuted },
+  sortBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 36, paddingHorizontal: 4 },
+  sortText: { fontSize: 14, color: colors.text, fontWeight: '700' },
 
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 12 },
-  skeletonCard: { width: '48.5%', height: 240, borderRadius: 20, backgroundColor: colors.track },
+  skeletonCard: { width: '48.5%', height: 260, borderRadius: 20, backgroundColor: colors.track },
 
   empty: { alignItems: 'center', paddingVertical: 40, gap: 8 },
   emptyIcon: { width: 64, height: 64, borderRadius: 32, backgroundColor: colors.track, alignItems: 'center', justifyContent: 'center' },
   emptyTitle: { fontSize: 17, fontWeight: '800', color: colors.textSecondary },
   emptySub: { fontSize: 14, color: colors.textMuted, textAlign: 'center', maxWidth: 300 },
-  clearBtn: { marginTop: 12, height: 44, paddingHorizontal: 22, borderRadius: 22, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center' },
+  clearBtn: { marginTop: 12, height: 44, paddingHorizontal: 22, borderRadius: 22, borderWidth: 1.5, borderColor: colors.disabled, alignItems: 'center', justifyContent: 'center' },
   clearText: { fontSize: 14, fontWeight: '700', color: colors.text },
 
   fab: {
     position: 'absolute', right: 16, bottom: 16,
-    height: 48, paddingHorizontal: 18, borderRadius: 24,
+    height: 52, paddingHorizontal: 20, borderRadius: 26,
     flexDirection: 'row', alignItems: 'center', gap: 6,
     backgroundColor: colors.brand,
-    shadowColor: colors.text, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.22, shadowRadius: 12, elevation: 6,
+    ...buttonShadow,
   },
   fabText: { color: colors.white, fontSize: 15, fontWeight: '800' },
 });

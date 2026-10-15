@@ -683,7 +683,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
 
       <Toast message={toast} onHide={() => setToast(null)} />
 
-      <AffluenceSheet visible={showAffluence} onClose={() => setShowAffluence(false)}>
+      <AffluenceSheet visible={showAffluence} onClose={() => setShowAffluence(false)} alertOn={alertOn} onToggleAlert={toggleAlert} showAlert={!!snapshot?.isOpen}>
         {snapshot ? (
           <>
             {isAdmin || !snapshot.isOpen ? (
@@ -695,6 +695,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
                 checkedIn={!!snapshot.myCheckIn}
                 onScanOut={handleScanOut}
                 showCounts={showCounts}
+                usualSlot={user.usualTrainingTime}
               />
             ) : (
               <CrowdFlipCard
@@ -707,6 +708,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
                     checkedIn={!!snapshot.myCheckIn}
                     onScanOut={handleScanOut}
                     showCounts={showCounts}
+                    usualSlot={user.usualTrainingTime}
                     header={header}
                     footer={footer}
                   />

@@ -3,7 +3,7 @@ import {
   Animated,
   Easing,
   LayoutAnimation,
-  LayoutChangeEvent,
+  Modal,
   PanResponder,
   Platform,
   Pressable,
@@ -11,14 +11,17 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '../ui/Text';
 import { Icon } from '../ui/Icon';
 import { NewsItem, NewsType } from '../../services/clubNewsService';
-import { brandAlpha, colors, ink } from '../../theme';
+import { brandAlpha, colors, fonts, radius } from '../../theme';
 import { haptics } from '../../utils/haptics';
 import { useReduceMotion } from '../../hooks/useDeviceState';
 import { useBackHandler } from '../../navigation/backStack';
 import { claimSwipe } from '../../navigation/swipeGuard';
+import { Tag, TagTone } from '../ui/Tag';
+import { Title } from '../ui/Title';
 
 const nativeDriver = Platform.OS !== 'web';
 /** Space the pinned news card takes at the top of Accueil (card + its top margin). */
@@ -32,6 +35,8 @@ export const NEWS_TYPES: Record<NewsType, { label: string; icon: string; solid: 
   cours: { label: 'Cours', icon: 'time', solid: colors.teal.bar, soft: colors.teal.soft, text: colors.teal.text },
 };
 
+const TAG_TONE: Record<NewsType, TagTone> = { info: 'info', promo: 'brand', cours: 'success', coach: 'neutral', event: 'warning' };
+
 interface Props {
   items: NewsItem[];
   onAction: (item: NewsItem) => void;
@@ -39,21 +44,18 @@ interface Props {
 }
 
 /**
- * Slim bar pinned under the Floor header. Pull it down (or tap it) to reveal every club announcement;
- * push it up, tap it again, or tap the dimmed background to close.
+ * Red news card pinned under the Accueil header. Tap it (or pull it down) to open the
+ * "Infos du club" page with every announcement; back, the back button or Escape closes it.
  * Must be rendered as an absolute overlay over the Floor content area (it fills its parent).
  */
 export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
   const reduceMotion = useReduceMotion();
   const offset = useRef(new Animated.Value(0)).current;
+  const insets = useSafeAreaInsets();
   const [open, setOpen] = useState(false);
-  const [panelH, setPanelH] = useState(0);
-  const [areaH, setAreaH] = useState(0);
   const [expanded, setExpanded] = useState<string | null>(null);
 
   const openRef = useRef(false);
-  const panelHRef = useRef(0);
-  const dragBase = useRef(0);
 
   const unread = items.filter(n => !n.read);
   const latest = unread[0] ?? items[0];
@@ -63,12 +65,8 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
     setOpen(next);
     if (!next) setExpanded(null);
     if (next !== open) haptics.select();
-    Animated.timing(offset, {
-      toValue: next ? panelHRef.current : 0,
-      duration: reduceMotion ? 120 : 320,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: nativeDriver,
-    }).start();
+    // The card settles back in place; the page itself slides in as a full screen.
+    Animated.spring(offset, { toValue: 0, useNativeDriver: nativeDriver, speed: 20, bounciness: 6 }).start();
   };
   const setPanelRef = useRef(setPanel);
   setPanelRef.current = setPanel;
@@ -81,17 +79,14 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
       onPanResponderGrant: () => {
         claimSwipe();
         offset.stopAnimation();
-        dragBase.current = openRef.current ? panelHRef.current : 0;
       },
+      // The card follows the finger a little, then opens the page.
       onPanResponderMove: (_, g) => {
-        offset.setValue(Math.max(0, Math.min(panelHRef.current, dragBase.current + g.dy)));
+        offset.setValue(Math.max(0, Math.min(28, g.dy * 0.5)));
       },
       onPanResponderRelease: (_, g) => {
-        const wasOpen = openRef.current;
-        if (Math.abs(g.dy) <= 4) return setPanelRef.current(!wasOpen);
-        if (g.vy > 0.5) return setPanelRef.current(true);
-        if (g.vy < -0.5) return setPanelRef.current(false);
-        setPanelRef.current(wasOpen ? g.dy > -50 : g.dy > 50);
+        if (Math.abs(g.dy) <= 4 || g.dy > 40 || g.vy > 0.5) return setPanelRef.current(true);
+        setPanelRef.current(false);
       },
       onPanResponderTerminate: () => setPanelRef.current(openRef.current),
     })
@@ -109,7 +104,7 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
   // One gentle nudge on arrival when there is something new, so members learn the bar pulls down.
   const hasUnread = unread.length > 0;
   useEffect(() => {
-    if (!hasUnread || reduceMotion || !panelH) return;
+    if (!hasUnread || reduceMotion) return;
     const t = setTimeout(() => {
       if (openRef.current) return;
       Animated.sequence([
@@ -119,14 +114,7 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
     }, 1200);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasUnread, reduceMotion, panelH > 0]);
-
-  const onPanelLayout = (e: LayoutChangeEvent) => {
-    const h = Math.round(e.nativeEvent.layout.height);
-    panelHRef.current = h;
-    setPanelH(h);
-    if (openRef.current) offset.setValue(h);
-  };
+  }, [hasUnread, reduceMotion]);
 
   const markRead = (ids: string[]) => {
     if (ids.length) onRead(ids);
@@ -145,110 +133,18 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
 
   if (!items.length) return null;
 
-  const h = Math.max(1, panelH);
-  const scrimOpacity = offset.interpolate({ inputRange: [0, 220], outputRange: [0, 1], extrapolate: 'clamp' });
-  const panelY = offset.interpolate({ inputRange: [0, h], outputRange: [-h, 0], extrapolate: 'clamp' });
-  const chevron = offset.interpolate({ inputRange: [0, h], outputRange: ['0deg', '180deg'], extrapolate: 'clamp' });
-
-  const barSmall = open
-    ? 'Infos du club'
-    : unread.length
-      ? `${unread.length} ${unread.length === 1 ? 'nouvelle info' : 'nouvelles infos'} du club`
-      : 'Infos du club';
-  const barTitle = open ? 'Glisse vers le haut pour fermer' : latest?.title;
+  const barSmall = unread.length
+    ? `${unread.length} ${unread.length === 1 ? 'nouvelle info' : 'nouvelles infos'} du club`
+    : 'Infos du club';
 
   return (
-    <View style={styles.area} pointerEvents="box-none" onLayout={e => setAreaH(e.nativeEvent.layout.height)}>
-      <Animated.View style={[StyleSheet.absoluteFill, styles.scrim, { opacity: scrimOpacity }]} pointerEvents={open ? 'auto' : 'none'}>
-        <Pressable style={StyleSheet.absoluteFill} onPress={() => setPanel(false)} accessibilityLabel="Fermer les infos du club" />
-      </Animated.View>
-
-      <Animated.View
-        onLayout={onPanelLayout}
-        pointerEvents={open ? 'auto' : 'none'}
-        importantForAccessibility={open ? 'auto' : 'no-hide-descendants'}
-        accessibilityElementsHidden={!open}
-        style={[
-          styles.panel,
-          { maxHeight: areaH ? areaH * 0.62 : 420, opacity: panelH ? 1 : 0, transform: [{ translateY: panelY }] },
-        ]}
-      >
-        <View style={styles.panelHead}>
-          <Text style={styles.panelTitle} accessibilityRole="header">Infos du club</Text>
-          {unread.length > 0 && (
-            <Pressable onPress={() => markRead(unread.map(n => n.id))} hitSlop={8} accessibilityRole="button">
-              <Text style={styles.link}>Tout marquer comme lu</Text>
-            </Pressable>
-          )}
-        </View>
-
-        <ScrollView style={styles.list} contentContainerStyle={styles.listContent} nestedScrollEnabled showsVerticalScrollIndicator={false}>
-          {items.map(n => {
-            const t = NEWS_TYPES[n.type];
-            const isOpen = expanded === n.id;
-            return (
-              <View key={n.id} style={[styles.item, { backgroundColor: n.read ? colors.bg : t.soft }]}>
-                <Pressable
-                  onPress={() => toggleItem(n)}
-                  accessibilityRole="button"
-                  accessibilityState={{ expanded: isOpen }}
-                  accessibilityLabel={`${t.label}${n.read ? '' : ', non lue'} : ${n.title}`}
-                  style={({ pressed }) => [styles.itemBtn, pressed && { opacity: 0.85 }]}
-                >
-                  <View style={[styles.icon, { backgroundColor: t.solid }]}>
-                    <Icon name={t.icon as any} size={18} color={colors.white} />
-                  </View>
-                  <View style={styles.body}>
-                    <View style={styles.meta}>
-                      <Text style={[styles.tag, { color: t.text }]}>{t.label}</Text>
-                      {n.pinned && (
-                        <View style={styles.pin}>
-                          <Icon name="pin" size={10} color={colors.text} />
-                          <Text style={styles.pinText}>Épinglé</Text>
-                        </View>
-                      )}
-                      <Text style={styles.metaText} numberOfLines={1}>
-                        {n.author} · {n.date}
-                      </Text>
-                    </View>
-                    <Text style={styles.title}>{n.title}</Text>
-                    {!!n.text && (
-                      <Text style={styles.text} numberOfLines={isOpen ? undefined : 2}>
-                        {n.text}
-                      </Text>
-                    )}
-                    {isOpen && !!n.when && (
-                      <View style={styles.whenRow}>
-                        <Icon name="time-outline" size={13} color={colors.textSecondary} />
-                        <Text style={styles.whenText}>{n.when}</Text>
-                      </View>
-                    )}
-                  </View>
-                  {!n.read && <View style={styles.unreadDot} />}
-                </Pressable>
-                {isOpen && !!n.cta && (
-                  <Pressable
-                    onPress={() => runAction(n)}
-                    accessibilityRole="button"
-                    style={({ pressed }) => [styles.cta, { backgroundColor: t.solid }, pressed && { opacity: 0.85 }]}
-                  >
-                    <Text style={styles.ctaText}>{n.cta}</Text>
-                    <Icon name="arrow-forward" size={15} color={colors.white} />
-                  </Pressable>
-                )}
-              </View>
-            );
-          })}
-        </ScrollView>
-      </Animated.View>
-
+    <View style={styles.area} pointerEvents="box-none">
       <Animated.View
         {...pan.panHandlers}
         accessible
         accessibilityRole="button"
-        accessibilityState={{ expanded: open }}
-        accessibilityLabel={open ? 'Fermer les infos du club' : `${unread.length} nouvelles infos du club, ouvrir`}
-        onAccessibilityTap={() => setPanel(!open)}
+        accessibilityLabel={`${barSmall}, ouvrir`}
+        onAccessibilityTap={() => setPanel(true)}
         style={[styles.bar, { transform: [{ translateY: offset }] }]}
       >
         <View style={styles.barRow}>
@@ -257,64 +153,128 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
           </View>
           <View style={styles.barTxt}>
             <Text style={styles.barSmall} numberOfLines={1}>{barSmall}</Text>
-            <Text style={styles.barTitle} numberOfLines={1}>{barTitle}</Text>
+            <Text style={styles.barTitle} numberOfLines={1}>{latest?.title}</Text>
           </View>
-          <Animated.View style={{ transform: [{ rotate: chevron }] }}>
-            <Icon name="chevron-down" size={20} color={colors.brandText} />
-          </Animated.View>
+          <Icon name="chevron-forward" size={20} color={colors.brandText} />
         </View>
       </Animated.View>
+
+      {/* "Infos du club": a full page (design-ref Infos). */}
+      <Modal visible={open} animationType={reduceMotion ? 'fade' : 'slide'} onRequestClose={() => setPanel(false)} statusBarTranslucent>
+        <View style={[styles.page, { paddingTop: insets.top + 8 }]}>
+          <View style={styles.pageTop}>
+            <Pressable onPress={() => setPanel(false)} accessibilityRole="button" accessibilityLabel="Fermer les infos du club" style={styles.back}>
+              <Icon name="chevron-back" size={24} color={colors.text} />
+            </Pressable>
+            <Title variant="section" style={styles.pageTitle}>Infos du club</Title>
+            <View style={styles.backSpacer} />
+          </View>
+
+          <ScrollView style={styles.list} contentContainerStyle={[styles.listContent, { paddingBottom: 32 + insets.bottom }]} showsVerticalScrollIndicator={false}>
+            <View style={styles.panelHead}>
+              <Title variant="display" size={34} numberOfLines={1} style={{ flexShrink: 0 }}>{unread.length ? `${unread.length} ${unread.length === 1 ? 'nouvelle' : 'nouvelles'}` : 'À jour'}</Title>
+              {unread.length > 0 && (
+                <Pressable onPress={() => markRead(unread.map(n => n.id))} hitSlop={8} accessibilityRole="button" style={{ flexShrink: 1 }}>
+                  <Text style={styles.link}>Tout marquer comme lu</Text>
+                </Pressable>
+              )}
+            </View>
+
+          {items.map(n => {
+            const t = NEWS_TYPES[n.type];
+            const isOpen = expanded === n.id;
+            return (
+              <View key={n.id} style={[styles.item, n.pinned && !n.read && styles.itemPinned]}>
+                <Pressable
+                  onPress={() => toggleItem(n)}
+                  accessibilityRole="button"
+                  accessibilityState={{ expanded: isOpen }}
+                  accessibilityLabel={`${t.label}${n.read ? '' : ', non lue'} : ${n.title}`}
+                  style={({ pressed }) => [styles.itemBtn, pressed && { opacity: 0.85 }]}
+                >
+                  <View style={styles.meta}>
+                    <Tag label={t.label} tone={TAG_TONE[n.type]} />
+                    {n.pinned && (
+                      <View style={styles.pin}>
+                        <Icon name="pin" size={14} color={colors.brandText} />
+                        <Text style={styles.pinText}>Épinglé</Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text style={styles.title}>{n.title}</Text>
+                  {!!n.text && (
+                    <Text style={styles.text} numberOfLines={isOpen ? undefined : 2}>
+                      {n.text}
+                    </Text>
+                  )}
+                  {isOpen && !!n.when && (
+                    <View style={styles.whenRow}>
+                      <Icon name="time-outline" size={14} color={colors.textSecondary} />
+                      <Text style={styles.whenText}>{n.when}</Text>
+                    </View>
+                  )}
+                  <Text style={styles.metaText} numberOfLines={1}>
+                    {n.author} · {n.date}
+                  </Text>
+                  {!n.read && <View style={styles.unreadDot} />}
+                </Pressable>
+                {isOpen && !!n.cta && (
+                  <Pressable
+                    onPress={() => runAction(n)}
+                    accessibilityRole="button"
+                    style={({ pressed }) => [styles.cta, pressed && { opacity: 0.85 }]}
+                  >
+                    <Text style={styles.ctaText}>{n.cta}</Text>
+                    <Icon name="arrow-forward" size={16} color={colors.white} />
+                  </Pressable>
+                )}
+              </View>
+            );
+          })}
+          </ScrollView>
+        </View>
+      </Modal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   area: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden', zIndex: 30 },
-  scrim: { backgroundColor: ink(0.45) },
+  page: { flex: 1, backgroundColor: colors.page },
+  pageTop: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, height: 60 },
+  back: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center' },
+  backSpacer: { width: 44 },
+  pageTitle: { flex: 1, textAlign: 'center', fontSize: 22 },
+  panelHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12, paddingTop: 12, paddingBottom: 6 },
+  link: { fontSize: 13, fontWeight: '700', color: colors.brand, paddingBottom: 6, textAlign: 'right' },
+  list: { flex: 1 },
+  listContent: { gap: 14, paddingHorizontal: 20 },
 
-  panel: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: colors.card,
-    paddingTop: 12,
-    paddingHorizontal: 12,
-    paddingBottom: 8,
-  },
-  panelHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 4, paddingBottom: 10 },
-  panelTitle: { fontSize: 16, fontWeight: '800', color: colors.text },
-  link: { fontSize: 12, fontWeight: '800', color: colors.brand },
-  list: { flexGrow: 0, flexShrink: 1 },
-  listContent: { gap: 8, paddingBottom: 4 },
-
-  item: { borderRadius: 16 },
-  itemBtn: { flexDirection: 'row', gap: 12, padding: 12 },
-  icon: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  body: { flex: 1, minWidth: 0, gap: 3, paddingRight: 10 },
-  meta: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 },
-  tag: { fontSize: 11, fontWeight: '800', letterSpacing: 0.6, textTransform: 'uppercase' },
-  pin: { flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 6, paddingVertical: 1, borderRadius: 6, backgroundColor: colors.card },
-  pinText: { fontSize: 11, fontWeight: '800', color: colors.text },
-  metaText: { fontSize: 11, color: colors.textMuted, flexShrink: 1 },
-  title: { fontSize: 14, fontWeight: '800', color: colors.text, lineHeight: 18 },
-  text: { fontSize: 13, lineHeight: 18, color: colors.textSecondary },
-  whenRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 2 },
-  whenText: { fontSize: 12, fontWeight: '700', color: colors.textSecondary },
-  unreadDot: { position: 'absolute', top: 14, right: 12, width: 8, height: 8, borderRadius: 4, backgroundColor: colors.red.bar },
+  item: { borderRadius: radius.cardLg, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
+  itemPinned: { backgroundColor: colors.brandTint, borderColor: colors.brand },
+  itemBtn: { gap: 8, padding: 18 },
+  meta: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 10, paddingRight: 18 },
+  pin: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  pinText: { fontSize: 14, fontWeight: '600', color: colors.brandText },
+  metaText: { fontSize: 13, color: colors.textMuted, marginTop: 2 },
+  title: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 21, lineHeight: 24, color: colors.text, textTransform: 'uppercase', paddingRight: 14 },
+  text: { fontSize: 14, fontWeight: '500', lineHeight: 21, color: colors.textSecondary },
+  whenRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  whenText: { fontSize: 13, fontWeight: '700', color: colors.textSecondary },
+  unreadDot: { position: 'absolute', top: 22, right: 18, width: 9, height: 9, borderRadius: 5, backgroundColor: colors.brand },
   cta: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
-    minHeight: 44,
-    marginLeft: 60,
-    marginRight: 12,
-    marginBottom: 12,
-    borderRadius: 12,
-    paddingHorizontal: 12,
+    gap: 8,
+    height: 48,
+    marginHorizontal: 18,
+    marginBottom: 18,
+    borderRadius: 999,
+    paddingHorizontal: 16,
+    backgroundColor: colors.brand,
   },
-  ctaText: { color: colors.white, fontSize: 13, fontWeight: '800' },
+  ctaText: { color: colors.white, fontSize: 14, fontWeight: '800' },
 
   // Pinned red card under the header (design-ref Main "N nouvelles infos du club"). Pull or tap to open the list.
   bar: {

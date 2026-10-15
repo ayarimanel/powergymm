@@ -5,7 +5,7 @@ import { MuscleGroup } from '../../types/database';
 import { MuscleLevel } from '../../floor/useFloorSnapshot';
 import { levelTint } from '../../floor/levelColors';
 import { LEVEL_LABEL } from '../../floor/crowd';
-import { card, colors } from '../../theme';
+import { colors, radius } from '../../theme';
 import { haptics } from '../../utils/haptics';
 import { claimSwipe } from '../../navigation/swipeGuard';
 
@@ -87,7 +87,7 @@ export const ZoneBoard: React.FC<Props> = ({ muscles, myMuscle, bestLabel, sugge
           const me = m.muscle === selected;
           return (
             <View key={m.muscle} style={[styles.row, me && styles.rowMe]}>
-              <Text style={[styles.rowName, me && { color: colors.brand }]} numberOfLines={1}>{m.label}</Text>
+              <Text style={[styles.rowName, me && { color: colors.brandText }]} numberOfLines={1}>{m.label}</Text>
               <View style={styles.track}>
                 <View style={[styles.fill, { width: `${Math.max(4, (m.count / maxCount) * 100)}%`, backgroundColor: t.bar }]} />
               </View>
@@ -111,24 +111,25 @@ export const ZoneBoard: React.FC<Props> = ({ muscles, myMuscle, bestLabel, sugge
 };
 
 const styles = StyleSheet.create({
-  card: { ...card, padding: 16, gap: 12 },
-  label: { fontSize: 13, color: colors.text, fontWeight: '700' },
-  rowsNote: { fontSize: 11, color: colors.textMuted, marginTop: -4 },
+  // Stacked sections on the Affluence sheet, like the "Toute la salle" side.
+  card: { gap: 16 },
+  label: { fontSize: 14, color: colors.text, fontWeight: '700' },
+  rowsNote: { fontSize: 12, color: colors.textMuted },
 
-  chips: { flexDirection: 'row', gap: 6, paddingVertical: 2 },
-  chip: { height: 32, paddingHorizontal: 12, borderRadius: 16, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center' },
-  chipOn: { borderColor: colors.brand, backgroundColor: colors.brand + '18' },
-  chipText: { fontSize: 12, fontWeight: '700', color: colors.textMuted },
-  chipTextOn: { color: colors.brand },
+  chips: { flexDirection: 'row', gap: 8, paddingVertical: 2 },
+  chip: { height: 40, paddingHorizontal: 16, borderRadius: 999, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center' },
+  chipOn: { borderColor: colors.text, backgroundColor: colors.text },
+  chipText: { fontSize: 14, fontWeight: '700', color: colors.textSecondary },
+  chipTextOn: { color: colors.onInverse },
 
-  verdict: { borderRadius: 12, padding: 12 },
-  verdictText: { fontSize: 13, color: colors.text, lineHeight: 19 },
+  verdict: { borderRadius: 16, padding: 14 },
+  verdictText: { fontSize: 14, color: colors.text, lineHeight: 20 },
   verdictBold: { fontWeight: '800' },
 
-  rows: { gap: 9 },
+  rows: { gap: 12, padding: 18, borderRadius: radius.cardLg, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
   row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  rowMe: { backgroundColor: colors.brand + '14', marginHorizontal: -8, paddingHorizontal: 8, paddingVertical: 5, borderRadius: 10 },
-  rowName: { width: 78, fontSize: 13, fontWeight: '700', color: colors.text },
+  rowMe: { backgroundColor: colors.brandSoft, marginHorizontal: -8, paddingHorizontal: 8, paddingVertical: 6, borderRadius: 12 },
+  rowName: { width: 80, fontSize: 14, fontWeight: '700', color: colors.text },
   track: { flex: 1, height: 10, borderRadius: 99, backgroundColor: colors.track, overflow: 'hidden' },
   fill: { height: '100%', borderRadius: 99 },
   count: { width: 64, textAlign: 'right', fontSize: 12, color: colors.textMuted, fontWeight: '700' },

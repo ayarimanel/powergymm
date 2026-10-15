@@ -106,7 +106,7 @@ export const CrowdFlipCard: React.FC<Props> = ({ renderGym, renderMuscles }) => 
               accessibilityLabel={s.label}
               style={[styles.switchBtn, on && styles.switchBtnOn]}
             >
-              <Icon name={s.icon as any} size={15} color={on ? colors.onBrand : colors.textSecondary} />
+              <Icon name={s.icon as any} size={15} color={on ? colors.onInverse : colors.textSecondary} />
               <Text style={[styles.switchText, on && styles.switchTextOn]} numberOfLines={1}>
                 {s.label}
               </Text>
@@ -155,21 +155,21 @@ export const CrowdFlipCard: React.FC<Props> = ({ renderGym, renderMuscles }) => 
 
 const styles = StyleSheet.create({
   head: { gap: 10 },
-  switch: { flexDirection: 'row', backgroundColor: colors.track, borderRadius: radius.pill, padding: 3 },
-  switchBtn: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, height: 36, borderRadius: radius.pill, paddingHorizontal: 8 },
-  switchBtnOn: { backgroundColor: colors.brand },
-  switchText: { fontSize: 13, fontWeight: '800', color: colors.textSecondary },
-  switchTextOn: { color: colors.onBrand },
+  switch: { flexDirection: 'row', backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: radius.pill, padding: 4 },
+  switchBtn: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, height: 44, borderRadius: radius.pill, paddingHorizontal: 8 },
+  switchBtnOn: { backgroundColor: colors.text },
+  switchText: { fontSize: 14, fontWeight: '800', color: colors.textSecondary },
+  switchTextOn: { color: colors.onInverse },
   newDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.brand, marginLeft: -2, marginTop: -8 },
-  explain: { fontSize: 13, lineHeight: 18, color: colors.textSecondary },
+  explain: { fontSize: 14, fontWeight: '500', lineHeight: 20, color: colors.textSecondary },
 
-  foot: { gap: 12, borderTopWidth: 1, borderTopColor: colors.divider, paddingTop: 12 },
+  foot: { gap: 14 },
   legend: { flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 6 },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  legendDot: { width: 9, height: 9, borderRadius: 5 },
-  legendText: { fontSize: 11, color: colors.textMuted },
+  legendDot: { width: 10, height: 10, borderRadius: 5 },
+  legendText: { fontSize: 12, color: colors.textSecondary },
   legendWord: { fontWeight: '800', color: colors.textSecondary },
-  flipBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 42, borderRadius: radius.pill, backgroundColor: colors.brandSoft },
+  flipBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 48, borderRadius: radius.pill, backgroundColor: colors.brandSoft },
   flipText: { fontSize: 13, fontWeight: '800', color: colors.brandText },
   newTag: { backgroundColor: colors.brand, borderRadius: radius.pill, paddingHorizontal: 7, paddingVertical: 2 },
   newTagText: { fontSize: 10, fontWeight: '800', color: colors.onBrand },

@@ -3,10 +3,13 @@ import { Animated, Easing, Pressable, ScrollView, StyleSheet, View } from 'react
 import { Text } from '../ui/Text';
 import { Icon } from '../ui/Icon';
 import { FloorSnapshot } from '../../floor/useFloorSnapshot';
+import { TrainingTimeSlot } from '../../types/database';
 import { WeekForecast } from '../../floor/useWeekForecast';
-import { LEVEL_LABEL } from '../../floor/crowd';
+import { CrowdLevel, LEVEL_LABEL } from '../../floor/crowd';
 import { levelTint } from '../../floor/levelColors';
-import { card, colors } from '../../theme';
+import { colors, fonts, radius } from '../../theme';
+import Svg, { Circle, Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
+import { Title } from '../ui/Title';
 import { haptics } from '../../utils/haptics';
 import { claimSwipe } from '../../navigation/swipeGuard';
 
@@ -19,12 +22,60 @@ interface Props {
   onScanOut: () => void;
   /** Owner setting: false = levels only, never a number of people. */
   showCounts: boolean;
+  /** The member's usual training time (sign-up): shown as "Ton créneau" with how busy it usually is. */
+  usualSlot?: TrainingTimeSlot;
   /** Placed inside the card, above and below the content (the flip card's switch and button). */
   header?: React.ReactNode;
   footer?: React.ReactNode;
 }
 
 const DAY_LABELS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+const DAY_FULL = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+/** Hours of each training-time choice (same split as the sign-up cards). */
+const SLOT_HOURS: Record<TrainingTimeSlot, [number, number]> = { morning: [6, 12], afternoon: [12, 17], evening: [17, 22] };
+const LEVEL_RANK: Record<CrowdLevel, number> = { calme: 0, moyen: 1, plein: 2 };
+
+/** How full the gym is, as a ring (design-ref Affluence). */
+const RING = 124;
+const RING_STROKE = 12;
+const Ring: React.FC<{ fill: number; children: React.ReactNode }> = ({ fill, children }) => {
+  const r = (RING - RING_STROKE) / 2;
+  const c = 2 * Math.PI * r;
+  return (
+    <View style={{ width: RING, height: RING }}>
+      <Svg width={RING} height={RING}>
+        <Circle cx={RING / 2} cy={RING / 2} r={r} stroke={colors.track} strokeWidth={RING_STROKE} fill="none" />
+        <Circle
+          cx={RING / 2}
+          cy={RING / 2}
+          r={r}
+          stroke={colors.brand}
+          strokeWidth={RING_STROKE}
+          fill="none"
+          strokeLinecap="round"
+          strokeDasharray={`${c * Math.max(0, Math.min(1, fill))} ${c}`}
+          transform={`rotate(-90 ${RING / 2} ${RING / 2})`}
+        />
+      </Svg>
+      <View style={styles.ringCenter} pointerEvents="none">{children}</View>
+    </View>
+  );
+};
+
+/** A usual-crowd bar: light at the top, fading into the card (design-ref Affluence). */
+const FadeBar: React.FC<{ id: string; opacity: number }> = ({ id, opacity }) => (
+  <Svg width="100%" height="100%" preserveAspectRatio="none" style={StyleSheet.absoluteFill}>
+    <Defs>
+      <LinearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+        <Stop offset="0" stopColor={colors.text} stopOpacity={0.9 * opacity} />
+        <Stop offset="1" stopColor={colors.text} stopOpacity={0.12 * opacity} />
+      </LinearGradient>
+    </Defs>
+    <Rect x="0" y="0" width="100%" height="100%" rx="5" fill={`url(#${id})`} />
+  </Svg>
+);
+/** When the club hides counts, the ring follows the level instead of the head count. */
+const LEVEL_FILL = { calme: 0.33, moyen: 0.66, plein: 1 } as const;
 const pad = (n: number) => String(n).padStart(2, '0');
 const weekdayOf = (d: Date) => (d.getDay() + 6) % 7;
 
@@ -65,7 +116,7 @@ export const FloorLocked: React.FC<{ gymName: string; onScan: () => void }> = ({
   </View>
 );
 
-export const FloorLive: React.FC<Props> = ({ snapshot, week, alertOn, onToggleAlert, checkedIn, onScanOut, showCounts, header, footer }) => {
+export const FloorLive: React.FC<Props> = ({ snapshot, week, alertOn, onToggleAlert, checkedIn, onScanOut, showCounts, usualSlot, header, footer }) => {
   const todayIndex = weekdayOf(snapshot.now);
   const [selDay, setSelDay] = useState(todayIndex);
   const [selHour, setSelHour] = useState<number | null>(null);
@@ -140,20 +191,41 @@ export const FloorLive: React.FC<Props> = ({ snapshot, week, alertOn, onToggleAl
 
   // When it's busy, the answer ("come at 15h") goes first, before the problem.
   const busy = snapshot.level !== 'calme';
+  const [bestRange, bestLevel] = (bestLabel ?? '').split(' · ');
+  const todayCurve = week?.byDay[todayIndex] ?? snapshot.hourly;
+  const slot = usualSlot ? SLOT_HOURS[usualSlot] : null;
+  const slotHours = slot ? todayCurve.filter(h => h.hour >= slot[0] && h.hour < slot[1]) : [];
+  const slotLevel = slotHours.length ? slotHours.reduce((a, b) => (LEVEL_RANK[b.level] > LEVEL_RANK[a.level] ? b : a)).level : null;
   const bestBox = bestLabel ? (
-    <View style={styles.best}>
-      <View style={{ flex: 1 }}>
-        <Text style={styles.bestLabel}>{busy ? 'Plus calme aujourd’hui' : 'Meilleur créneau aujourd’hui'}</Text>
-        <Text style={styles.bestValue}>{bestLabel}</Text>
+    <View style={styles.tiles}>
+      <View style={styles.tile} accessible accessibilityLabel={`${busy ? 'Plus calme aujourd’hui' : 'Meilleur créneau aujourd’hui'} : ${bestLabel}`}>
+        <View style={styles.tileIc}>
+          <Icon name="moon-outline" size={20} color={colors.brandText} />
+        </View>
+        <Text style={styles.tileValue}>{bestRange}</Text>
+        <Text style={styles.tileLabel}>{busy ? 'Plus calme aujourd’hui' : 'Meilleur créneau aujourd’hui'}{bestLevel ? ` · ${bestLevel}` : ''}</Text>
       </View>
-      <Pressable
-        onPress={onToggleAlert}
-        accessibilityRole="button"
-        style={({ pressed }) => [styles.alertBtn, alertOn ? styles.alertBtnOn : styles.alertBtnGhost, pressed && { opacity: 0.85 }]}
-      >
-        <Icon name={alertOn ? 'notifications' : 'notifications-outline'} size={15} color={alertOn ? colors.green.text : colors.brand} />
-        <Text style={[styles.alertText, { color: alertOn ? colors.green.text : colors.brand }]}>{alertOn ? 'Alerte activée' : "M'alerter si calme"}</Text>
-      </Pressable>
+      {slot && slotLevel ? (
+        <View style={styles.tile} accessible accessibilityLabel={`Ton créneau, ${slot[0]}h – ${slot[1]}h : souvent ${LEVEL_LABEL[slotLevel].toLowerCase()}`}>
+          <View style={styles.tileIc}>
+            <Icon name="time-outline" size={20} color={colors.brandText} />
+          </View>
+          <Text style={styles.tileValue}>{slot[0]}h – {slot[1]}h</Text>
+          <Text style={styles.tileLabel}>Ton créneau · souvent {LEVEL_LABEL[slotLevel].toLowerCase()}</Text>
+        </View>
+      ) : (
+        <Pressable
+          onPress={onToggleAlert}
+          accessibilityRole="button"
+          accessibilityState={{ selected: alertOn }}
+          style={({ pressed }) => [styles.tile, alertOn && styles.tileOn, pressed && { opacity: 0.85 }]}
+        >
+          <View style={[styles.tileIc, alertOn && { backgroundColor: colors.green.soft }]}>
+            <Icon name={alertOn ? 'notifications' : 'notifications-outline'} size={20} color={alertOn ? colors.green.text : colors.brandText} />
+          </View>
+          <Text style={[styles.tileAction, alertOn && { color: colors.green.text }]}>{alertOn ? 'Alerte activée' : "M'alerter si calme"}</Text>
+        </Pressable>
+      )}
     </View>
   ) : null;
 
@@ -172,44 +244,41 @@ export const FloorLive: React.FC<Props> = ({ snapshot, week, alertOn, onToggleAl
   return (
     <View style={styles.card}>
       {header}
-      {/* Top: live tag + status pill */}
-      <View style={styles.topRow}>
-        <View style={{ flex: 1 }}>
+      {/* Top: ring + live count (design-ref Affluence) */}
+      <View style={styles.liveCard}>
+        <Ring fill={showCounts ? live / Math.max(1, snapshot.capacity) : LEVEL_FILL[snapshot.level]}>
+          {showCounts ? (
+            <>
+              <Text style={styles.ringPct}>{Math.round(Math.min(1, live / Math.max(1, snapshot.capacity)) * 100)}</Text>
+              <Text style={styles.ringSub}>% rempli</Text>
+            </>
+          ) : (
+            <Text style={[styles.ringWord, { color: tint.text }]}>{LEVEL_LABEL[snapshot.level]}</Text>
+          )}
+        </Ring>
+        <View style={styles.liveInfo}>
           <View style={styles.tagRow}>
-            <PulseDot color={tint.bar} />
+            <PulseDot color={colors.brand} />
             <Text style={styles.tag}>EN DIRECT · {pad(nowHour)}:{pad(snapshot.now.getMinutes())}</Text>
           </View>
-          <View style={styles.countRow}>
-            {showCounts ? (
-              <>
+          {showCounts ? (
+            <>
+              <View style={styles.countRow}>
                 <Text style={styles.count}>{live}</Text>
-                <Text style={styles.unit}>membres{'\n'}sur le plateau</Text>
-              </>
-            ) : (
-              <>
-                <Text style={[styles.count, styles.levelWord, { color: tint.text }]}>{LEVEL_LABEL[snapshot.level].charAt(0) + LEVEL_LABEL[snapshot.level].slice(1).toLowerCase()}</Text>
-                <Text style={styles.unit}>en ce{'\n'}moment</Text>
-              </>
-            )}
-          </View>
-        </View>
-        {showCounts && (
+                <Text style={styles.cap}>/ {snapshot.capacity}</Text>
+              </View>
+              <Text style={styles.unit}>membres sur le plateau</Text>
+            </>
+          ) : (
+            <Text style={[styles.levelWord, { color: tint.text }]}>
+              {LEVEL_LABEL[snapshot.level].charAt(0) + LEVEL_LABEL[snapshot.level].slice(1).toLowerCase()} en ce moment
+            </Text>
+          )}
           <View style={[styles.pill, { backgroundColor: tint.soft }]}>
-            <Text style={[styles.pillText, { color: tint.text }]}>{LEVEL_LABEL[snapshot.level]}</Text>
+            <Text style={[styles.pillText, { color: tint.text }]}>
+              {LEVEL_LABEL[snapshot.level]}{cmp ? ` · ${cmp.strong}${cmp.rest}` : ''}
+            </Text>
           </View>
-        )}
-      </View>
-
-      {/* Gauge */}
-      <View style={styles.gaugeWrap}>
-        <View style={styles.gauge}>
-          <View style={[styles.gaugeFill, { width: `${Math.min(100, (live / snapshot.capacity) * 100)}%`, backgroundColor: tint.bar }]} />
-        </View>
-        <View style={styles.gaugeLabels}>
-          <Text style={styles.cmp}>
-            {cmp ? (<><Text style={styles.bold}>{cmp.strong}</Text>{cmp.rest}</>) : ' '}
-          </Text>
-          {showCounts && <Text style={styles.cap}>{live} / {snapshot.capacity} places</Text>}
         </View>
       </View>
 
@@ -221,6 +290,11 @@ export const FloorLive: React.FC<Props> = ({ snapshot, week, alertOn, onToggleAl
           <Text style={styles.scanOutText}>Tu es là — terminer ma séance</Text>
         </Pressable>
       )}
+
+      <View>
+        <Title variant="section">{isToday ? 'Aujourd’hui' : DAY_FULL[selDay]}</Title>
+        <Text style={styles.secSub}>Habituellement vs maintenant</Text>
+      </View>
 
       {/* Day selector */}
       <ScrollView horizontal onTouchStart={claimSwipe} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.days}>
@@ -244,6 +318,7 @@ export const FloorLive: React.FC<Props> = ({ snapshot, week, alertOn, onToggleAl
       <View style={styles.readoutWrap}>{readout}</View>
 
       {/* Chart */}
+      <View style={styles.chartCard}>
       <View style={styles.chart}>
         {hourly.map(h => {
           const sel = selHour === h.hour;
@@ -258,15 +333,13 @@ export const FloorLive: React.FC<Props> = ({ snapshot, week, alertOn, onToggleAl
               style={styles.barSlot}
             >
               <View style={styles.barTrack}>
-                <View
-                  style={[
-                    styles.barUsual,
-                    { height: `${Math.max(2, (h.count / maxCount) * 100)}%`, opacity: past ? 0.5 : 1 },
-                    sel && { backgroundColor: colors.textMuted },
-                  ]}
-                />
+                <View style={[styles.barUsual, { height: `${Math.max(2, (h.count / maxCount) * 100)}%` }, sel && { backgroundColor: colors.textMuted }]}>
+                  {!sel && <FadeBar id={`bar-${selDay}-${h.hour}`} opacity={past ? 0.55 : 1} />}
+                </View>
                 {isNow && (
-                  <View style={[styles.barNow, { height: `${Math.max(2, (live / maxCount) * 100)}%`, backgroundColor: colors.brand }]} />
+                  <View style={[styles.barNow, { height: `${Math.max(2, (live / maxCount) * 100)}%`, backgroundColor: colors.brand }]}>
+                    {showCounts && <Text style={styles.barNowLabel} numberOfLines={1}>{live}</Text>}
+                  </View>
                 )}
               </View>
             </Pressable>
@@ -279,9 +352,10 @@ export const FloorLive: React.FC<Props> = ({ snapshot, week, alertOn, onToggleAl
         <Text style={styles.axisText}>18h</Text>
         <Text style={styles.axisText}>22h</Text>
       </View>
+      </View>
 
       <View style={styles.legend}>
-        <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: colors.pastBar }]} /><Text style={styles.legendText}>Habituellement</Text></View>
+        <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: colors.textSecondary }]} /><Text style={styles.legendText}>Habituellement</Text></View>
         <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: colors.brand }]} /><Text style={styles.legendText}>Maintenant</Text></View>
       </View>
 
@@ -293,65 +367,73 @@ export const FloorLive: React.FC<Props> = ({ snapshot, week, alertOn, onToggleAl
 };
 
 const styles = StyleSheet.create({
-  card: { ...card, borderRadius: 24, padding: 16, gap: 14 },
-  closed: { alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 28 },
+  // The view is a stack of sections (design-ref Affluence); the closed state keeps a card.
+  card: { gap: 16 },
+  closed: { alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 28, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: radius.cardLg },
   closedTitle: { fontSize: 18, fontWeight: '800', color: colors.text },
   closedSub: { fontSize: 14, color: colors.textSecondary },
-  unlock: { flexDirection: 'row', alignItems: 'center', gap: 8, height: 44, paddingHorizontal: 18, borderRadius: 22, backgroundColor: colors.brand, marginTop: 6 },
+  unlock: { flexDirection: 'row', alignItems: 'center', gap: 8, height: 48, paddingHorizontal: 20, borderRadius: 999, backgroundColor: colors.brand, marginTop: 6 },
   unlockText: { color: colors.white, fontSize: 14, fontWeight: '800' },
+
+  liveCard: { flexDirection: 'row', alignItems: 'center', gap: 18, padding: 18, borderRadius: radius.cardLg, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
+  ringCenter: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' },
+  ringPct: { fontFamily: fonts.headingBlack, fontWeight: 'normal', fontSize: 34, lineHeight: 36, color: colors.text },
+  ringSub: { fontSize: 12, fontWeight: '600', color: colors.textSecondary },
+  ringWord: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 18 },
+  liveInfo: { flex: 1, gap: 6 },
 
   topRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   tagRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
-  tag: { fontSize: 11, fontWeight: '800', letterSpacing: 0.8, color: colors.textMuted },
+  tag: { fontSize: 11, fontWeight: '800', letterSpacing: 1.6, color: colors.textSecondary },
   dotWrap: { width: 8, height: 8, alignItems: 'center', justifyContent: 'center' },
   dot: { width: 8, height: 8, borderRadius: 4 },
   dotHalo: { position: 'absolute', width: 8, height: 8, borderRadius: 4 },
 
-  countRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 8, marginTop: 6 },
-  count: { fontSize: 54, lineHeight: 52, fontWeight: '900', color: colors.text },
-  unit: { fontSize: 13, fontWeight: '700', color: colors.textMuted, marginBottom: 4 },
-  levelWord: { fontSize: 40, lineHeight: 44 },
-  pill: { paddingHorizontal: 14, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
-  pillText: { fontSize: 13, fontWeight: '800' },
+  countRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 6 },
+  count: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 52, lineHeight: 52, color: colors.brand },
+  unit: { fontSize: 13, fontWeight: '600', color: colors.textSecondary },
+  levelWord: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 30, lineHeight: 32 },
+  pill: { alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10 },
+  pillText: { fontSize: 11, fontWeight: '800', letterSpacing: 1, textTransform: 'uppercase' },
 
-  gaugeWrap: { gap: 5 },
-  gauge: { height: 8, borderRadius: 99, backgroundColor: colors.track, overflow: 'hidden' },
-  gaugeFill: { height: '100%', borderRadius: 99 },
-  gaugeLabels: { flexDirection: 'row', justifyContent: 'space-between' },
   cmp: { fontSize: 12, color: colors.textMuted, flexShrink: 1 },
-  cap: { fontSize: 12, color: colors.textMuted, fontWeight: '600' },
+  cap: { fontSize: 16, color: colors.textSecondary, fontWeight: '700', marginBottom: 6 },
   bold: { fontWeight: '800', color: colors.text },
 
-  scanOut: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', height: 30, paddingHorizontal: 12, borderRadius: 15, backgroundColor: colors.track },
-  scanOutText: { fontSize: 12, fontWeight: '800', color: colors.text },
+  scanOut: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 44, borderRadius: 999, backgroundColor: colors.bg },
+  scanOutText: { fontSize: 14, fontWeight: '700', color: colors.text },
 
-  days: { flexDirection: 'row', gap: 6, paddingVertical: 2 },
-  dayChip: { height: 30, paddingHorizontal: 12, borderRadius: 15, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center' },
+  secSub: { fontSize: 14, fontWeight: '500', color: colors.textSecondary, marginTop: 4 },
+
+  days: { flexDirection: 'row', gap: 8, paddingVertical: 2 },
+  dayChip: { height: 40, paddingHorizontal: 18, borderRadius: 999, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center' },
   dayChipOn: { backgroundColor: colors.text, borderColor: colors.text },
-  dayChipText: { fontSize: 12, fontWeight: '700', color: colors.textMuted },
-  dayChipTextOn: { color: colors.card },
+  dayChipText: { fontSize: 14, fontWeight: '700', color: colors.textSecondary },
+  dayChipTextOn: { color: colors.onInverse },
 
   readoutWrap: { minHeight: 20 },
-  readout: { fontSize: 13, color: colors.textSecondary },
+  readout: { fontSize: 13, color: colors.textSecondary, lineHeight: 19 },
 
-  chart: { flexDirection: 'row', alignItems: 'flex-end', gap: 3, height: 110, borderBottomWidth: 1, borderBottomColor: colors.border, paddingTop: 6 },
+  chartCard: { padding: 16, paddingTop: 22, borderRadius: radius.cardLg, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
+  chart: { flexDirection: 'row', alignItems: 'flex-end', gap: 5, height: 150, paddingTop: 14 },
   barSlot: { flex: 1, height: '100%', justifyContent: 'flex-end' },
   barTrack: { height: '100%', justifyContent: 'flex-end', position: 'relative' },
-  barUsual: { width: '100%', backgroundColor: colors.pastBar, borderTopLeftRadius: 5, borderTopRightRadius: 5 },
-  barNow: { position: 'absolute', left: '18%', right: '18%', bottom: 0, borderTopLeftRadius: 4, borderTopRightRadius: 4 },
-  axis: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 },
-  axisText: { fontSize: 11, color: colors.textMuted, fontWeight: '600' },
+  barUsual: { width: '100%', borderTopLeftRadius: 5, borderTopRightRadius: 5, overflow: 'hidden' },
+  barNow: { position: 'absolute', left: 0, right: 0, bottom: 0, borderTopLeftRadius: 5, borderTopRightRadius: 5, alignItems: 'center' },
+  barNowLabel: { position: 'absolute', top: -18, width: 40, textAlign: 'center', fontSize: 12, fontWeight: '800', color: colors.brandText },
+  axis: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
+  axisText: { fontSize: 12, color: colors.textMuted, fontWeight: '600' },
 
   legend: { flexDirection: 'row', gap: 16 },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  legendDot: { width: 10, height: 10, borderRadius: 3 },
-  legendText: { fontSize: 11, color: colors.textMuted },
+  legendDot: { width: 10, height: 10, borderRadius: 5 },
+  legendText: { fontSize: 12, color: colors.textSecondary },
 
-  best: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.bg, borderRadius: 14, padding: 12 },
-  bestLabel: { fontSize: 11, color: colors.textMuted, fontWeight: '600' },
-  bestValue: { fontSize: 14, fontWeight: '800', color: colors.text, marginTop: 2 },
-  alertBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 36, paddingHorizontal: 12, borderRadius: 12 },
-  alertBtnGhost: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
-  alertBtnOn: { backgroundColor: colors.green.soft },
-  alertText: { fontSize: 12, fontWeight: '800' },
+  tiles: { flexDirection: 'row', gap: 12 },
+  tile: { flex: 1, gap: 8, padding: 16, borderRadius: radius.cardLg, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
+  tileOn: { borderColor: colors.green.bar },
+  tileIc: { width: 42, height: 42, borderRadius: 21, backgroundColor: colors.brandSoft, alignItems: 'center', justifyContent: 'center' },
+  tileValue: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 28, lineHeight: 30, color: colors.brandText },
+  tileLabel: { fontSize: 13, fontWeight: '500', lineHeight: 18, color: colors.textSecondary },
+  tileAction: { fontSize: 15, fontWeight: '800', lineHeight: 20, color: colors.text, marginTop: 6 },
 });

@@ -2,7 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MarketplaceProduct, ProductReservation, ReservationStatus, UserProfile } from '../types/database';
 import { DEFAULT_PRODUCTS } from '../data/defaultProducts';
 
-const PRODUCTS_KEY = '@gym_app_shop_products_v1';
+// v2: demo catalogue from housenutrition.tn (earlier saved catalogues are left untouched).
+const PRODUCTS_KEY = '@gym_app_shop_products_v2';
 const RESERVATIONS_KEY = '@gym_app_shop_reservations_v1';
 const CART_KEY = '@gym_app_shop_cart_v1';
 

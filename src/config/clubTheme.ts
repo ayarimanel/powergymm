@@ -15,6 +15,8 @@ const clubTheme = {
   get logoOnDark() { return require('../../assets/brand/logo-powergym-white.png'); },
   /** The red W on white: avatar of the club's official posts, favicon. */
   get mark() { return require('../../assets/brand/favicon-powergym.png'); },
+  /** Text logo (Wordmark component): main word, accent word in the primary color, small spaced line under it. */
+  wordmark: { main: 'POWER', accent: 'GYM', sub: 'TUNIS' },
   /** Shown where a 2-letter avatar stands for the club. */
   clubInitials: 'PG',
   /** Width / height of the logo files, so they never get squashed. */
@@ -109,6 +111,9 @@ const clubTheme = {
     xl: 20,
     pill: 999,
     card: 16,
+    /** New design: big cards and sheets. */
+    cardLg: 24,
+    input: 16,
   },
 
   // ─── Login screen ───

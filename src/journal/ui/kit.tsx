@@ -4,7 +4,7 @@ import { Text } from '../../components/ui/Text';
 import Svg, { Path } from 'react-native-svg';
 import { MuscleGroup } from '../../types/database';
 import { Recovery } from '../journalLogic';
-import { colors } from '../../theme';
+import { buttonShadow, colors, fonts, radius } from '../../theme';
 
 /** Journal tokens (Journal.css), mapped onto the app theme. */
 export const J = {
@@ -84,7 +84,7 @@ export function Seg<T extends string | number>({ options, value, onChange, small
         const on = v === value;
         return (
           <Pressable key={String(v)} onPress={() => onChange(v)} accessibilityRole="tab" accessibilityState={{ selected: on }} style={[k.segBtn, small && k.segBtnSm, on && k.segOn]}>
-            <Text style={[k.segText, small && { fontSize: 11 }, on && { color: colors.onBrand }]}>{label}</Text>
+            <Text style={[k.segText, small && { fontSize: 11 }, on && { color: colors.onInverse }]}>{label}</Text>
           </Pressable>
         );
       })}
@@ -143,18 +143,18 @@ export const MuscleIcon: React.FC<{ id: MuscleGroup; color: string; small?: bool
 export const Dot: React.FC<{ color: string; size?: number }> = ({ color, size = 8 }) => <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: color }} />;
 
 export const k = StyleSheet.create({
-  card: { backgroundColor: J.surface, borderWidth: 1, borderColor: J.line, borderRadius: 20, padding: 14, shadowColor: colors.black, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 14, elevation: 1 },
-  sec: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 10 },
-  h2: { fontSize: 15, fontWeight: '800', color: J.fg },
-  sub: { fontSize: 12, color: J.muted },
+  card: { backgroundColor: J.surface, borderWidth: 1, borderColor: J.line, borderRadius: radius.cardLg, padding: 16 },
+  sec: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 12 },
+  h2: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 22, lineHeight: 24, color: J.fg, textTransform: 'uppercase', flexShrink: 1 },
+  sub: { fontSize: 12, fontWeight: '600', color: J.muted },
   empty: { color: J.muted, fontSize: 13, marginTop: 6, marginBottom: 10 },
   note: { fontSize: 11, color: J.muted, marginTop: 10, lineHeight: 16 },
 
-  btn: { borderRadius: 14, paddingVertical: 12, paddingHorizontal: 16, alignItems: 'center', justifyContent: 'center', minHeight: 44 },
-  btnSm: { paddingVertical: 6, paddingHorizontal: 10, borderRadius: 10, minHeight: 32 },
-  btn_primary: { backgroundColor: J.accent },
+  btn: { borderRadius: 999, paddingVertical: 12, paddingHorizontal: 20, alignItems: 'center', justifyContent: 'center', minHeight: 48 },
+  btnSm: { paddingVertical: 6, paddingHorizontal: 14, borderRadius: 999, minHeight: 34 },
+  btn_primary: { backgroundColor: J.accent, ...buttonShadow },
   btn_soft: { backgroundColor: J.accentSoft },
-  btn_ghost: { backgroundColor: J.surface2 },
+  btn_ghost: { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: colors.disabled },
   btn_danger: { backgroundColor: J.tired },
   btn_dark: { backgroundColor: J.fg },
   btnText: { fontWeight: '800', fontSize: 14 },
@@ -170,17 +170,17 @@ export const k = StyleSheet.create({
   seg: { flexDirection: 'row', backgroundColor: J.surface2, borderRadius: 999, padding: 3, alignSelf: 'flex-start' },
   segBtn: { borderRadius: 999, paddingVertical: 5, paddingHorizontal: 10 },
   segBtnSm: { paddingVertical: 3, paddingHorizontal: 9 },
-  // Active segment = the club color, as the filter pills
-  segOn: { backgroundColor: colors.brand, shadowColor: colors.brand, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4, elevation: 1 },
-  segText: { fontSize: 12, fontWeight: '700', color: J.muted },
+  // Active segment = light fill, dark text (the mockup's selected chips)
+  segOn: { backgroundColor: colors.text },
+  segText: { fontSize: 12, fontWeight: '700', color: colors.textSecondary },
 
-  kpis: { flexDirection: 'row', backgroundColor: J.surface2, borderRadius: 14, paddingVertical: 10, paddingHorizontal: 4 },
+  kpis: { flexDirection: 'row', backgroundColor: colors.bg, borderRadius: 16, paddingVertical: 12, paddingHorizontal: 4 },
   kpisTight: { backgroundColor: 'transparent', padding: 0, gap: 16 },
   kpi: { flex: 1, alignItems: 'center', minWidth: 0 },
-  kpiV: { fontSize: 24, fontWeight: '900', color: J.fg, lineHeight: 26 },
-  kpiL: { fontSize: 11, color: J.muted },
+  kpiV: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 28, color: J.fg, lineHeight: 30 },
+  kpiL: { fontSize: 11, fontWeight: '600', color: J.muted },
 
-  pill: { alignSelf: 'center', borderRadius: 8, paddingHorizontal: 7, paddingVertical: 2, marginTop: 3 },
+  pill: { alignSelf: 'center', borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2, marginTop: 3 },
   pillText: { fontSize: 10.5, fontWeight: '800' },
 
   ic: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center' },

@@ -118,6 +118,7 @@ function AppInner() {
   const [currentTab, setCurrentTab] = useState<ActiveTab>('floor');
   const [wallFocus, setWallFocus] = useState<string | null>(null); // Wall post to open (from a notification)
   const [journalStart, setJournalStart] = useState(0); // bumped to start a session (after a check-in)
+  const [journalBilan, setJournalBilan] = useState(0); // bumped to open "Mon bilan" from Accueil
 
   // Tab history, so back (button, gesture, edge swipe) returns to the previous tab.
   const [tabHistory, setTabHistory] = useState<ActiveTab[]>([]);
@@ -357,6 +358,10 @@ function AppInner() {
                   setJournalStart(t => t + 1);
                   openTab('machines');
                 }}
+                onOpenBilan={() => {
+                  setJournalBilan(t => t + 1);
+                  openTab('machines');
+                }}
               />
             )}
             {currentTab === 'shop' && <MarketplaceScreen user={userProfile} />}
@@ -370,7 +375,7 @@ function AppInner() {
             )}
             {currentTab === 'coaches' && <CoachProfilesScreen user={userProfile} onUpdateUser={setUserProfile} />}
             {currentTab === 'machines' && (
-              <JournalScreen user={userProfile} startToken={journalStart} />
+              <JournalScreen user={userProfile} startToken={journalStart} bilanToken={journalBilan} />
             )}
         </>
       </Animated.View>

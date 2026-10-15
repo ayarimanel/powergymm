@@ -10,9 +10,11 @@ interface Props {
   user: UserProfile;
   /** Bumped by the app after a check-in to start a session right away. */
   startToken?: number;
+  /** Bumped to open "Mon bilan" (Accueil quick action). */
+  bilanToken?: number;
 }
 
-export const JournalScreen: React.FC<Props> = ({ user, startToken }) => {
+export const JournalScreen: React.FC<Props> = ({ user, startToken, bilanToken }) => {
   const scrollRef = useScrollToTopOnReselect('machines');
   const data = useJournalData({ userId: user.id });
 
@@ -38,6 +40,7 @@ export const JournalScreen: React.FC<Props> = ({ user, startToken }) => {
       startToken={startToken}
       scrollRef={scrollRef}
       gender={user.gender}
+      bilanToken={bilanToken}
     />
   );
 };

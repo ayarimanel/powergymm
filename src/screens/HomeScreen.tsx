@@ -89,6 +89,8 @@ interface HomeScreenProps {
   onWipe: () => void;
   /** Open the Journal and start a session (offered right after a check-in). */
   onStartSession: () => void;
+  /** Open the Journal on "Mon bilan". */
+  onOpenBilan?: () => void;
 }
 
 const REFRESH_MS = 30_000;
@@ -108,7 +110,7 @@ const QuickAction: React.FC<{ icon: IconName; label: string; onPress: () => void
   </Pressable>
 );
 
-export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOpenWallPost, onNavigate, onOpenAccount, onLogout, onWipe, onStartSession }) => {
+export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOpenWallPost, onNavigate, onOpenAccount, onLogout, onWipe, onStartSession, onOpenBilan }) => {
   const [floor, setFloor] = useState<LiveFloorSummary | null>(null);
   const [gymConfig, setGymConfig] = useState<GymProfileConfig | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -622,7 +624,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
               <QuickAction icon="barbell-outline" label="Séance" onPress={onStartSession} />
               <QuickAction icon="ribbon-outline" label="Coachs" onPress={() => onNavigate('coaches')} />
               <QuickAction icon="bag-handle-outline" label="Boutique" onPress={() => onNavigate('shop')} />
-              <QuickAction icon="pulse-outline" label="Mon bilan" onPress={() => onNavigate('machines')} />
+              <QuickAction icon="pulse-outline" label="Mon bilan" onPress={() => (onOpenBilan ? onOpenBilan() : onNavigate('machines'))} />
             </>
           )}
         </View>

@@ -29,6 +29,9 @@ interface Props {
   onDelete: (id: string) => void;
   /** The member's gender (sign-up): which body "Mon corps" shows first. */
   gender?: GenderType;
+  /** "Mon journal" page: the calendar of sessions, or the bilan. */
+  onOpenHistory?: () => void;
+  onOpenBilan?: () => void;
 }
 
 /** One line per exercise: "Développé couché ........ 3 × 10 à 40 kg" */
@@ -67,8 +70,8 @@ const statusText = (r: Recovery) =>
 const statusColor = (r: Recovery) =>
   r.status === 'never' ? J.muted : r.status === 'ready' ? J.okText : r.status === 'recovering' ? J.recText : J.tiredText;
 
-export const JournalHome: React.FC<Props> = ({ history, saved, active, now, selDay, setSelDay, onStart, onRepeat, onResume, onMuscle, onDelete, gender }) => {
-  const [period, setPeriod] = useState<7 | 30>(7);
+export const JournalHome: React.FC<Props> = ({ history, saved, active, now, selDay, setSelDay, onStart, onRepeat, onResume, onMuscle, onDelete, gender, onOpenHistory, onOpenBilan }) => {
+  const period = 7; // "Cette semaine"; 30 days live in Mon bilan
   const [confirmDel, setConfirmDel] = useState<string | null>(null);
   const [sex, setSex] = useState<BodySex>(gender === 'female' ? 'femme' : 'homme');
   const week = weekDays(history, now);
@@ -77,7 +80,6 @@ export const JournalHome: React.FC<Props> = ({ history, saved, active, now, selD
   const sugg = suggestMuscle(history, now);
   const suggR = sugg && muscleRecovery(history, sugg.id, now);
   const stats = useMemo(() => periodStats(history, period, now), [history, period, now]);
-  const maxSets = Math.max(1, ...Object.values(stats.perMuscle).map(x => x?.sets ?? 0));
   const status = Object.fromEntries(MUSCLES.map(m => [m.id, muscleRecovery(history, m.id, now).status])) as Record<MuscleGroup, Recovery['status']>;
   const cardio = muscleRecovery(history, 'cardio', now);
 
@@ -211,14 +213,10 @@ export const JournalHome: React.FC<Props> = ({ history, saved, active, now, selD
       </View>
 
       {/* Dernières séances */}
-      {!active && <LastSessions history={saved} now={now} onRepeat={onRepeat} />}
+      {!active && <LastSessions history={saved} now={now} onRepeat={onRepeat} onOpenHistory={onOpenHistory} />}
 
       {/* Cette semaine / 30 jours */}
-      <SectionHeader
-        title={period === 7 ? 'Cette semaine' : '30 derniers jours'}
-        style={s.sec}
-        right={<Seg small options={[[7, '7 j'], [30, '30 j']]} value={period} onChange={setPeriod} />}
-      />
+      <SectionHeader title="Cette semaine" style={s.sec} actionLabel={onOpenBilan ? 'Mon bilan →' : undefined} onAction={onOpenBilan} />
       <View style={s.tiles}>
         <View style={s.tile}>
           <Text style={[s.tileNum, tabular]}>{stats.activeDays}</Text>
@@ -237,37 +235,17 @@ export const JournalHome: React.FC<Props> = ({ history, saved, active, now, selD
           <Text style={s.tileLabel}>record{stats.prs > 1 ? 's' : ''}</Text>
         </View>
       </View>
-      <Card>
-        <Text style={s.barsTitle}>Séries par muscle</Text>
-        <View style={s.bars}>
-          {MUSCLES.map(m => {
-            const x = stats.perMuscle[m.id] ?? { sets: 0, volume: 0 };
-            return (
-              <View key={m.id} style={s.bar}>
-                <Text style={s.barName} numberOfLines={1}>{m.name}</Text>
-                <View style={s.barTrack}>
-                  <View style={[s.barFill, { width: `${(x.sets / maxSets) * 100}%` }]} />
-                </View>
-                <Text style={[s.barVal, tabular]}>
-                  <Text style={{ color: J.fg, fontWeight: '800' }}>{x.sets}</Text> séries
-                </Text>
-              </View>
-            );
-          })}
-        </View>
-        <Text style={k.note}>Compté en séries : c'est plus juste que les kg pour comparer les muscles (les jambes soulèvent toujours plus lourd).</Text>
-      </Card>
     </View>
   );
 };
 
 /** Last sessions as log cards (design-ref Entrainement): exercises + "Refaire" with the same weights. */
-const LastSessions: React.FC<{ history: Workout[]; now: Date; onRepeat: (w: Workout) => void }> = ({ history, now, onRepeat }) => {
+const LastSessions: React.FC<{ history: Workout[]; now: Date; onRepeat: (w: Workout) => void; onOpenHistory?: () => void }> = ({ history, now, onRepeat, onOpenHistory }) => {
   const list = repeatableSessions(history, 3);
   if (!list.length) return null;
   return (
     <>
-      <SectionHeader title="Dernières séances" style={s.sec} right={<Text style={s.caption}>avec tes derniers poids</Text>} />
+      <SectionHeader title="Dernières séances" style={s.sec} actionLabel={onOpenHistory ? 'Historique' : undefined} onAction={onOpenHistory} />
       {list.map(({ workout, muscles }, i) => {
         const d = new Date(workout.date);
         return (

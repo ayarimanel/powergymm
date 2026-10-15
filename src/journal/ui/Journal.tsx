@@ -9,6 +9,7 @@ import {
 import { SyncInfo, newId } from '../journalSync';
 import { haptics } from '../../utils/haptics';
 import { JournalHome } from './JournalHome';
+import { JournalPage, JournalTab } from './JournalPage';
 import { Logger } from './Logger';
 import { MuscleSheet, SheetState } from './MuscleSheet';
 import { ActiveBar, Rest, RestTimer, Session, Summary, Toast } from './SessionScreens';
@@ -34,10 +35,13 @@ interface Props {
   scrollRef?: React.RefObject<ScrollView | null>;
   /** The member's gender: which body "Mon corps" shows first. */
   gender?: GenderType;
+  /** Changes each time another page asks to open "Mon bilan" (Accueil quick action). */
+  bilanToken?: number;
 }
 
 const REST_DEFAULT = 90;
 let handledStartToken = 0;
+let handledBilanToken = 0;
 
 function useTick(active: boolean) {
   const [now, setNow] = useState(() => new Date());
@@ -49,15 +53,16 @@ function useTick(active: boolean) {
   return now;
 }
 
-export const Journal: React.FC<Props> = ({ history, customExercises, draft, onDraftChange, onSaveWorkout, onDeleteWorkout, onCreateExercise, sync, startToken, scrollRef, gender }) => {
+export const Journal: React.FC<Props> = ({ history, customExercises, draft, onDraftChange, onSaveWorkout, onDeleteWorkout, onCreateExercise, sync, startToken, scrollRef, gender, bilanToken }) => {
   setCustomExercises(customExercises); // keep the catalog in sync before rendering anything
 
-  type Screen = 'home' | 'logger' | 'session' | 'summary';
+  type Screen = 'home' | 'logger' | 'session' | 'summary' | 'journal';
   const [screen, setScreen] = useState<Screen>(draft ? 'session' : 'home');
   const [sheet, setSheet] = useState<SheetState | null>(null);
   const [active, setActive] = useState<Workout | null>(draft);
   const [exIdx, setExIdx] = useState(0);
   const [selDay, setSelDay] = useState(() => new Date());
+  const [journalTab, setJournalTab] = useState<JournalTab>('seances');
   const [rest, setRest] = useState<Rest | null>(null);
   /** Rest length picked in the timer (60/90/120 s), used for the next sets too. */
   const [restLen, setRestLen] = useState(REST_DEFAULT);
@@ -107,6 +112,14 @@ export const Journal: React.FC<Props> = ({ history, customExercises, draft, onDr
       setSheet({ picker: true });
     }
   }, [startToken]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Accueil's "Mon bilan" quick action: open the Bilan tab (same remembering as startToken).
+  useEffect(() => {
+    if (!bilanToken || bilanToken <= handledBilanToken) return;
+    handledBilanToken = bilanToken;
+    setJournalTab('bilan');
+    setScreen('journal');
+  }, [bilanToken]);
 
   const openExercise = (exerciseId: string) => {
     let w = active || startWorkout(selDay);
@@ -238,6 +251,21 @@ export const Journal: React.FC<Props> = ({ history, customExercises, draft, onDr
         onBack={() => setScreen('home')}
       />
     );
+  } else if (screen === 'journal') {
+    body = (
+      <JournalPage
+        history={history}
+        now={now}
+        tab={journalTab}
+        setTab={setJournalTab}
+        onBack={() => setScreen('home')}
+        onRepeat={repeatWorkout}
+        onDay={d => {
+          setSelDay(d);
+          setScreen('home');
+        }}
+      />
+    );
   } else if (screen === 'summary' && finished) {
     body = (
       <Summary
@@ -265,6 +293,14 @@ export const Journal: React.FC<Props> = ({ history, customExercises, draft, onDr
         onResume={() => setScreen('session')}
         onMuscle={id => setSheet({ muscleId: id })}
         gender={gender}
+        onOpenHistory={() => {
+          setJournalTab('seances');
+          setScreen('journal');
+        }}
+        onOpenBilan={() => {
+          setJournalTab('bilan');
+          setScreen('journal');
+        }}
         onDelete={async id => {
           try {
             await onDeleteWorkout(id);

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Communauté</title>
+</head>
+<body>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,800;1,900&amp;family=Manrope:wght@500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>@font-face{font-family:'Manrope';font-style:normal;font-weight:500;src:url(fonts/manrope-latin-500-normal.woff2) format('woff2')}@font-face{font-family:'Manrope';font-style:normal;font-weight:600;src:url(fonts/manrope-latin-600-normal.woff2) format('woff2')}@font-face{font-family:'Manrope';font-style:normal;font-weight:700;src:url(fonts/manrope-latin-700-normal.woff2) format('woff2')}@font-face{font-family:'Manrope';font-style:normal;font-weight:800;src:url(fonts/manrope-latin-800-normal.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:500;src:url(fonts/barlow-condensed-latin-500-normal.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:600;src:url(fonts/barlow-condensed-latin-600-normal.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:700;src:url(fonts/barlow-condensed-latin-700-normal.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:800;src:url(fonts/barlow-condensed-latin-800-normal.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:900;src:url(fonts/barlow-condensed-latin-900-normal.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:italic;font-weight:500;src:url(fonts/barlow-condensed-latin-500-italic.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:italic;font-weight:600;src:url(fonts/barlow-condensed-latin-600-italic.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:italic;font-weight:700;src:url(fonts/barlow-condensed-latin-700-italic.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:italic;font-weight:800;src:url(fonts/barlow-condensed-latin-800-italic.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:italic;font-weight:900;src:url(fonts/barlow-condensed-latin-900-italic.woff2) format('woff2')}
+body{margin:0;background:#0B0B0C}
+*{box-sizing:border-box}
+.s{width:390px;background:#0B0B0C;color:#F5F5F5;font-family:'Manrope',sans-serif;position:relative;overflow:hidden;padding:52px 20px 120px;display:flex;flex-direction:column;gap:16px}
+.h2{font-family:'Barlow Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:24px;line-height:1.1;margin:0}
+.cp{font-size:12px;font-weight:600;color:#A1A1A6}
+.sb{display:flex;align-items:center;justify-content:space-between}
+.row{display:flex;align-items:center}
+a{color:#E31E24;text-decoration:none}
+.chip{height:36px;padding:0 14px;border-radius:999px;background:#141416;border:1px solid #2A2A2E;color:#A1A1A6;font:700 13px 'Manrope';flex-shrink:0}
+.chip.on{background:#E31E24;border-color:#E31E24;color:#fff}
+.rec{display:flex;flex-direction:column;align-items:center;gap:4px;width:76px;flex-shrink:0}
+.rec .av{width:64px;height:64px;border-radius:32px;padding:3px;border:2px solid #E31E24}
+.rec .av span{width:100%;height:100%;border-radius:29px;background:#1C1C1F;display:flex;align-items:center;justify-content:center;font:800 18px 'Manrope'}
+.cm{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #2A2A2E;color:#F5F5F5}
+.cm .ic{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font:800 14px 'Manrope'}
+.post{padding:16px;border-radius:24px;background:#141416;border:1px solid #2A2A2E;display:flex;flex-direction:column;gap:12px}
+.post p{margin:0;font:500 15px/1.5 'Manrope'}
+.au{display:flex;align-items:center;gap:10px}
+.au .a{width:40px;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;font:800 14px 'Manrope';flex-shrink:0}
+.acts{display:flex;gap:18px;color:#A1A1A6;font:700 13px 'Manrope'}
+.acts span{display:flex;align-items:center;gap:6px}
+.nav{position:absolute;left:16px;right:16px;bottom:22px;height:72px;border-radius:28px;background:#141416;border:1px solid #2A2A2E;display:flex;align-items:center;justify-content:space-between;padding:0 18px}
+.nav a{display:flex;flex-direction:column;align-items:center;gap:4px;color:#6B6B70;font:700 11px 'Manrope';min-width:48px}
+.nav a.on{color:#E31E24}
+.nav a.on::after{content:'';width:16px;height:3px;border-radius:2px;background:#E31E24}
+.nav a.sc{width:52px;height:52px;min-width:52px;border-radius:26px;background:#E31E24;color:#fff;justify-content:center}
+</style>
+<div class="s" style="height: 1720px">
+  <div class="sb">
+    <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic; text-transform: uppercase; font-size: 40px; line-height: 1">Communauté</h1>
+    <span style="width: 40px; height: 40px; border-radius: 20px; border: 2px solid #E31E24; background: #3A1214; display: flex; align-items: center; justify-content: center; font: 800 14px 'Manrope'; color: #E31E24">M</span>
+  </div>
+  <div class="row" style="padding: 4px; border-radius: 999px; background: #1C1C1F">
+    <button style="flex: 1; height: 40px; border-radius: 999px; background: #E31E24; color: #fff; border: 0; font: 800 13px 'Manrope'">Pour toi</button>
+    <button style="flex: 1; height: 40px; border-radius: 999px; background: transparent; color: #A1A1A6; border: 0; font: 700 13px 'Manrope'">Communautés</button>
+  </div>
+  <div style="position: relative; height: 220px; border-radius: 24px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; padding: 18px">
+    <img src="images/deadlift.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+    <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,11,12,.05), rgba(11,11,12,.92) 85%)"></div>
+    <span style="position: absolute; top: 14px; left: 14px; padding: 5px 10px; border-radius: 8px; background: #E31E24; color: #fff; font: 800 11px 'Manrope'; letter-spacing: 1px">DÉFI DU CLUB</span>
+    <div style="position: relative; display: flex; align-items: flex-end; justify-content: space-between; gap: 10px">
+      <div style="display: flex; flex-direction: column; gap: 6px"><span class="h2" style="font-size: 28px">Défi deadlift samedi</span><span class="row" style="gap: 8px; font: 700 13px 'Manrope'; color: #ff6a6e"><span style="width: 3px; height: 14px; border-radius: 2px; background: #E31E24"></span>Inscriptions à l'accueil · 1 mois offert</span></div>
+      <button style="height: 40px; padding: 0 16px; border-radius: 999px; background: #F5F5F5; color: #0B0B0C; border: 0; font: 800 13px 'Manrope'; flex-shrink: 0">Participer</button>
+    </div>
+  </div>
+  <div class="sb"><h2 class="h2">Records du club</h2><a href="#" style="font: 700 13px 'Manrope'">Tout voir</a></div>
+  <div class="row" style="gap: 10px; overflow: hidden; margin-right: -20px; align-items: flex-start">
+    <div class="rec"><span class="av"><img src="images/coach-karim.jpg" alt="" style="width: 100%; height: 100%; border-radius: 29px; object-fit: cover"></span><b style="font: 800 15px 'Barlow Condensed'; font-size: 18px">160 kg</b><span class="cp" style="text-align: center">Soulevé de terre</span></div>
+    <div class="rec"><span class="av"><img src="images/coach-sarra.jpg" alt="" style="width: 100%; height: 100%; border-radius: 29px; object-fit: cover"></span><b style="font-family: 'Barlow Condensed'; font-weight: 800; font-size: 18px">120 kg</b><span class="cp">Squat</span></div>
+    <div class="rec"><span class="av"><span>A</span></span><b style="font-family: 'Barlow Condensed'; font-weight: 800; font-size: 18px">100 kg</b><span class="cp" style="text-align: center">Développé couché</span></div>
+    <div class="rec"><span class="av"><span>S</span></span><b style="font-family: 'Barlow Condensed'; font-weight: 800; font-size: 18px">42 min</b><span class="cp">10 km tapis</span></div>
+  </div>
+  <div class="sb"><h2 class="h2">Mes communautés</h2><a href="#" style="font: 700 13px 'Manrope'">Explorer</a></div>
+  <div>
+    <a href="PageCommunaute.html" class="cm"><span class="ic" style="background: #E31E24; color: #fff">PG</span><span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font: 800 15px 'Manrope'">Le Club</span><span class="cp">412 membres · Officielle · 2 nouveaux</span></span><span class="cp" style="color: #6B6B70">17:05</span></a>
+    <a href="PageCommunaute.html" class="cm"><span class="ic" style="background: #12233A; color: #5AA9FF">G</span><span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font: 800 15px 'Manrope'">Général</span><span class="cp">312 membres · Ouverte · 9 nouveaux</span></span><span class="cp" style="color: #6B6B70">16:40</span></a>
+    <a href="PageCommunaute.html" class="cm" style="border-bottom: 0"><span class="ic" style="background: #0F2A1A; color: #22C55E">D</span><span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font: 800 15px 'Manrope'">Débutants</span><span class="cp">88 membres · Privée · 5 nouveaux</span></span><span class="cp" style="color: #6B6B70">Hier</span></a>
+  </div>
+  <div class="row" style="gap: 12px; padding: 10px 10px 10px 14px; border-radius: 999px; background: #141416; border: 1px solid #2A2A2E">
+    <span style="width: 32px; height: 32px; border-radius: 16px; background: #3A1214; color: #E31E24; display: flex; align-items: center; justify-content: center; font: 800 12px 'Manrope'">M</span>
+    <span style="flex: 1; font: 500 14px 'Manrope'; color: #6B6B70">Pose une question ou partage un record…</span>
+  </div>
+  <div class="row" style="gap: 8px; overflow: hidden; margin-right: -20px"><button class="chip on">Tout</button><button class="chip">Records</button><button class="chip">Questions</button><button class="chip">Le Club</button></div>
+  <div class="post">
+    <div class="au"><span class="a" style="background: #E31E24; color: #fff">PG</span><span style="flex: 1; display: flex; flex-direction: column"><span class="row" style="gap: 6px; font: 800 14px 'Manrope'">Power Gym Tunis<span style="padding: 2px 6px; border-radius: 5px; background: #3A1214; color: #ff6a6e; font: 800 10px 'Manrope'">OFFICIEL</span></span><span class="cp" style="color: #6B6B70">dans Le Club · il y a 1 h</span></span></div>
+    <p>Le nouveau rack de squat est arrivé dans la zone force. Venez le tester ce week-end !</p>
+    <div class="acts"><span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>52</span><span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>Commenter</span></div>
+  </div>
+  <div class="post">
+    <div class="au"><span class="a" style="background: #26262A">?</span><span style="flex: 1; display: flex; flex-direction: column"><span style="font: 800 14px 'Manrope'">Membre anonyme</span><span class="cp" style="color: #6B6B70">dans Débutants · il y a 3 h</span></span><span style="padding: 3px 8px; border-radius: 6px; background: #12233A; color: #5AA9FF; font: 800 10px 'Manrope'">QUESTION</span></div>
+    <p>C'est normal d'avoir un peu mal aux genoux au squat ? Je débute depuis 2 semaines.</p>
+    <div style="padding: 12px 14px; border-radius: 16px; background: #3A1214; display: flex; flex-direction: column; gap: 6px">
+      <span class="row" style="gap: 6px; font: 800 12px 'Manrope'; color: #ff6a6e"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path></svg>Répondu par Coach Sonia</span>
+      <span style="font: 500 14px/1.5 'Manrope'">Une gêne légère peut venir de la position des pieds. Passe me voir demain 18h, on regarde ta technique.</span>
+    </div>
+    <div class="acts"><span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>14</span><span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>Répondre</span></div>
+  </div>
+  <button style="position: absolute; right: 20px; bottom: 112px; height: 52px; padding: 0 22px; border-radius: 999px; background: #E31E24; color: #fff; border: 0; font: 800 15px 'Manrope'; display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 24px rgba(227,30,36,.45)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Publier</button>
+  <nav class="nav" aria-label="Navigation principale">
+    <a href="Main.html" aria-label="Accueil"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></a>
+    <a href="Entrainement.html" aria-label="Entraînement"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.4 14.4 9.6 9.6"></path><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"></path><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"></path></svg></a>
+    <a href="Scan.html" class="sc" aria-label="Scanner à l'entrée"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="5" height="5" x="3" y="3" rx="1"></rect><rect width="5" height="5" x="16" y="3" rx="1"></rect><rect width="5" height="5" x="3" y="16" rx="1"></rect><path d="M21 16h-3a2 2 0 0 0-2 2v3"></path><path d="M12 7v3a2 2 0 0 1-2 2H7"></path><path d="M16 12h1"></path><path d="M12 21v-1"></path></svg></a>
+    <a href="Boutique.html" aria-label="Boutique"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg></a>
+    <a href="Communaute.html" class="on"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>Communauté</a>
+  </nav>
+</div>
+</body>
+</html>

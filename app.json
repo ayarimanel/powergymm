@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "Power Gym Tunis",
+    "slug": "gym-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#FFFFFF",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Autorise l’accès à tes photos pour publier sur le Mur et choisir ta photo de profil.",
+          "cameraPermission": "Autorise l’appareil photo pour prendre une photo de séance ou de repas."
+        }
+      ],
+      "expo-font"
+    ]
+  }
+}

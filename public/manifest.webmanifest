@@ -1,0 +1,20 @@
+{
+  "name": "Power Gym Tunis",
+  "short_name": "Power Gym",
+  "description": "Plus qu’une salle, une communauté. L’affluence du club, tes séances et les coachs.",
+  "lang": "fr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFFFFF",
+  "theme_color": "#E31E24",
+  "icons": [
+    {
+      "src": "/icons/icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

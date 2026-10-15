@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Affluence</title>
+</head>
+<body>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,800;1,900&amp;family=Manrope:wght@500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>@font-face{font-family:'Manrope';font-style:normal;font-weight:500;src:url(fonts/manrope-latin-500-normal.woff2) format('woff2')}@font-face{font-family:'Manrope';font-style:normal;font-weight:600;src:url(fonts/manrope-latin-600-normal.woff2) format('woff2')}@font-face{font-family:'Manrope';font-style:normal;font-weight:700;src:url(fonts/manrope-latin-700-normal.woff2) format('woff2')}@font-face{font-family:'Manrope';font-style:normal;font-weight:800;src:url(fonts/manrope-latin-800-normal.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:500;src:url(fonts/barlow-condensed-latin-500-normal.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:600;src:url(fonts/barlow-condensed-latin-600-normal.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:700;src:url(fonts/barlow-condensed-latin-700-normal.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:800;src:url(fonts/barlow-condensed-latin-800-normal.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:900;src:url(fonts/barlow-condensed-latin-900-normal.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:italic;font-weight:500;src:url(fonts/barlow-condensed-latin-500-italic.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:italic;font-weight:600;src:url(fonts/barlow-condensed-latin-600-italic.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:italic;font-weight:700;src:url(fonts/barlow-condensed-latin-700-italic.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:italic;font-weight:800;src:url(fonts/barlow-condensed-latin-800-italic.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:italic;font-weight:900;src:url(fonts/barlow-condensed-latin-900-italic.woff2) format('woff2')}
+body{margin:0;background:#0B0B0C}
+*{box-sizing:border-box}
+.s{width:390px;background:#0B0B0C;color:#F5F5F5;font-family:'Manrope',sans-serif;position:relative;overflow:hidden;padding:52px 20px 120px;display:flex;flex-direction:column;gap:16px}
+.h2{font-family:'Barlow Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:24px;line-height:1.1;margin:0}
+.n{font-family:'Barlow Condensed',sans-serif;font-weight:800;line-height:1}
+.lb{font-size:13px;font-weight:700}
+.cp{font-size:12px;font-weight:600;color:#A1A1A6}
+.ov{font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase}
+.card{background:#141416;border:1px solid #2A2A2E;border-radius:24px;padding:18px}
+.sb{display:flex;align-items:center;justify-content:space-between}
+.row{display:flex;align-items:center}
+a{color:#E31E24;text-decoration:none}
+.mini{flex:1;display:flex;flex-direction:column;gap:10px}
+.mini .i{width:48px;height:48px;border-radius:24px;background:#3A1214;display:flex;align-items:center;justify-content:center}
+.chip{height:36px;padding:0 14px;border-radius:999px;background:#1C1C1F;border:1px solid #2A2A2E;color:#A1A1A6;font:700 13px 'Manrope';flex-shrink:0}
+.chip.on{background:#F5F5F5;border-color:#F5F5F5;color:#0B0B0C}
+.bars{display:flex;align-items:flex-end;gap:5px;height:170px}
+.bars span{flex:1;border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,#F5F5F5,rgba(245,245,245,.12))}
+.nav{position:absolute;left:16px;right:16px;bottom:22px;height:72px;border-radius:28px;background:#141416;border:1px solid #2A2A2E;display:flex;align-items:center;justify-content:space-between;padding:0 18px}
+.nav a{display:flex;flex-direction:column;align-items:center;gap:4px;color:#6B6B70;font:700 11px 'Manrope';min-width:48px}
+.nav a.on{color:#E31E24}
+.nav a.on::after{content:'';width:16px;height:3px;border-radius:2px;background:#E31E24}
+.nav a.sc{width:52px;height:52px;min-width:52px;border-radius:26px;background:#E31E24;color:#fff;justify-content:center}
+</style>
+<div class="s" style="height: 1120px">
+  <div class="sb">
+    <a href="Main.html" aria-label="Retour" style="width: 44px; height: 44px; border-radius: 22px; background: #1C1C1F; display: flex; align-items: center; justify-content: center; color: #F5F5F5"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg></a>
+    <span class="h2" style="font-size: 22px">Affluence</span>
+    <button aria-label="M'alerter quand c'est calme" style="width: 44px; height: 44px; border-radius: 22px; background: #1C1C1F; border: 0; color: #F5F5F5; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg></button>
+  </div>
+  <div class="card row" style="gap: 20px; padding: 22px">
+    <div style="position: relative; width: 132px; height: 132px; flex-shrink: 0">
+      <svg width="132" height="132" viewBox="0 0 132 132" aria-hidden="true"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF5A3C"></stop><stop offset="1" stop-color="#E31E24"></stop></linearGradient></defs><circle cx="66" cy="66" r="56" fill="none" stroke="#26262A" stroke-width="13"></circle><circle cx="66" cy="66" r="56" fill="none" stroke="url(#rg)" stroke-width="13" stroke-linecap="round" stroke-dasharray="253 352" transform="rotate(-90 66 66)"></circle></svg>
+      <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="n" style="font-size: 36px">72</span><span class="cp">% rempli</span></div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <span class="row ov" style="gap: 6px; color: #A1A1A6"><span style="width: 8px; height: 8px; border-radius: 4px; background: #E31E24"></span>En direct · 18:30</span>
+      <span class="row" style="gap: 4px; align-items: baseline"><span class="n" style="font-size: 52px; color: #E31E24">36</span><span class="lb" style="color: #A1A1A6">/ 50</span></span>
+      <span class="cp">membres sur le plateau</span>
+      <span style="align-self: flex-start; padding: 4px 10px; border-radius: 8px; background: #33240A; color: #F5A524; font: 800 11px 'Manrope'; letter-spacing: 1px">MOYEN · COMME D'HABITUDE</span>
+    </div>
+  </div>
+  <div class="row" style="gap: 12px; align-items: stretch">
+    <div class="card mini"><span class="i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E31E24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg></span><span class="n" style="font-size: 30px; color: #E31E24">21h–22h</span><span class="cp">Plus calme aujourd'hui</span></div>
+    <div class="card mini"><span class="i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E31E24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg></span><span class="n" style="font-size: 30px; color: #E31E24">18h–20h</span><span class="cp">Ton créneau · souvent chargé</span></div>
+  </div>
+  <div style="margin-top: 6px"><h2 class="h2">Aujourd'hui</h2><span class="cp">Habituellement vs maintenant</span></div>
+  <div class="row" style="gap: 8px; overflow: hidden; margin-right: -20px">
+    <button class="chip">Lun</button><button class="chip">Mar</button><button class="chip">Mer</button><button class="chip on">Jeu</button><button class="chip">Ven</button><button class="chip">Sam</button><button class="chip">Dim</button>
+  </div>
+  <div class="card" style="display: flex; flex-direction: column; gap: 10px; padding: 18px 16px">
+    <div class="bars" aria-label="Affluence par heure, de 6h à 22h">
+      <span style="height: 12%"></span><span style="height: 22%"></span><span style="height: 30%"></span><span style="height: 26%"></span><span style="height: 18%"></span><span style="height: 16%"></span><span style="height: 24%"></span><span style="height: 28%"></span><span style="height: 22%"></span><span style="height: 26%"></span><span style="height: 40%"></span><span style="height: 60%"></span>
+      <span style="height: 72%; background: linear-gradient(180deg,#FF5A3C,rgba(227,30,36,.35)); position: relative"><b style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font: 800 12px 'Manrope'; color: #E31E24">36</b></span>
+      <span style="height: 92%"></span><span style="height: 74%"></span><span style="height: 40%"></span><span style="height: 20%"></span>
+    </div>
+    <div class="sb cp" style="color: #6B6B70"><span>6h</span><span>10h</span><span>14h</span><span>18h</span><span>22h</span></div>
+  </div>
+  <div class="row cp" style="gap: 14px">
+    <span class="row" style="gap: 6px"><span style="width: 8px; height: 8px; border-radius: 4px; background: #22C55E"></span>Calme</span>
+    <span class="row" style="gap: 6px"><span style="width: 8px; height: 8px; border-radius: 4px; background: #F5A524"></span>Moyen · un peu d'attente</span>
+    <span class="row" style="gap: 6px"><span style="width: 8px; height: 8px; border-radius: 4px; background: #E31E24"></span>Chargé</span>
+  </div>
+  <div class="row" style="padding: 4px; border-radius: 999px; background: #1C1C1F">
+    <button style="flex: 1; height: 40px; border-radius: 999px; background: #F5F5F5; color: #0B0B0C; border: 0; font: 800 13px 'Manrope'">Toute la salle</button>
+    <button style="flex: 1; height: 40px; border-radius: 999px; background: transparent; color: #A1A1A6; border: 0; font: 700 13px 'Manrope'">Par muscle · voir les zones prises</button>
+  </div>
+  <nav class="nav" aria-label="Navigation principale">
+    <a href="Main.html" class="on"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>Accueil</a>
+    <a href="Entrainement.html" aria-label="Entraînement"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.4 14.4 9.6 9.6"></path><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"></path><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"></path></svg></a>
+    <a href="Scan.html" class="sc" aria-label="Scanner à l'entrée"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="5" height="5" x="3" y="3" rx="1"></rect><rect width="5" height="5" x="16" y="3" rx="1"></rect><rect width="5" height="5" x="3" y="16" rx="1"></rect><path d="M21 16h-3a2 2 0 0 0-2 2v3"></path><path d="M12 7v3a2 2 0 0 1-2 2H7"></path><path d="M16 12h1"></path><path d="M12 21v-1"></path></svg></a>
+    <a href="Boutique.html" aria-label="Boutique"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg></a>
+    <a href="Communaute.html" aria-label="Communauté"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></a>
+  </nav>
+</div>
+</body>
+</html>

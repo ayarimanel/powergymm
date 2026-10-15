@@ -282,7 +282,7 @@ export const FloorLive: React.FC<Props> = ({ snapshot, week, alertOn, onToggleAl
         </View>
       </View>
 
-      {busy && bestBox}
+      {bestBox}
 
       {checkedIn && (
         <Pressable onPress={onScanOut} accessibilityRole="button" style={({ pressed }) => [styles.scanOut, pressed && { opacity: 0.85 }]}>
@@ -314,8 +314,8 @@ export const FloorLive: React.FC<Props> = ({ snapshot, week, alertOn, onToggleAl
         })}
       </ScrollView>
 
-      {/* Readout */}
-      <View style={styles.readoutWrap}>{readout}</View>
+      {/* Readout: a tapped bar, or another day */}
+      {(!!selEntry || !isToday) && <View style={styles.readoutWrap}>{readout}</View>}
 
       {/* Chart */}
       <View style={styles.chartCard}>
@@ -330,7 +330,7 @@ export const FloorLive: React.FC<Props> = ({ snapshot, week, alertOn, onToggleAl
               onPress={() => setSelHour(sel ? null : h.hour)}
               accessibilityRole="button"
               accessibilityLabel={showCounts ? `${h.hour}h, habituellement ${h.count} membres` : `${h.hour}h, habituellement ${LEVEL_LABEL[h.level].toLowerCase()}`}
-              style={styles.barSlot}
+              style={[styles.barSlot, isNow && { zIndex: 2 }]}
             >
               <View style={styles.barTrack}>
                 <View style={[styles.barUsual, { height: `${Math.max(2, (h.count / maxCount) * 100)}%` }, sel && { backgroundColor: colors.textMuted }]}>
@@ -348,19 +348,13 @@ export const FloorLive: React.FC<Props> = ({ snapshot, week, alertOn, onToggleAl
       </View>
       <View style={styles.axis}>
         <Text style={styles.axisText}>6h</Text>
-        <Text style={styles.axisText}>12h</Text>
+        <Text style={styles.axisText}>10h</Text>
+        <Text style={styles.axisText}>14h</Text>
         <Text style={styles.axisText}>18h</Text>
         <Text style={styles.axisText}>22h</Text>
       </View>
       </View>
 
-      <View style={styles.legend}>
-        <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: colors.textSecondary }]} /><Text style={styles.legendText}>Habituellement</Text></View>
-        <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: colors.brand }]} /><Text style={styles.legendText}>Maintenant</Text></View>
-      </View>
-
-      {/* Best slot + alert (already shown at the top when it's busy) */}
-      {!busy && bestBox}
       {footer}
     </View>
   );
@@ -415,12 +409,12 @@ const styles = StyleSheet.create({
   readout: { fontSize: 13, color: colors.textSecondary, lineHeight: 19 },
 
   chartCard: { padding: 16, paddingTop: 22, borderRadius: radius.cardLg, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
-  chart: { flexDirection: 'row', alignItems: 'flex-end', gap: 5, height: 150, paddingTop: 14 },
+  chart: { flexDirection: 'row', alignItems: 'flex-end', gap: 6, height: 230, paddingTop: 22 },
   barSlot: { flex: 1, height: '100%', justifyContent: 'flex-end' },
   barTrack: { height: '100%', justifyContent: 'flex-end', position: 'relative' },
   barUsual: { width: '100%', borderTopLeftRadius: 5, borderTopRightRadius: 5, overflow: 'hidden' },
   barNow: { position: 'absolute', left: 0, right: 0, bottom: 0, borderTopLeftRadius: 5, borderTopRightRadius: 5, alignItems: 'center' },
-  barNowLabel: { position: 'absolute', top: -18, width: 40, textAlign: 'center', fontSize: 12, fontWeight: '800', color: colors.brandText },
+  barNowLabel: { position: 'absolute', top: -22, left: '50%', marginLeft: -20, width: 40, textAlign: 'center', fontSize: 14, fontWeight: '800', color: colors.brandText },
   axis: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
   axisText: { fontSize: 12, color: colors.textMuted, fontWeight: '600' },
 

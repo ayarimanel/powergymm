@@ -43,6 +43,8 @@ interface BottomSheetProps {
    * 'sheet': the slide-up sheet with snap points; kept for the coaches and the notifications.
    */
   variant?: 'page' | 'sheet';
+  /** Page only: 'slide' (default) comes in from the right, 'fade' just appears (shop product, panier). */
+  pageMotion?: 'slide' | 'fade';
 }
 
 /** Lets a scroll list inside the sheet tell the sheet whether it is scrolled to the top. */
@@ -83,7 +85,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = props =>
  * the phone's back button/gesture, or Escape on web. Same render prop as the sheet, at
  * full height (expanded = true, extraBottom = the keyboard).
  */
-const PageSheet: React.FC<BottomSheetProps> = ({ visible, onClose, children, header }) => {
+const PageSheet: React.FC<BottomSheetProps> = ({ visible, onClose, children, header, pageMotion = 'slide' }) => {
   const { width: winW } = useWindowDimensions();
   const reduceMotion = useReduceMotion();
   const insets = useSafeAreaInsets();
@@ -95,11 +97,11 @@ const PageSheet: React.FC<BottomSheetProps> = ({ visible, onClose, children, hea
     (toValue: number, done?: () => void) =>
       Animated.timing(translateX, {
         toValue,
-        duration: reduceMotion ? 120 : toValue === 0 ? 300 : 220,
+        duration: reduceMotion || pageMotion === 'fade' ? 140 : toValue === 0 ? 300 : 220,
         easing: toValue === 0 ? Easing.out(Easing.cubic) : Easing.in(Easing.cubic),
         useNativeDriver: true,
       }).start(({ finished }) => finished && done?.()),
-    [translateX, reduceMotion]
+    [translateX, reduceMotion, pageMotion]
   );
 
   const requestClose = useCallback(() => {
@@ -113,7 +115,7 @@ const PageSheet: React.FC<BottomSheetProps> = ({ visible, onClose, children, hea
   useEffect(() => {
     if (visible) {
       setMounted(true);
-      translateX.setValue(reduceMotion ? 0 : winW);
+      translateX.setValue(reduceMotion && pageMotion === 'slide' ? 0 : winW);
       const t = setTimeout(() => slide(0), 16);
       return () => clearTimeout(t);
     } else if (mounted) {
@@ -133,9 +135,14 @@ const PageSheet: React.FC<BottomSheetProps> = ({ visible, onClose, children, hea
 
   if (!mounted) return null;
 
+  const motionStyle =
+    pageMotion === 'fade'
+      ? { opacity: translateX.interpolate({ inputRange: [0, Math.max(1, winW)], outputRange: [1, 0], extrapolate: 'clamp' }) }
+      : { transform: [{ translateX }] };
+
   return (
     <Modal visible transparent animationType="none" onRequestClose={requestClose} statusBarTranslucent>
-      <Animated.View style={[styles.page, { paddingTop: insets.top, transform: [{ translateX }] }]}>
+      <Animated.View style={[styles.page, { paddingTop: insets.top }, motionStyle]}>
         <View style={styles.pageInner}>
           <View style={styles.pageTop}>
             <Pressable onPress={requestClose} hitSlop={8} accessibilityRole="button" accessibilityLabel="Retour" style={({ pressed }) => [styles.back, pressed && { opacity: 0.7 }]}>

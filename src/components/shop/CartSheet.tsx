@@ -25,7 +25,7 @@ export const CartSheet: React.FC<Props> = ({ visible, lines, onClose, onSetQty, 
   const total = orderable.reduce((a, l) => a + l.quantity * l.product.priceTnd, 0);
 
   return (
-    <BottomSheet visible={visible} onClose={onClose} snaps={[0.92]} header={<Title variant="section" size={26}>Panier</Title>}>
+    <BottomSheet visible={visible} onClose={onClose} snaps={[0.92]} pageMotion="fade" header={<Title variant="section" size={26}>Panier</Title>}>
       {(_e, extraBottom) => (
         <View style={{ flex: 1 }}>
           <SheetScrollView contentContainerStyle={[styles.scroll, { paddingBottom: 24 + extraBottom }]} showsVerticalScrollIndicator={false}>

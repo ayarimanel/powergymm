@@ -55,7 +55,7 @@ export const ProductSheet: React.FC<Props> = ({ product, isOwner, onClose, onRes
   };
 
   return (
-    <BottomSheet visible={!!product} onClose={onClose} snaps={[0.9]}>
+    <BottomSheet visible={!!product} onClose={onClose} snaps={[0.9]} pageMotion="fade">
       {() =>
         p ? (
           <View style={{ flex: 1 }}>

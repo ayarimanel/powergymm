@@ -337,9 +337,10 @@ export const FloorLive: React.FC<Props> = ({ snapshot, week, alertOn, onToggleAl
                   {!sel && <FadeBar id={`bar-${selDay}-${h.hour}`} opacity={past ? 0.55 : 1} />}
                 </View>
                 {isNow && (
-                  <View style={[styles.barNow, { height: `${Math.max(2, (live / maxCount) * 100)}%`, backgroundColor: colors.brand }]}>
-                    {showCounts && <Text style={styles.barNowLabel} numberOfLines={1}>{live}</Text>}
-                  </View>
+                  <View style={[styles.barNow, { height: `${Math.max(2, (live / maxCount) * 100)}%`, backgroundColor: colors.brand }]} />
+                )}
+                {isNow && showCounts && (
+                  <Text style={[styles.barNowLabel, { bottom: `${Math.max(2, (live / maxCount) * 100)}%` }]}>{live}</Text>
                 )}
               </View>
             </Pressable>
@@ -414,7 +415,7 @@ const styles = StyleSheet.create({
   barTrack: { height: '100%', justifyContent: 'flex-end', position: 'relative' },
   barUsual: { width: '100%', borderTopLeftRadius: 5, borderTopRightRadius: 5, overflow: 'hidden' },
   barNow: { position: 'absolute', left: 0, right: 0, bottom: 0, borderTopLeftRadius: 5, borderTopRightRadius: 5, alignItems: 'center' },
-  barNowLabel: { position: 'absolute', top: -22, left: '50%', marginLeft: -20, width: 40, textAlign: 'center', fontSize: 14, fontWeight: '800', color: colors.brandText },
+  barNowLabel: { position: 'absolute', left: -16, right: -16, marginBottom: 4, textAlign: 'center', fontSize: 14, fontWeight: '800', color: colors.brandText },
   axis: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
   axisText: { fontSize: 12, color: colors.textMuted, fontWeight: '600' },
 

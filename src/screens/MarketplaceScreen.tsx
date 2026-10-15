@@ -38,7 +38,7 @@ const KpiTile: React.FC<{ icon: string; value: number; label: string; tint?: { b
     disabled={!onPress}
     accessibilityRole={onPress ? 'button' : undefined}
     accessibilityLabel={`${label} : ${value}`}
-    style={[styles.kpi, tint && value > 0 && { backgroundColor: tint.soft }]}
+    style={styles.kpi}
   >
     <Icon name={icon as any} size={18} color={tint && value > 0 ? tint.text : colors.textSecondary} />
     <Text style={[styles.kpiValue, tint && value > 0 && { color: tint.text }]}>{value}</Text>

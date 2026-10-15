@@ -41,11 +41,8 @@ export const ProductCard: React.FC<Props> = ({ product: p, isOwner, onPress, onE
           )}
 
           {!p.inStock && (
-            <View style={styles.soldOutVeil}>
-              <View style={styles.soldOutPill}>
-                <Icon name="close-circle" size={14} color={colors.onInverse} />
-                <Text style={styles.soldOutText}>Rupture</Text>
-              </View>
+            <View style={styles.soldOutTag}>
+              <Text style={styles.soldOutText}>Rupture</Text>
             </View>
           )}
 
@@ -103,9 +100,9 @@ const styles = StyleSheet.create({
   promo: { position: 'absolute', top: 8, left: 8, backgroundColor: colors.brand, borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2 },
   promoText: { color: colors.white, fontSize: 12, fontWeight: '800' },
 
-  soldOutVeil: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' },
-  soldOutPill: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: colors.text, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
-  soldOutText: { color: colors.onInverse, fontSize: 13, fontWeight: '800' },
+  // Same quiet tag as a full coach ("Complet" on the Coachs page)
+  soldOutTag: { position: 'absolute', bottom: 8, left: 8, backgroundColor: colors.track, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 },
+  soldOutText: { color: colors.text, fontSize: 11, fontWeight: '800', letterSpacing: 1.2, textTransform: 'uppercase' },
 
   lowStock: { position: 'absolute', bottom: 8, left: 8, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.amber.soft, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
   lowStockText: { color: colors.amber.text, fontSize: 11, fontWeight: '800' },

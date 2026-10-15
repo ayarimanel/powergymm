@@ -14,7 +14,7 @@ import { Title } from '../components/ui/Title';
 import { SectionHeader } from '../components/ui/SectionHeader';
 import { LiveRingCard } from '../components/home/LiveRingCard';
 import { AffluenceSheet } from '../components/home/AffluenceSheet';
-import { CheckInRecord, CommunityPost, MemberProfile, MuscleGroup, StaffPermissions, UserProfile } from '../types/database';
+import { CheckInRecord, CoachProfile, CommunityPost, MemberProfile, MuscleGroup, StaffPermissions, UserProfile } from '../types/database';
 import { CheckInService } from '../services/checkInService';
 import { LiveFloorEngine, LiveFloorSummary } from '../services/liveFloorEngine';
 import { computeAnalytics, ClubAnalytics } from '../services/analyticsService';
@@ -24,7 +24,9 @@ import { firstName, todayStr } from '../services/floorViewModel';
 import { ClubStatus, ClubStatusService } from '../services/clubStatusService';
 import { ActivityEvent, ActivityService, CommunityService } from '../services/communityService';
 import { FloorService } from '../services/floorService';
-import { CoachService, DAYS } from '../services/coachService';
+import { CoachService, DAYS, isOnFloorNow, isOwnProfile } from '../services/coachService';
+import { CoachCard } from '../components/coaches/CoachCard';
+import { claimSwipe } from '../navigation/swipeGuard';
 import { ClubMember, ClubService, Renewal } from '../services/clubService';
 import { ShopService } from '../services/shopService';
 import { PERMISSION_LABELS, PermissionsService, hasPermission, withFreshPermissions } from '../services/permissionsService';
@@ -120,6 +122,17 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
   const { snapshot, reload: reloadFloor } = useFloorSnapshot(user, gymConfig?.maxGymCapacity ?? 50);
   const week = useWeekForecast(gymConfig?.maxGymCapacity ?? 50);
   const [alertOn, setAlertOn] = useState(false);
+  // Validated coaches for the photo row on Accueil (same cards as the Coachs page).
+  const [homeCoaches, setHomeCoaches] = useState<CoachProfile[]>([]);
+  useEffect(() => {
+    CoachService.getCoaches().then(list =>
+      setHomeCoaches(
+        list
+          .filter(c => c.status !== 'pending')
+          .sort((a, b) => Number(isOnFloorNow(b)) - Number(isOnFloorNow(a)) || Number(b.isAcceptingClients) - Number(a.isAcceptingClients))
+      )
+    );
+  }, []);
   const [showFloorAdmin, setShowFloorAdmin] = useState(false);
   const { streak: weeklyStreak, reload: reloadStreak, setGoal: setStreakGoal } = useWeeklyStreak();
 
@@ -673,16 +686,26 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
         {/* Coachs left the navbar: they open from here. */}
         <View style={styles.section}>
           <SectionHeader title="Les coachs du club" actionLabel="Voir" onAction={() => onNavigate('coaches')} />
-          <Pressable onPress={() => onNavigate('coaches')} accessibilityRole="button" accessibilityLabel="Les coachs du club" style={({ pressed }) => [styles.coachCard, pressed && { opacity: 0.88 }]}>
-            <View style={styles.coachIcon}>
-              <Icon name="ribbon-outline" size={22} color={colors.text} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.coachTitle}>Trouve ton coach</Text>
-              <Text style={styles.coachSub}>Coaching perso, programmes et séances</Text>
-            </View>
-            <Icon name="chevron-forward" size={20} color={colors.textMuted} />
-          </Pressable>
+          {homeCoaches.length > 0 ? (
+            <ScrollView horizontal onTouchStart={claimSwipe} showsHorizontalScrollIndicator={false} snapToInterval={COACH_CARD_W + 10} decelerationRate="fast" contentContainerStyle={styles.coachTrack}>
+              {homeCoaches.map(c => (
+                <View key={c.id} style={{ width: COACH_CARD_W }}>
+                  <CoachCard coach={c} isMine={isOwnProfile(c, user)} onPress={() => onNavigate('coaches')} />
+                </View>
+              ))}
+            </ScrollView>
+          ) : (
+            <Pressable onPress={() => onNavigate('coaches')} accessibilityRole="button" accessibilityLabel="Les coachs du club" style={({ pressed }) => [styles.coachCard, pressed && { opacity: 0.88 }]}>
+              <View style={styles.coachIcon}>
+                <Icon name="ribbon-outline" size={22} color={colors.text} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.coachTitle}>Trouve ton coach</Text>
+                <Text style={styles.coachSub}>Coaching perso, programmes et séances</Text>
+              </View>
+              <Icon name="chevron-forward" size={20} color={colors.textMuted} />
+            </Pressable>
+          )}
         </View>
       </ScrollView>
 
@@ -930,6 +953,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
   );
 };
 
+const COACH_CARD_W = 300;
+
 const styles = StyleSheet.create({
   announce: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.brand, borderRadius: 18, padding: 16, marginBottom: 14 },
   announceTitle: { color: colors.white, fontSize: 16, fontWeight: '800' },
@@ -958,6 +983,7 @@ const styles = StyleSheet.create({
   qaBadgeText: { color: colors.white, fontSize: 11, fontWeight: '800' },
   qaLabel: { fontSize: 13, fontWeight: '600', color: colors.text },
   section: { marginTop: 14, gap: 14 },
+  coachTrack: { paddingRight: 16, gap: 10 },
   coachCard: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 18, borderRadius: radius.cardLg, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
   coachIcon: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center' },
   coachTitle: { fontSize: 16, fontWeight: '800', color: colors.text },

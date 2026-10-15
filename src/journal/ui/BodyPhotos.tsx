@@ -9,7 +9,7 @@ import { colors } from '../../theme';
 /**
  * "Mon corps" (design-ref HANDOFF): face + dos photos side by side, each muscle's
  * recovery drawn as a soft glow on top — green Prêt, orange Récupération, red
- * Fatigué, nothing for Pas encore. Tapping a zone opens that muscle.
+ * Fatigué, nothing for Pas encore. Touching any part of a muscle opens its exercises.
  */
 export type BodySex = 'femme' | 'homme';
 
@@ -40,6 +40,38 @@ const ZONES: Record<'face' | 'dos', Zone[]> = {
     { m: 'legs', x: 61, y: 62, w: 24, h: 20 },
   ],
 };
+
+/**
+ * Tap areas: the whole body is covered, so touching any part of a muscle opens it
+ * (abs → pectoraux side of the torso, hips and glutes → jambes, forearms and hands → bras,
+ * neck/traps from the back → dos). Rectangles in % of the photo itself (all four renders
+ * share the same framing); drawn in order, so later ones win where they overlap.
+ */
+type Rect = { m: MuscleGroup; x0: number; x1: number; y0: number; y1: number };
+const LIMBS: Rect[] = [
+  { m: 'legs', x0: 31, x1: 69, y0: 45, y1: 99 },
+  { m: 'arms', x0: 15, x1: 34, y0: 25, y1: 58 },
+  { m: 'arms', x0: 66, x1: 85, y0: 25, y1: 58 },
+];
+const TAPS: Record<'face' | 'dos', Rect[]> = {
+  face: [
+    ...LIMBS,
+    { m: 'chest', x0: 34, x1: 66, y0: 19, y1: 45 },
+    { m: 'shoulders', x0: 24, x1: 40, y0: 18, y1: 28 },
+    { m: 'shoulders', x0: 60, x1: 76, y0: 18, y1: 28 },
+  ],
+  dos: [
+    ...LIMBS,
+    { m: 'back', x0: 34, x1: 66, y0: 18, y1: 43 },
+    { m: 'back', x0: 41, x1: 59, y0: 14, y1: 18 },
+    { m: 'shoulders', x0: 24, x1: 40, y0: 18, y1: 28 },
+    { m: 'shoulders', x0: 60, x1: 76, y0: 18, y1: 28 },
+  ],
+};
+/** The photos are 768 × 1376, shown "cover" in a 0.47-wide box: same height, sides cropped. */
+const PHOTO_RATIO = 768 / 1376;
+const BOX_RATIO = 0.47;
+const toBoxX = (x: number) => (x * PHOTO_RATIO) / BOX_RATIO - ((PHOTO_RATIO / BOX_RATIO - 1) * 100) / 2;
 
 const GLOW: Record<Recovery['status'], string | null> = {
   ready: colors.green.bar,
@@ -98,16 +130,20 @@ const Photo: React.FC<Props & { side: 'face' | 'dos' }> = ({ sex, side, status, 
           })}
         </Svg>
       )}
-      {/* Tap zones: the same rectangles, invisible */}
-      {ZONES[side].map((z, i) => (
-        <Pressable
-          key={i}
-          onPress={() => onMuscle(z.m)}
-          accessibilityRole="button"
-          accessibilityLabel={`Exercices ${LABEL[z.m]}`}
-          style={[s.zone, { left: `${z.x - z.w / 2}%`, top: `${z.y - z.h / 2}%`, width: `${z.w}%`, height: `${z.h}%` }]}
-        />
-      ))}
+      {/* Tap areas over the whole body, invisible */}
+      {TAPS[side].map((z, i) => {
+        const left = Math.max(0, toBoxX(z.x0));
+        const right = Math.min(100, toBoxX(z.x1));
+        return (
+          <Pressable
+            key={i}
+            onPress={() => onMuscle(z.m)}
+            accessibilityRole="button"
+            accessibilityLabel={`Exercices ${LABEL[z.m]}`}
+            style={[s.zone, { left: `${left}%`, top: `${z.y0}%`, width: `${right - left}%`, height: `${z.y1 - z.y0}%` }]}
+          />
+        );
+      })}
     </View>
   );
 };

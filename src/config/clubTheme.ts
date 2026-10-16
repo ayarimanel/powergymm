@@ -69,6 +69,14 @@ const clubTheme = {
     barChartDefault: '#E0E0E5',
     barChartNow: '#E31E24',
 
+    // Dark pieces on the light page (design-ref/light-mode Accueil-clair-C): tab bar, news bar, main dark button
+    inverse: '#17171A',
+    inverseText: '#FFFFFF',
+    inverseTextMuted: '#A1A1A6',
+    inverseAccent: '#FF6B70',
+    /** Text on a solid amber label ("Ça se remplit"). */
+    onWarning: '#2A1A00',
+
     /** Switch track when off. */
     disabled: '#C9C9CE',
 
@@ -117,6 +125,8 @@ const clubTheme = {
     dangerLight: '#351416',
     barChartDefault: '#34343A',
     disabled: '#4A4A50',
+    inverse: '#202024',
+    inverseAccent: '#FF5A5F',
   } as Record<string, string>,
 
   /** Set at launch by applyColorMode(); read by src/theme.ts. */

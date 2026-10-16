@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { Text } from '../ui/Text';
@@ -91,8 +91,8 @@ export const LiveRingCard: React.FC<Props> = ({ snapshot, showCounts, checkedIn,
               <Text style={s.countOf}>/ {snapshot.capacity} au plateau</Text>
             </View>
           ) : null}
-          <View style={[s.level, { backgroundColor: tint.soft }]}>
-            <Text style={[s.levelText, { color: tint.text }]}>{levelWord}</Text>
+          <View style={[s.level, { backgroundColor: tint.bar }]}>
+            <Text style={[s.levelText, { color: snapshot.level === 'moyen' ? colors.onWarning : colors.white }]}>{levelWord}</Text>
           </View>
           {snapshot.bestHour != null ? <Text style={s.sub}>Plus calme : {snapshot.bestHour}h – {snapshot.bestHour + 1}h</Text> : null}
         </View>
@@ -121,10 +121,10 @@ const s = StyleSheet.create({
   liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.brand },
   liveText: { fontSize: 11, fontWeight: '800', letterSpacing: 1.6, color: colors.textSecondary },
   countRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 6 },
-  count: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 40, lineHeight: 42, color: colors.brand },
+  count: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 40, lineHeight: 42, color: colors.text },
   countOf: { fontSize: 14, fontWeight: '600', color: colors.textSecondary, marginBottom: 6 },
-  level: { alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
-  levelText: { fontSize: 11, fontWeight: '800', letterSpacing: 1 },
+  level: { alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
+  levelText: { fontSize: 11, fontWeight: '800', letterSpacing: 1.2 },
   sub: { fontSize: 13, fontWeight: '500', color: colors.textSecondary },
   scanOut: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 44, marginTop: 16, borderRadius: 999, backgroundColor: colors.bg },
   scanOutText: { fontSize: 14, fontWeight: '700', color: colors.text },

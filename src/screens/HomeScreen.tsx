@@ -614,8 +614,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
                   <Text style={[styles.crowdBtnText, alertOn && { color: colors.green.text }]} numberOfLines={1}>{alertOn ? 'Alerte activée' : "M'alerter si calme"}</Text>
                 </Pressable>
               )}
-              <Pressable onPress={() => setShowAffluence(true)} accessibilityRole="button" style={({ pressed }) => [styles.crowdBtn, pressed && { opacity: 0.85 }]}>
-                <Text style={styles.crowdBtnText} numberOfLines={1}>Voir l'affluence</Text>
+              <Pressable onPress={() => setShowAffluence(true)} accessibilityRole="button" style={({ pressed }) => [styles.crowdBtn, styles.crowdBtnDark, pressed && { opacity: 0.85 }]}>
+                <Text style={[styles.crowdBtnText, { color: colors.inverseText }]} numberOfLines={1}>Voir l'affluence</Text>
               </Pressable>
             </View>
           </>
@@ -974,6 +974,7 @@ const styles = StyleSheet.create({
   greeting: { marginTop: 4 },
   crowdBtns: { flexDirection: 'row', gap: 10 },
   crowdBtn: { flex: 1, height: 48, borderRadius: 999, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.card, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 12 },
+  crowdBtnDark: { backgroundColor: colors.inverse, borderColor: colors.inverse },
   crowdBtnOn: { borderColor: colors.green.bar, backgroundColor: colors.green.soft },
   crowdBtnText: { fontSize: 14, fontWeight: '700', color: colors.text },
   quick: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 4, marginTop: 4 },

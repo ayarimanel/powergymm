@@ -157,7 +157,7 @@ export const ClassesCarousel: React.FC<Props> = ({ classes, userId, profiles, on
                 <Wordmark size={15} style={styles.mark} />
                 {(booked || full || level === 'hot') && (
                   <View style={[styles.status, booked ? styles.statusBooked : full ? styles.statusFull : styles.statusHot]}>
-                    <Text style={[styles.statusText, { color: booked ? colors.green.text : full ? colors.text : colors.amber.text }]}>
+                    <Text style={[styles.statusText, { color: booked ? colors.green.text : full ? colors.text : colors.onWarning }]}>
                       {booked ? 'Réservé' : full ? 'Complet' : 'Ça se remplit'}
                     </Text>
                   </View>
@@ -242,8 +242,8 @@ const styles = StyleSheet.create({
 
   top: { position: 'absolute', top: 16, left: 18, right: 14, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   mark: { opacity: 0.9 },
-  status: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 },
-  statusHot: { backgroundColor: colors.amber.soft },
+  status: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999 },
+  statusHot: { backgroundColor: colors.amber.bar },
   statusFull: { backgroundColor: colors.track },
   statusBooked: { backgroundColor: colors.green.soft },
   statusText: { fontSize: 11, fontWeight: '800', letterSpacing: 1, textTransform: 'uppercase' },

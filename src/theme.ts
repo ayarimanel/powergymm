@@ -36,6 +36,12 @@ export const colors = {
   onInverse: c.page,
   white: '#FFFFFF',
   black: '#000000',
+  /** Dark pieces on the page: tab bar, news bar, the dark button. */
+  inverse: c.inverse,
+  inverseText: c.inverseText,
+  inverseTextMuted: c.inverseTextMuted,
+  inverseAccent: c.inverseAccent,
+  onWarning: c.onWarning,
   tabActive: c.tabActive,
   tabInactive: c.tabInactive,
   notification: c.notification,

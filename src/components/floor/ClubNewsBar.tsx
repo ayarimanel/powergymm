@@ -259,7 +259,7 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
             <Text style={styles.barTitle} numberOfLines={1}>{barTitle}</Text>
           </View>
           <Animated.View style={{ transform: [{ rotate: chevron }] }}>
-            <Icon name="chevron-down" size={22} color={colors.brandText} />
+            <Icon name="chevron-down" size={22} color={colors.inverseTextMuted} />
           </Animated.View>
         </View>
       </Animated.View>
@@ -324,20 +324,20 @@ const styles = StyleSheet.create({
     height: NEWS_BAR_HEIGHT - 8,
     justifyContent: 'center',
     paddingHorizontal: 16,
-    backgroundColor: colors.brandSoft,
+    backgroundColor: colors.inverse,
     borderWidth: 1,
-    borderColor: brandAlpha(0.35),
+    borderColor: colors.inverse,
     borderRadius: 24,
     ...(Platform.OS === 'web' ? ({ cursor: 'grab', userSelect: 'none', touchAction: 'none' } as object) : null),
   },
-  barOpen: { backgroundColor: colors.card, borderColor: colors.border },
+  barOpen: {},
   barRow: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   count: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center' },
   countZero: { backgroundColor: colors.brandTint },
   countText: { color: colors.white, fontSize: 12, fontWeight: '800' },
   barTxt: { flex: 1, minWidth: 0, gap: 2 },
-  barSmall: { fontSize: 13, fontWeight: '600', color: colors.brandText },
-  barTitle: { fontSize: 15, fontWeight: '800', color: colors.text },
+  barSmall: { fontSize: 13, fontWeight: '600', color: colors.inverseAccent },
+  barTitle: { fontSize: 15, fontWeight: '800', color: colors.inverseText },
   dots: { flexDirection: 'row', gap: 3 },
   dot: { width: 7, height: 7, borderRadius: 4 },
   grip: { alignSelf: 'center', width: 36, height: 4, borderRadius: 2, backgroundColor: colors.border },

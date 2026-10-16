@@ -60,8 +60,7 @@ export const ScanFab: React.FC<Props> = ({ checkedInToday, onPress, collapsed, o
 };
 
 const styles = StyleSheet.create({
-  // Above the floating navbar (72 high, 22 from the bottom)
-  row: { position: 'absolute', right: 16, bottom: 108, flexDirection: 'row', alignItems: 'center', gap: 10 },
+  row: { position: 'absolute', right: 16, bottom: 16, flexDirection: 'row', alignItems: 'center', gap: 10 },
   reportWrap: { borderRadius: 24, shadowColor: colors.text, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.16, shadowRadius: 10, elevation: 5 },
   report: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
   badge: { position: 'absolute', top: -4, right: -4, minWidth: 20, height: 20, borderRadius: 10, paddingHorizontal: 5, backgroundColor: colors.red.bar, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: colors.card },

@@ -92,10 +92,10 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
       onPanResponderMove: () => {},
       onPanResponderRelease: (_, g) => {
         const wasOpen = openRef.current;
-        if (Math.abs(g.dy) <= 4) return setPanelRef.current(!wasOpen);
-        if (g.vy > 0.5) return setPanelRef.current(true);
-        if (g.vy < -0.5) return setPanelRef.current(false);
-        setPanelRef.current(wasOpen ? g.dy > -50 : g.dy > 50);
+        // Only a tap opens the list; sliding down on the bar does nothing (a swipe up still closes it).
+        if (Math.abs(g.dy) <= 6 && Math.abs(g.dx) <= 6) return setPanelRef.current(!wasOpen);
+        if (wasOpen && g.dy < -50) return setPanelRef.current(false);
+        setPanelRef.current(wasOpen);
       },
       onPanResponderTerminate: () => setPanelRef.current(openRef.current),
     })
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   },
   ctaText: { color: colors.white, fontSize: 14, fontWeight: '800' },
 
-  // Pinned red card under the header (design-ref Main "N nouvelles infos du club"). Pull or tap to open the list.
+  // Pinned red card under the header (design-ref Main "N nouvelles infos du club"). Tap to open the list.
   bar: {
     position: 'absolute',
     top: 8,

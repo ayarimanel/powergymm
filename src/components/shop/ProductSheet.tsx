@@ -166,7 +166,7 @@ export const ProductSheet: React.FC<Props> = ({ product, isOwner, onClose, onRes
                     accessibilityRole="button"
                     style={[styles.reserveBtn, !p.inStock && styles.reserveBtnOff]}
                   >
-                    <Text style={styles.footerBtnText}>
+                    <Text style={styles.footerBtnText} numberOfLines={1}>
                       {p.inStock ? `Ajouter au panier · ${formatPrice(p.priceTnd * qty)}` : 'Indisponible'}
                     </Text>
                   </Pressable>
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
   qty: { minWidth: 28, textAlign: 'center', fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 22, color: colors.text },
   reserveBtn: { flex: 1, height: 56, borderRadius: 999, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center', ...buttonShadow },
   reserveBtnOff: { backgroundColor: colors.disabled, shadowOpacity: 0, elevation: 0 },
-  footerBtnText: { color: colors.white, fontSize: 15, fontWeight: '800' },
+  footerBtnText: { color: colors.white, fontSize: 13.5, fontWeight: '700' },
 
   ownerRow: { flexDirection: 'row', gap: 12 },
   deleteBtn: { minWidth: 56, height: 56, paddingHorizontal: 16, borderRadius: 999, borderWidth: 1.5, borderColor: colors.red.bar, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },

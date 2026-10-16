@@ -77,7 +77,7 @@ export const WelcomeCover: React.FC<Props> = ({ onLogin, onSignup }) => {
 
       <View style={[styles.body, { paddingTop: insets.top + 36, paddingBottom: Math.max(24, insets.bottom + 16) }]}>
         <Animated.View style={rise(-12)}>
-          <Wordmark />
+          <Wordmark onDark />
         </Animated.View>
 
         <View style={{ flex: 1 }} />

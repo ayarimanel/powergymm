@@ -225,29 +225,32 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
         )}
       </View>
 
-      <View style={styles.searchWrap}>
-        <Icon name="search-outline" size={20} color={colors.textMuted} />
-        <TextInput
-          style={styles.searchInput}
-          value={query}
-          onChangeText={setQuery}
-          placeholder="Protéine, gainer, ceinture…"
-          placeholderTextColor={colors.textMuted}
-          accessibilityLabel="Chercher un produit"
-        />
-        {!!query && (
-          <Pressable onPress={() => setQuery('')} hitSlop={10} accessibilityRole="button" accessibilityLabel="Effacer la recherche">
-            <Icon name="close-circle" size={18} color={colors.textMuted} />
-          </Pressable>
-        )}
-      </View>
-
-      {/* Categories as chips */}
-      <View style={styles.railWrap}>
-        <CategoryRail active={filter} counts={counts} onSelect={setFilter} />
-      </View>
-
       <ScrollView ref={scrollRef} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        {/* Search and categories scroll away with the products */}
+        <View style={styles.topControls}>
+          <View style={styles.searchWrap}>
+            <Icon name="search-outline" size={20} color={colors.textMuted} />
+            <TextInput
+              style={styles.searchInput}
+              value={query}
+              onChangeText={setQuery}
+              placeholder="Protéine, gainer, ceinture…"
+              placeholderTextColor={colors.textMuted}
+              accessibilityLabel="Chercher un produit"
+            />
+            {!!query && (
+              <Pressable onPress={() => setQuery('')} hitSlop={10} accessibilityRole="button" accessibilityLabel="Effacer la recherche">
+                <Icon name="close-circle" size={18} color={colors.textMuted} />
+              </Pressable>
+            )}
+          </View>
+
+          {/* Categories as chips */}
+          <View style={styles.railWrap}>
+            <CategoryRail active={filter} counts={counts} onSelect={setFilter} />
+          </View>
+        </View>
+
         {/* En solde */}
         {filter === 'all' && !query && promoProducts.length > 0 && (
           <View style={{ gap: 14 }}>
@@ -399,6 +402,8 @@ const styles = StyleSheet.create({
   searchInput: { flex: 1, fontSize: 15, fontWeight: '500', color: colors.text, height: '100%' as any },
 
   railWrap: { paddingBottom: 8 },
+  /** Cancels the content padding: search and chips keep their own side margins. */
+  topControls: { marginHorizontal: -16, marginTop: -16 },
 
   content: { padding: 16, paddingBottom: 96, gap: 18, maxWidth: 720, width: '100%', alignSelf: 'center' },
 

@@ -29,8 +29,6 @@ import { AccountSheet } from './src/components/account/AccountSheet';
 import { useReduceMotion } from './src/hooks/useDeviceState';
 import { goBack, useBackHandler } from './src/navigation/backStack';
 import { emitTabReselect } from './src/navigation/tabEvents';
-import { requestScan } from './src/navigation/scanEvents';
-import { todayStr } from './src/services/floorViewModel';
 import { claimSwipe, startSwipe, startsInHorizontalScroller, swipeClaimed } from './src/navigation/swipeGuard';
 import { haptics } from './src/utils/haptics';
 import { colors, clubTheme, statusBarStyle } from './src/theme';
@@ -386,12 +384,6 @@ function AppInner() {
         right={barTabs.slice(2).map(x => ({ id: x.id, label: t(x.label), icon: x.icon }))}
         active={currentTab}
         onTab={id => openTab(id as ActiveTab)}
-        onScan={() => {
-          if (currentTab !== 'floor') openTab('floor');
-          requestScan();
-        }}
-        scanLabel="Scanner le QR code"
-        checkedIn={userProfile.lastCheckInDate === todayStr()}
         bottomInset={insets.bottom}
       />
 

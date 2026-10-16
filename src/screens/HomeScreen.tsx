@@ -61,6 +61,7 @@ import { journalSummary, muscleRecovery, suggestMuscle } from '../journal/journa
 import { useScanRequests } from '../navigation/scanEvents';
 import { useCollapseOnScroll } from '../components/CollapsibleFab';
 import { Toast } from '../components/home/Toast';
+import { ScanFab } from '../components/home/ScanFab';
 import { QrScannerModal } from '../components/QrScannerModal';
 import { PostScanMuscleSelectModal } from '../components/PostScanMuscleSelectModal';
 import { useScrollToTopOnReselect } from '../navigation/tabEvents';
@@ -551,15 +552,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
         avatarName={user.fullName}
         avatarUrl={user.avatarUrl}
         onOpenProfile={onOpenAccount}
-        onReport={() => {
-          if (isAdmin) {
-            ProblemReportService.getAll().then(setReports);
-            ClubService.getMembers().then(setClubMembers);
-            setShowReportsAdmin(true);
-          } else setShowReport(true);
-        }}
-        reportBadge={isAdmin ? openReports.length : undefined}
-        reportLabel={isAdmin ? 'Problèmes signalés' : 'Signaler un problème'}
       />
 
       {!online && (
@@ -713,6 +705,21 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
       </View>
 
       <Toast message={toast} onHide={() => setToast(null)} />
+      {/* Signaler + Scan float on the right, just above the navbar (as before the redesign). */}
+      <ScanFab
+        checkedInToday={checkedInToday}
+        onPress={openScanner}
+        collapsed={fabCollapsed}
+        onReport={() => {
+          if (isAdmin) {
+            ProblemReportService.getAll().then(setReports);
+            ClubService.getMembers().then(setClubMembers);
+            setShowReportsAdmin(true);
+          } else setShowReport(true);
+        }}
+        reportBadge={isAdmin ? openReports.length : undefined}
+        reportLabel={isAdmin ? 'Problèmes signalés' : 'Signaler un problème'}
+      />
 
       <AffluenceSheet visible={showAffluence} onClose={() => setShowAffluence(false)} alertOn={alertOn} onToggleAlert={toggleAlert} showAlert={!!snapshot?.isOpen}>
         {snapshot ? (

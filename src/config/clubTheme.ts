@@ -70,7 +70,7 @@ const clubTheme = {
     barChartNow: '#E31E24',
 
     // Dark pieces on the light page (design-ref/light-mode Accueil-clair-C): tab bar, news bar, main dark button
-    inverse: '#17171A',
+    inverse: '#2A2A2E',
     inverseText: '#FFFFFF',
     inverseTextMuted: '#A1A1A6',
     inverseAccent: '#FF6B70',

@@ -18,10 +18,6 @@ interface Props {
   right: BarTab[];
   active: string;
   onTab: (id: string) => void;
-  onScan: () => void;
-  scanLabel: string;
-  /** Today's presence is validated: the Scan circle shows a green check. */
-  checkedIn: boolean;
   bottomInset: number;
 }
 
@@ -30,18 +26,10 @@ interface Props {
  * bottom, 72px high, radius 28, surface + border. Active = red icon + small red dash.
  * Scan is the red circle in the middle.
  */
-export const FloatingTabBar: React.FC<Props> = ({ left, right, active, onTab, onScan, scanLabel, checkedIn, bottomInset }) => (
+export const FloatingTabBar: React.FC<Props> = ({ left, right, active, onTab, bottomInset }) => (
   <View style={[s.wrap, { marginBottom: 22 + bottomInset }]}>
     <View style={s.bar} accessibilityRole="tablist">
       {left.map(t => <Item key={t.id} tab={t} active={active === t.id} onPress={() => onTab(t.id)} />)}
-      <Pressable
-        onPress={onScan}
-        accessibilityRole="button"
-        accessibilityLabel={checkedIn ? 'Présence validée aujourd’hui' : scanLabel}
-        style={({ pressed }) => [s.scan, checkedIn ? s.scanDone : buttonShadow, pressed && { opacity: 0.85 }]}
-      >
-        <Icon name={checkedIn ? 'checkmark' : 'qr-code'} size={24} color={colors.white} />
-      </Pressable>
       {right.map(t => <Item key={t.id} tab={t} active={active === t.id} onPress={() => onTab(t.id)} />)}
     </View>
   </View>

@@ -4,7 +4,7 @@ import Svg, { Defs, Ellipse, RadialGradient, Stop } from 'react-native-svg';
 import { Text } from '../../components/ui/Text';
 import { MuscleGroup } from '../../types/database';
 import { Recovery } from '../journalLogic';
-import { colors } from '../../theme';
+import { colors, isDarkMode } from '../../theme';
 
 /**
  * "Mon corps" (design-ref HANDOFF): face + dos photos side by side, each muscle's
@@ -13,10 +13,16 @@ import { colors } from '../../theme';
  */
 export type BodySex = 'femme' | 'homme';
 
-const IMAGES = {
-  femme: { face: require('../../../assets/body/femme-face.jpg'), dos: require('../../../assets/body/femme-dos.jpg') },
-  homme: { face: require('../../../assets/body/homme-face.jpg'), dos: require('../../../assets/body/homme-dos.jpg') },
-};
+// Light pictures on the light theme, the original dark renders in dark mode.
+const IMAGES = isDarkMode
+  ? {
+      femme: { face: require('../../../assets/body/femme-face.jpg'), dos: require('../../../assets/body/femme-dos.jpg') },
+      homme: { face: require('../../../assets/body/homme-face.jpg'), dos: require('../../../assets/body/homme-dos.jpg') },
+    }
+  : {
+      femme: { face: require('../../../assets/body/femme-face-clair.jpg'), dos: require('../../../assets/body/femme-dos-clair.jpg') },
+      homme: { face: require('../../../assets/body/homme-face-clair.jpg'), dos: require('../../../assets/body/homme-dos-clair.jpg') },
+    };
 
 /** Glow / tap zones in % of the photo box: centre x, centre y, width, height. */
 type Zone = { m: MuscleGroup; x: number; y: number; w: number; h: number };
@@ -174,7 +180,7 @@ export const BodyLegend: React.FC = () => (
 
 const s = StyleSheet.create({
   row: { flexDirection: 'row', gap: 10 },
-  photo: { flex: 1, aspectRatio: 0.47, borderRadius: 18, overflow: 'hidden', backgroundColor: colors.black, borderWidth: 1, borderColor: colors.bg },
+  photo: { flex: 1, aspectRatio: 0.47, borderRadius: 18, overflow: 'hidden', backgroundColor: colors.card, borderWidth: 1, borderColor: colors.bg },
   zone: { position: 'absolute' },
   legend: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 14 },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },

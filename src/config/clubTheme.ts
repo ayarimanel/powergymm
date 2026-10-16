@@ -45,7 +45,7 @@ const clubTheme = {
     divider: '#E0E0E5',
 
     // Text
-    textPrimary: '#141416',
+    textPrimary: '#2E2E33', // dark grey, softer than black
     textSecondary: '#55555C',
     textTertiary: '#6E6E75',
     textOnPrimary: '#FFFFFF',

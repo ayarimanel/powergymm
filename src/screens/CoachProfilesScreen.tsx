@@ -116,8 +116,10 @@ export const CoachProfilesScreen: React.FC<Props> = ({ user, onUpdateUser }) => 
           <View style={[s.liveDot, !live.length && { backgroundColor: J.muted }]} />
           <Text style={s.chipText}>{live.length ? `${live.length} au plateau` : 'Personne au plateau'}</Text>
         </View>
-        {/* The page title left for the logo band on top (TopBanner) */}
-        <View accessible accessibilityRole="header" accessibilityLabel={`Les coachs du club${gymName ? `, ${gymName}` : ''}`} />
+        <View style={{ alignSelf: 'stretch' }} accessible accessibilityRole="header" accessibilityLabel={`Les coachs du club${gymName ? `, ${gymName}` : ''}`}>
+          <Title variant="display" size={40} accessibilityRole="none">Les coachs</Title>
+          <Title variant="display" size={40} color={colors.brand} accessibilityRole="none">du club</Title>
+        </View>
       </View>
 
       <ScrollView ref={scrollRef} contentContainerStyle={s.content}>

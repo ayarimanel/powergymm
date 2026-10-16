@@ -200,8 +200,10 @@ export const MarketplaceScreen: React.FC<MarketplaceScreenProps> = ({ user }) =>
         <View style={styles.avatarRing}>
           <Avatar name={user.fullName} url={user.avatarUrl} size={42} />
         </View>
-        {/* The page title left for the logo band on top (TopBanner) */}
-        <View style={{ flex: 1 }} accessible accessibilityRole="header" accessibilityLabel={`Boutique du club${gymName ? `, ${gymName}` : ''}`} />
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text style={styles.subtitle} numberOfLines={1}>Boutique du club</Text>
+          <Text style={styles.title} numberOfLines={1}>{gymName || 'Boutique'}</Text>
+        </View>
         <Pressable
           onPress={() => setShowOrders(true)}
           accessibilityRole="button"

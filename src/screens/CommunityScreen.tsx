@@ -426,7 +426,7 @@ export const CommunityScreen: React.FC<Props> = ({ user, onOpenAccount }) => {
       {/* Header */}
       <View style={styles.header}>
         <View style={{ flex: 1, minWidth: 0 }}>
-          {/* The page title left for the logo band on top (TopBanner) */}
+          <Title variant="display" size={40} numberOfLines={1}>Communauté</Title>
           <View style={styles.subRow}>
             <Text style={styles.subtitle} numberOfLines={1}>{gymName || 'Membres du club uniquement'}</Text>
             <View style={styles.roleBadge}><Text style={styles.roleBadgeText}>{ROLE_LABEL[role]}</Text></View>

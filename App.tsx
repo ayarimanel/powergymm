@@ -33,7 +33,7 @@ import { requestScan } from './src/navigation/scanEvents';
 import { todayStr } from './src/services/floorViewModel';
 import { claimSwipe, startSwipe, startsInHorizontalScroller, swipeClaimed } from './src/navigation/swipeGuard';
 import { haptics } from './src/utils/haptics';
-import { colors, clubTheme } from './src/theme';
+import { colors, clubTheme, statusBarStyle } from './src/theme';
 import { useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold, Manrope_700Bold, Manrope_800ExtraBold } from '@expo-google-fonts/manrope';
 import {
   BarlowCondensed_600SemiBold,
@@ -325,7 +325,7 @@ function AppInner() {
 
   return (
     <View {...edgeSwipe.panHandlers} style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.header} />
+      <StatusBar barStyle={statusBarStyle} backgroundColor={colors.header} />
 
       {/* Main Active Screen */}
       <Animated.View

@@ -43,7 +43,7 @@ import { ClubBan, MemberAdminService } from '../services/memberAdminService';
 import { ClubGrowthCard } from '../components/home/ClubGrowthCard';
 import { useT } from '../i18n';
 import { useOnline } from '../hooks/useDeviceState';
-import { colors, light, radius } from '../theme';
+import { colors, light, radius, statusBarStyle } from '../theme';
 import { HomeHeader } from '../components/home/HomeHeader';
 import { StreakSheet } from '../components/home/StreakSheet';
 import { ScanSuccessScreen } from '../components/home/ScanSuccessScreen';
@@ -539,7 +539,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
 
   return (
     <View style={styles.screen}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.header} />
+      <StatusBar barStyle={statusBarStyle} backgroundColor={colors.header} />
 
       <HomeHeader
         gymName={gymConfig?.name ?? ''}

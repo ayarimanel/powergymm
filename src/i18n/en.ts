@@ -13,6 +13,7 @@ export const EN: Record<string, string> = {
   'Choisis ta langue': 'Choose your language',
   'Tu pourras la changer à tout moment dans Paramètres.': 'You can change it any time in Settings.',
   Langue: 'Language',
+  'Mode sombre': 'Dark mode',
 
   /* ---------- tabs ---------- */
   Floor: 'Floor',

@@ -14,7 +14,8 @@ import { SOCIAL_NETWORKS, cleanHandle, keepUsable } from '../../community/social
 import { PERMISSION_LABELS } from '../../services/permissionsService';
 import { pickImages } from '../../services/imagePicker';
 import { GENDERS, GOALS, TIMES } from '../../data/profileOptions';
-import { buttonShadow, colors, fonts, radius } from '../../theme';
+import { buttonShadow, colors, fonts, isDarkMode, radius } from '../../theme';
+import { saveColorMode } from '../../config/colorMode';
 import { BottomSheet, SheetScrollView } from '../home/BottomSheet';
 import { Avatar } from '../community/Avatar';
 import { PinBoxes } from '../ui/PinBoxes';
@@ -96,6 +97,8 @@ export const AccountSheet: React.FC<Props> = ({ visible, onClose, user, config, 
   const [saved, setSaved] = useState(false);
   const [reminders, setReminders] = useState(false);
   const [reminderMsg, setReminderMsg] = useState('');
+  const [modeMsg, setModeMsg] = useState<string | null>(null);
+  const [darkOn, setDarkOn] = useState(isDarkMode);
   const [confirm, setConfirm] = useState<'logout' | 'wipe' | 'code' | null>(null);
   const [photoError, setPhotoError] = useState('');
   /** The profile (main) or its edit form, inside the same sheet (design-ref Profil). */
@@ -426,6 +429,12 @@ export const AccountSheet: React.FC<Props> = ({ visible, onClose, user, config, 
                     right={<Switch value={reminders} disabled={!remindersSupported} onValueChange={toggleReminders} trackColor={{ true: colors.green.bar, false: colors.disabled }} thumbColor={colors.white} />}
                   />
                   <Row icon="language-outline" title={t('Langue')} value={langLabel} onPress={() => setLangOpen(true)} />
+                  <Row
+                    icon="moon"
+                    title={t('Mode sombre')}
+                    sub={modeMsg ?? undefined}
+                    right={<Switch value={darkOn} onValueChange={on => { setDarkOn(on); saveColorMode(on ? 'dark' : 'light').then(done => { if (!done) setModeMsg('Ferme et rouvre l’app pour changer les couleurs.'); }); }} trackColor={{ true: colors.brand, false: colors.disabled }} thumbColor={colors.white} />}
+                  />
                   {!!user.username && user.role !== 'owner' && (
                     <Row icon="key-outline" title="Changer mon code secret" sub={pinDone ? 'Code changé.' : undefined} onPress={openCode} />
                   )}

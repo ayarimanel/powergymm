@@ -72,9 +72,9 @@ const s = StyleSheet.create({
   bar: {
     height: 72,
     borderRadius: 28,
-    backgroundColor: colors.inverse,
+    backgroundColor: colors.navBar,
     borderWidth: 1,
-    borderColor: colors.inverse,
+    borderColor: colors.navBar,
     shadowColor: colors.black,
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.28,

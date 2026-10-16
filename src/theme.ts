@@ -38,6 +38,8 @@ export const colors = {
   black: '#000000',
   /** Dark pieces on the page: tab bar, news bar, the dark button. */
   inverse: c.inverse,
+  /** Floating navbar background. */
+  navBar: c.navBar,
   inverseText: c.inverseText,
   inverseTextMuted: c.inverseTextMuted,
   inverseAccent: c.inverseAccent,

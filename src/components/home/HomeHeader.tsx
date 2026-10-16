@@ -91,7 +91,11 @@ export const HomeHeader: React.FC<Props> = ({
       />
       <Pressable onPress={onOpenProfile} accessibilityRole="button" accessibilityLabel="Paramètres" style={styles.avatarBtn}>
         <View style={styles.avatarRing}>
-          <Avatar name={avatarName} url={avatarUrl} size={36} />
+          {avatarUrl ? (
+            <Avatar name={avatarName} url={avatarUrl} size={44} />
+          ) : (
+            <Text style={styles.initial}>{(avatarName || '?').trim().charAt(0).toUpperCase()}</Text>
+          )}
         </View>
       </Pressable>
     </View>
@@ -108,7 +112,9 @@ const styles = StyleSheet.create({
   },
   iconBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: colors.bg },
   avatarBtn: { width: 46, height: 46, alignItems: 'center', justifyContent: 'center' },
-  avatarRing: { width: 46, height: 46, borderRadius: 23, borderWidth: 1.5, borderColor: colors.brand, alignItems: 'center', justifyContent: 'center' },
+  // Option C: a plain circle in the dark-piece grey, white initial
+  avatarRing: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.inverse, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
+  initial: { fontSize: 16, fontWeight: '800', color: colors.inverseText },
   pressed: { opacity: 0.75 },
   center: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: 8, minWidth: 0 },
   right: { flexDirection: 'row', alignItems: 'center', gap: 8 },

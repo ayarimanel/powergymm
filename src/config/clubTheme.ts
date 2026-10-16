@@ -64,15 +64,15 @@ const clubTheme = {
 
     // Specific
     notification: '#E31E24',
-    tabActive: '#FF3B40',
-    tabInactive: '#C9C9CE', // on the grey navbar
+    tabActive: '#E31E24',
+    tabInactive: '#D4D4D8', // on the grey navbar
     barChartDefault: '#E0E0E5',
     barChartNow: '#E31E24',
 
     // Dark pieces on the light page (design-ref/light-mode Accueil-clair-C): tab bar, news bar, main dark button
-    inverse: '#2A2A2E',
-    /** Floating navbar: medium grey, softer than the other dark pieces. */
-    navBar: '#4A4A50',
+    inverse: '#3A3A3F',
+    /** Floating navbar: dark grey (option C, a bit lighter). */
+    navBar: '#3A3A3F',
     inverseText: '#FFFFFF',
     inverseTextMuted: '#A1A1A6',
     inverseAccent: '#FF6B70',

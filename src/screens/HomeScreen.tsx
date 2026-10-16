@@ -62,6 +62,8 @@ import { useScanRequests } from '../navigation/scanEvents';
 import { useCollapseOnScroll } from '../components/CollapsibleFab';
 import { Toast } from '../components/home/Toast';
 import { ScanFab } from '../components/home/ScanFab';
+import { WeeklyGoalCard, visitedDaysThisWeek } from '../components/home/WeeklyGoalCard';
+import { HabitsService } from '../services/habitsService';
 import { QrScannerModal } from '../components/QrScannerModal';
 import { PostScanMuscleSelectModal } from '../components/PostScanMuscleSelectModal';
 import { useScrollToTopOnReselect } from '../navigation/tabEvents';
@@ -123,6 +125,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
   const { snapshot, reload: reloadFloor } = useFloorSnapshot(user, gymConfig?.maxGymCapacity ?? 50);
   const week = useWeekForecast(gymConfig?.maxGymCapacity ?? 50);
   const [alertOn, setAlertOn] = useState(false);
+  // "Objectif de la semaine": days with a visit this week vs the usual training days given at sign-up (3 if none).
+  const [weekVisited, setWeekVisited] = useState<number[]>([]);
+  const [weekGoal, setWeekGoal] = useState(3);
+  useEffect(() => {
+    CheckInService.getAllCheckIns().then(all => setWeekVisited(visitedDaysThisWeek(all.filter(c => c.userId === user.id).map(c => c.checkInTime))));
+    HabitsService.get(user.id).then(h => setWeekGoal(h.usualDays?.length || 3));
+  }, [user.id, user.lastCheckInDate]);
   // Validated coaches for the photo row on Accueil (same cards as the Coachs page).
   const [homeCoaches, setHomeCoaches] = useState<CoachProfile[]>([]);
   useEffect(() => {
@@ -587,6 +596,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ user, onUpdateUser, onOp
             <Icon name="chevron-forward" size={18} color={colors.amber.text} />
           </Pressable>
         )}
+
+        {/* Members: this week's sessions against their usual rhythm. */}
+        {!isAdmin && <WeeklyGoalCard visited={weekVisited} goal={weekGoal} />}
 
         {/* Live crowd: the ring card here, the full view (days, hours, muscles) behind "Voir l'affluence". */}
         {crowdLocked ? (

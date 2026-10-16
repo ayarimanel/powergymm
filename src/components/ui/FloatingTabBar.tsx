@@ -61,8 +61,12 @@ function Item({ tab, active, onPress }: { tab: BarTab; active: boolean; onPress:
         <Icon name={tab.icon} size={22} color={color} />
       </Animated.View>
       {/* As in the mockup: only the active tab spells its name (screen readers get it on every tab). */}
-      {active ? <Text style={[s.label, { color }]} numberOfLines={1}>{tab.label}</Text> : null}
-      <Animated.View style={[s.dash, { opacity: on, transform: [{ scaleX: on }] }]} />
+      {/* Active tab: its name in a small red pill (Figma inspiration) */}
+      {active ? (
+        <Animated.View style={[s.pill, { opacity: on }]}>
+          <Text style={s.pillText} numberOfLines={1}>{tab.label}</Text>
+        </Animated.View>
+      ) : null}
     </Pressable>
   );
 }
@@ -77,7 +81,7 @@ const s = StyleSheet.create({
     borderColor: colors.navBar,
     shadowColor: colors.black,
     shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.28,
+    shadowOpacity: 0.18,
     shadowRadius: 32,
     elevation: 12,
     flexDirection: 'row',
@@ -88,7 +92,8 @@ const s = StyleSheet.create({
   itemActive: { flex: 1.45 },
   item: { flex: 1, minWidth: 48, alignItems: 'center', justifyContent: 'center', gap: 4, paddingTop: 7 },
   label: { fontSize: 11, fontWeight: '700' },
-  dash: { width: 16, height: 3, borderRadius: 2, backgroundColor: colors.tabActive },
+  pill: { paddingHorizontal: 10, paddingVertical: 2, borderRadius: 999, backgroundColor: colors.brand },
+  pillText: { fontSize: 11, fontWeight: '800', color: colors.white },
   scan: { width: 52, height: 52, borderRadius: radius.pill, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center', marginHorizontal: 4 },
   scanDone: { backgroundColor: colors.green.bar },
 });

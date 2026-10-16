@@ -73,6 +73,8 @@ const clubTheme = {
     inverse: '#3A3A3F',
     /** Floating navbar: dark grey (option C, a bit lighter). */
     navBar: '#3A3A3F',
+    /** Logo band on top of every tab but Accueil. */
+    topBar: '#3A3A3F',
     inverseText: '#FFFFFF',
     inverseTextMuted: '#A1A1A6',
     inverseAccent: '#FF6B70',
@@ -129,6 +131,7 @@ const clubTheme = {
     disabled: '#4A4A50',
     inverse: '#202024',
     navBar: '#2A2A2F',
+    topBar: '#2A2A2F',
     inverseAccent: '#FF5A5F',
   } as Record<string, string>,
 

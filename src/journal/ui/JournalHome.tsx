@@ -87,7 +87,8 @@ export const JournalHome: React.FC<Props> = ({ history, saved, active, now, selD
     <View style={s.stack}>
       {/* Title + the main action */}
       <View style={s.titleRow}>
-        <Title variant="display" size={38}>Entraînement</Title>
+        {/* The page title left for the logo band on top (TopBanner) */}
+        <View accessible accessibilityRole="header" accessibilityLabel="Entraînement" />
         <Pressable onPress={active ? onResume : () => onStart(now)} accessibilityRole="button" hitSlop={8} style={s.startLink}>
           <Icon name="play" size={14} color={colors.brand} />
           <Text style={s.startLinkText}>{active ? 'Reprendre' : 'Commencer'}</Text>

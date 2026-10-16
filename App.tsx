@@ -3,6 +3,7 @@ import { View, StyleSheet, Pressable, StatusBar, ActivityIndicator, Animated, Ea
 import { Text } from './src/components/ui/Text';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FloatingTabBar } from './src/components/ui/FloatingTabBar';
+import { TopBanner } from './src/components/ui/TopBanner';
 import { IconName } from './src/components/ui/Icon';
 import { UserProfile } from './src/types/database';
 import { AuthService } from './src/services/authService';
@@ -322,8 +323,10 @@ function AppInner() {
   }
 
   return (
-    <View {...edgeSwipe.panHandlers} style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar barStyle={statusBarStyle} backgroundColor={colors.header} />
+    <View {...edgeSwipe.panHandlers} style={[styles.container, { paddingTop: currentTab === 'floor' ? insets.top : 0 }]}>
+      <StatusBar barStyle={currentTab === 'floor' ? statusBarStyle : 'light-content'} backgroundColor={currentTab === 'floor' ? colors.header : colors.topBar} />
+      {/* Every tab but Accueil: the colored logo band on top */}
+      {currentTab !== 'floor' && <TopBanner topInset={insets.top} />}
 
       {/* Main Active Screen */}
       <Animated.View

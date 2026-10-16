@@ -40,6 +40,8 @@ export const colors = {
   inverse: c.inverse,
   /** Floating navbar background. */
   navBar: c.navBar,
+  /** Logo band on top of every tab but Accueil. */
+  topBar: c.topBar,
   inverseText: c.inverseText,
   inverseTextMuted: c.inverseTextMuted,
   inverseAccent: c.inverseAccent,

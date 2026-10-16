@@ -2,7 +2,7 @@ import React from 'react';
 import { ActivityIndicator, Pressable, StyleProp, StyleSheet, ViewStyle } from 'react-native';
 import { Text } from './Text';
 import { Icon, IconName } from './Icon';
-import { buttonShadow, colors } from '../../theme';
+import { buttonShadow, colors, light } from '../../theme';
 
 /**
  * The club's buttons (design-ref Bienvenue / Q1Role):
@@ -26,10 +26,12 @@ interface Props {
   small?: boolean;
   style?: StyleProp<ViewStyle>;
   accessibilityLabel?: string;
+  /** On a dark photo (welcome screen): white label and outline, whatever the theme. */
+  onDark?: boolean;
 }
 
-export const Button: React.FC<Props> = ({ label, onPress, variant = 'primary', icon, iconLeft, loading, disabled, small, style, accessibilityLabel }) => {
-  const fg = variant === 'primary' ? colors.onBrand : colors.text;
+export const Button: React.FC<Props> = ({ label, onPress, variant = 'primary', icon, iconLeft, loading, disabled, small, style, accessibilityLabel, onDark }) => {
+  const fg = variant === 'primary' ? colors.onBrand : onDark ? colors.white : colors.text;
   const off = disabled || loading;
   return (
     <Pressable
@@ -44,6 +46,7 @@ export const Button: React.FC<Props> = ({ label, onPress, variant = 'primary', i
         variant === 'primary' && s.primary,
         variant === 'primary' && !off && buttonShadow,
         variant === 'secondary' && s.secondary,
+        variant === 'secondary' && onDark && { borderColor: light(0.45) },
         variant === 'ghost' && s.ghost,
         disabled && s.disabled,
         pressed && !off && (variant === 'primary' ? s.primaryPressed : s.pressed),

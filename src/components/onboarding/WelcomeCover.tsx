@@ -106,7 +106,7 @@ export const WelcomeCover: React.FC<Props> = ({ onLogin, onSignup }) => {
 
         <Animated.View style={[styles.actions, rise(40)]}>
           <Button label={t(clubTheme.login.primaryButtonText)} onPress={onLogin} icon="arrow-forward" />
-          <Button label={t(clubTheme.login.secondaryButtonText)} onPress={onSignup} variant="secondary" />
+          <Button label={t(clubTheme.login.secondaryButtonText)} onPress={onSignup} variant="secondary" onDark />
         </Animated.View>
       </View>
     </View>
@@ -123,10 +123,10 @@ const styles = StyleSheet.create({
     fontWeight: 'normal',
     fontSize: 54,
     lineHeight: 52,
-    color: colors.text,
+    color: colors.white, // on the gym photo, whatever the theme
     textTransform: 'uppercase',
   },
-  sub: { fontFamily: fonts.bodyMedium, fontSize: 15, lineHeight: 23, color: colors.textSecondary, marginTop: 16 },
+  sub: { fontFamily: fonts.bodyMedium, fontSize: 15, lineHeight: 23, color: light(0.75), marginTop: 16 },
 
   features: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 20 },
   feature: {
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     borderColor: light(0.1),
   },
   featureIcon: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center' },
-  featureText: { flex: 1, fontFamily: fonts.bodyBold, fontSize: 12, lineHeight: 16, color: colors.text },
+  featureText: { flex: 1, fontFamily: fonts.bodyBold, fontSize: 12, lineHeight: 16, color: colors.white },
 
   actions: { gap: 14, marginTop: 24 },
 });

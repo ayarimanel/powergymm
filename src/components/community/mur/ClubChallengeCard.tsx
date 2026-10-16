@@ -28,13 +28,13 @@ export const ClubChallengeCard: React.FC<Props> = ({ onJoin }) => (
       <Rect x="0" y="0" width="100%" height="100%" fill="url(#challenge)" />
     </Svg>
     <View style={s.mark} pointerEvents="none">
-      <Icon name="barbell" size={150} color={colors.text} />
+      <Icon name="barbell" size={150} color={colors.white} />
     </View>
 
     <View style={s.tag}>
       <Text style={s.tagText}>Défi du club</Text>
     </View>
-    <Title variant="card" size={32} style={s.title}>Défi deadlift samedi</Title>
+    <Title variant="card" size={32} color={colors.white} style={s.title}>Défi deadlift samedi</Title>
     <View style={s.bottom}>
       <View style={s.lineRow}>
         <View style={s.lineMark} />
@@ -48,7 +48,7 @@ export const ClubChallengeCard: React.FC<Props> = ({ onJoin }) => (
 );
 
 const s = StyleSheet.create({
-  card: { minHeight: 220, borderRadius: 24, overflow: 'hidden', padding: 20, justifyContent: 'flex-end', gap: 10, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
+  card: { minHeight: 220, borderRadius: 24, overflow: 'hidden', padding: 20, justifyContent: 'flex-end', gap: 10, backgroundColor: colors.night, borderWidth: 1, borderColor: colors.night }, // dark card in both themes
   mark: { position: 'absolute', top: -10, right: -20, opacity: 0.08, transform: [{ rotate: '-20deg' }] },
   tag: { position: 'absolute', top: 18, left: 20, backgroundColor: colors.brand, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 },
   tagText: { fontSize: 11, fontWeight: '800', letterSpacing: 1.2, textTransform: 'uppercase', color: colors.white },
@@ -56,7 +56,7 @@ const s = StyleSheet.create({
   bottom: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   lineRow: { flex: 1, flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
   lineMark: { width: 3, height: 18, borderRadius: 2, marginTop: 1, backgroundColor: colors.brand },
-  line: { flex: 1, fontSize: 14, fontWeight: '600', lineHeight: 20, color: colors.brandText },
-  btn: { height: 46, paddingHorizontal: 20, borderRadius: 999, backgroundColor: colors.text, alignItems: 'center', justifyContent: 'center' },
-  btnText: { fontSize: 15, fontWeight: '800', color: colors.onInverse },
+  line: { flex: 1, fontSize: 14, fontWeight: '600', lineHeight: 20, color: colors.inverseAccent }, // on the dark fade
+  btn: { height: 46, paddingHorizontal: 20, borderRadius: 999, backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center' },
+  btnText: { fontSize: 15, fontWeight: '800', color: colors.night },
 });

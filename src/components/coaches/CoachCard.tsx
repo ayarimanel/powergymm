@@ -9,7 +9,7 @@ import { daysSummary, isOnFloorNow } from '../../services/coachService';
 import { fmtTnd, fromPrice, offersPersonal } from '../../coaching/offers';
 import { Avatar } from '../community/Avatar';
 import { Btn, J } from '../../journal/ui/kit';
-import { colors, radius } from '../../theme';
+import { colors, light, radius } from '../../theme';
 
 interface Props {
   coach: CoachProfile;
@@ -78,7 +78,7 @@ export const CoachCard: React.FC<Props> = ({ coach: c, isMine, onPress, onApprov
 
         <View style={s.info}>
           <View style={s.nameRow}>
-            <Title variant="card" numberOfLines={1} style={{ flexShrink: 1 }}>{c.fullName}</Title>
+            <Title variant="card" numberOfLines={1} color={colors.white} style={{ flexShrink: 1 }}>{c.fullName}</Title>
             {!pending && <Icon name="shield-checkmark-outline" size={22} color={colors.blue.text} accessibilityLabel="Coach validé par le club" />}
             {isMine && <Text style={s.me}>Toi</Text>}
           </View>
@@ -114,7 +114,8 @@ const s = StyleSheet.create({
   me: { fontSize: 11, fontWeight: '900', color: J.accentText, backgroundColor: J.accentSoft, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1, overflow: 'hidden' },
   lineRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   lineMark: { width: 3, height: 16, borderRadius: 2, backgroundColor: colors.brand },
-  line: { flex: 1, fontSize: 14, fontWeight: '600', color: colors.brandText },
-  under: { fontSize: 13, fontWeight: '500', color: colors.textSecondary },
+  // Text sits on the dark photo fade: white name, light red line, light grey details
+  line: { flex: 1, fontSize: 14, fontWeight: '600', color: colors.inverseAccent },
+  under: { fontSize: 13, fontWeight: '500', color: light(0.8) },
   review: { flexDirection: 'row', gap: 8, padding: 14, borderTopWidth: 1, borderTopColor: J.line },
 });

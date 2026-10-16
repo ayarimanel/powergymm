@@ -88,10 +88,8 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
         offset.stopAnimation();
         dragBase.current = openRef.current ? panelHRef.current : 0;
       },
-      // The list follows the finger, then settles open or closed.
-      onPanResponderMove: (_, g) => {
-        offset.setValue(Math.max(0, Math.min(panelHRef.current, dragBase.current + g.dy)));
-      },
+      // The bar stays in place under the finger; a clear swipe or a tap opens/closes the list on release.
+      onPanResponderMove: () => {},
       onPanResponderRelease: (_, g) => {
         const wasOpen = openRef.current;
         if (Math.abs(g.dy) <= 4) return setPanelRef.current(!wasOpen);
@@ -111,21 +109,6 @@ export const ClubNewsBar: React.FC<Props> = ({ items, onAction, onRead }) => {
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [open]);
-
-  // One gentle nudge on arrival when there is something new, so members learn the bar pulls down.
-  const hasUnread = unread.length > 0;
-  useEffect(() => {
-    if (!hasUnread || reduceMotion || !panelH) return;
-    const t = setTimeout(() => {
-      if (openRef.current) return;
-      Animated.sequence([
-        Animated.timing(offset, { toValue: 10, duration: 220, easing: Easing.out(Easing.quad), useNativeDriver: nativeDriver }),
-        Animated.spring(offset, { toValue: 0, useNativeDriver: nativeDriver, speed: 14, bounciness: 10 }),
-      ]).start();
-    }, 1200);
-    return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasUnread, reduceMotion, panelH > 0]);
 
   const onPanelLayout = (e: LayoutChangeEvent) => {
     const h = Math.round(e.nativeEvent.layout.height);

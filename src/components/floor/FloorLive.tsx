@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Easing, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Animated, Easing, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../ui/Text';
 import { Icon } from '../ui/Icon';
 import { FloorSnapshot } from '../../floor/useFloorSnapshot';
@@ -8,7 +8,7 @@ import { WeekForecast } from '../../floor/useWeekForecast';
 import { CrowdLevel, LEVEL_LABEL } from '../../floor/crowd';
 import { levelTint } from '../../floor/levelColors';
 import { colors, fonts, radius } from '../../theme';
-import Svg, { Circle, Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
+import Svg, { Circle, Defs, Line, LinearGradient, Path, Stop, Text as SvgText } from 'react-native-svg';
 import { Title } from '../ui/Title';
 import { haptics } from '../../utils/haptics';
 import { claimSwipe } from '../../navigation/swipeGuard';
@@ -35,47 +35,6 @@ const DAY_FULL = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', '
 const SLOT_HOURS: Record<TrainingTimeSlot, [number, number]> = { morning: [6, 12], afternoon: [12, 17], evening: [17, 22] };
 const LEVEL_RANK: Record<CrowdLevel, number> = { calme: 0, moyen: 1, plein: 2 };
 
-/** How full the gym is, as a ring (design-ref Affluence). */
-const RING = 124;
-const RING_STROKE = 12;
-const Ring: React.FC<{ fill: number; children: React.ReactNode }> = ({ fill, children }) => {
-  const r = (RING - RING_STROKE) / 2;
-  const c = 2 * Math.PI * r;
-  return (
-    <View style={{ width: RING, height: RING }}>
-      <Svg width={RING} height={RING}>
-        <Circle cx={RING / 2} cy={RING / 2} r={r} stroke={colors.track} strokeWidth={RING_STROKE} fill="none" />
-        <Circle
-          cx={RING / 2}
-          cy={RING / 2}
-          r={r}
-          stroke={colors.brand}
-          strokeWidth={RING_STROKE}
-          fill="none"
-          strokeLinecap="round"
-          strokeDasharray={`${c * Math.max(0, Math.min(1, fill))} ${c}`}
-          transform={`rotate(-90 ${RING / 2} ${RING / 2})`}
-        />
-      </Svg>
-      <View style={styles.ringCenter} pointerEvents="none">{children}</View>
-    </View>
-  );
-};
-
-/** A usual-crowd bar: light at the top, fading into the card (design-ref Affluence). */
-const FadeBar: React.FC<{ id: string; opacity: number }> = ({ id, opacity }) => (
-  <Svg width="100%" height="100%" preserveAspectRatio="none" style={StyleSheet.absoluteFill}>
-    <Defs>
-      <LinearGradient id={id} x1="0" y1="0" x2="0" y2="1">
-        <Stop offset="0" stopColor={colors.text} stopOpacity={0.9 * opacity} />
-        <Stop offset="1" stopColor={colors.text} stopOpacity={0.12 * opacity} />
-      </LinearGradient>
-    </Defs>
-    <Rect x="0" y="0" width="100%" height="100%" rx="5" fill={`url(#${id})`} />
-  </Svg>
-);
-/** When the club hides counts, the ring follows the level instead of the head count. */
-const LEVEL_FILL = { calme: 0.33, moyen: 0.66, plein: 1 } as const;
 const pad = (n: number) => String(n).padStart(2, '0');
 const weekdayOf = (d: Date) => (d.getDay() + 6) % 7;
 
@@ -120,6 +79,7 @@ export const FloorLive: React.FC<Props> = ({ snapshot, week, alertOn, onToggleAl
   const todayIndex = weekdayOf(snapshot.now);
   const [selDay, setSelDay] = useState(todayIndex);
   const [selHour, setSelHour] = useState<number | null>(null);
+  const [menu, setMenu] = useState(false);
 
   const tint = levelTint(snapshot.level);
   const nowHour = snapshot.now.getHours();
@@ -196,39 +156,6 @@ export const FloorLive: React.FC<Props> = ({ snapshot, week, alertOn, onToggleAl
   const slot = usualSlot ? SLOT_HOURS[usualSlot] : null;
   const slotHours = slot ? todayCurve.filter(h => h.hour >= slot[0] && h.hour < slot[1]) : [];
   const slotLevel = slotHours.length ? slotHours.reduce((a, b) => (LEVEL_RANK[b.level] > LEVEL_RANK[a.level] ? b : a)).level : null;
-  const bestBox = bestLabel ? (
-    <View style={styles.tiles}>
-      <View style={styles.tile} accessible accessibilityLabel={`${busy ? 'Plus calme aujourd’hui' : 'Meilleur créneau aujourd’hui'} : ${bestLabel}`}>
-        <View style={styles.tileIc}>
-          <Icon name="moon-outline" size={20} color={colors.brandText} />
-        </View>
-        <Text style={styles.tileValue}>{bestRange}</Text>
-        <Text style={styles.tileLabel}>{busy ? 'Plus calme aujourd’hui' : 'Meilleur créneau aujourd’hui'}{bestLevel ? ` · ${bestLevel}` : ''}</Text>
-      </View>
-      {slot && slotLevel ? (
-        <View style={styles.tile} accessible accessibilityLabel={`Ton créneau, ${slot[0]}h – ${slot[1]}h : souvent ${LEVEL_LABEL[slotLevel].toLowerCase()}`}>
-          <View style={styles.tileIc}>
-            <Icon name="time-outline" size={20} color={colors.brandText} />
-          </View>
-          <Text style={styles.tileValue}>{slot[0]}h – {slot[1]}h</Text>
-          <Text style={styles.tileLabel}>Ton créneau · souvent {LEVEL_LABEL[slotLevel].toLowerCase()}</Text>
-        </View>
-      ) : (
-        <Pressable
-          onPress={onToggleAlert}
-          accessibilityRole="button"
-          accessibilityState={{ selected: alertOn }}
-          style={({ pressed }) => [styles.tile, alertOn && styles.tileOn, pressed && { opacity: 0.85 }]}
-        >
-          <View style={[styles.tileIc, alertOn && { backgroundColor: colors.green.soft }]}>
-            <Icon name={alertOn ? 'notifications' : 'notifications-outline'} size={20} color={alertOn ? colors.green.text : colors.brandText} />
-          </View>
-          <Text style={[styles.tileAction, alertOn && { color: colors.green.text }]}>{alertOn ? 'Alerte activée' : "M'alerter si calme"}</Text>
-        </Pressable>
-      )}
-    </View>
-  ) : null;
-
   if (!snapshot.isOpen) {
     return (
       <View style={[styles.card, styles.closed]}>
@@ -241,48 +168,51 @@ export const FloorLive: React.FC<Props> = ({ snapshot, week, alertOn, onToggleAl
     );
   }
 
+  const pct = Math.round(Math.min(1, live / Math.max(1, snapshot.capacity)) * 100);
+  const peak = hourly.length ? hourly.reduce((x, y) => (y.count > x.count ? y : x), hourly[0]) : null;
+
   return (
     <View style={styles.card}>
       {header}
-      {/* Top: ring + live count (design-ref Affluence) */}
-      <View style={styles.liveCard}>
-        <Ring fill={showCounts ? live / Math.max(1, snapshot.capacity) : LEVEL_FILL[snapshot.level]}>
-          {showCounts ? (
-            <>
-              <Text style={styles.ringPct}>{Math.round(Math.min(1, live / Math.max(1, snapshot.capacity)) * 100)}</Text>
-              <Text style={styles.ringSub}>% rempli</Text>
-            </>
-          ) : (
-            <Text style={[styles.ringWord, { color: tint.text }]}>{LEVEL_LABEL[snapshot.level]}</Text>
-          )}
-        </Ring>
-        <View style={styles.liveInfo}>
-          <View style={styles.tagRow}>
-            <PulseDot color={colors.brand} />
-            <Text style={styles.tag}>EN DIRECT · {pad(nowHour)}:{pad(snapshot.now.getMinutes())}</Text>
-          </View>
-          {showCounts ? (
-            <>
-              <View style={styles.countRow}>
-                <Text style={styles.count}>{live}</Text>
-                <Text style={styles.cap}>/ {snapshot.capacity}</Text>
-              </View>
-              <Text style={styles.unit}>membres sur le plateau</Text>
-            </>
-          ) : (
-            <Text style={[styles.levelWord, { color: tint.text }]}>
-              {LEVEL_LABEL[snapshot.level].charAt(0) + LEVEL_LABEL[snapshot.level].slice(1).toLowerCase()} en ce moment
-            </Text>
-          )}
-          <View style={[styles.pill, { backgroundColor: tint.soft }]}>
-            <Text style={[styles.pillText, { color: tint.text }]}>
-              {LEVEL_LABEL[snapshot.level]}{cmp ? ` · ${cmp.strong}${cmp.rest}` : ''}
-            </Text>
-          </View>
-        </View>
-      </View>
 
-      {bestBox}
+      {/* Stat tiles, 2 x 2 (dashboard layout): live, level, calmest hour, my slot */}
+      <View style={styles.grid}>
+        <StatTile icon="pulse-outline" label="En direct" live>
+          <Text style={styles.statValue}>{showCounts ? live : LEVEL_LABEL[snapshot.level]}</Text>
+          <Text style={styles.statSub}>{showCounts ? `sur ${snapshot.capacity} · ${pct} % rempli` : `à ${pad(nowHour)}:${pad(snapshot.now.getMinutes())}`}</Text>
+        </StatTile>
+        <StatTile icon="stats-chart-outline" label="Niveau">
+          <Text style={[styles.statValue, { color: tint.text }]} numberOfLines={1}>{LEVEL_LABEL[snapshot.level].charAt(0) + LEVEL_LABEL[snapshot.level].slice(1).toLowerCase()}</Text>
+          <Text style={styles.statSub}>{cmp ? `${cmp.strong}${cmp.rest}` : 'en ce moment'}</Text>
+        </StatTile>
+        {bestLabel ? (
+          <StatTile icon="moon-outline" label={busy ? 'Plus calme' : 'Meilleur créneau'}>
+            <Text style={styles.statValue} numberOfLines={1}>{bestRange}</Text>
+            <Text style={styles.statSub}>aujourd’hui{bestLevel ? ` · ${bestLevel}` : ''}</Text>
+          </StatTile>
+        ) : null}
+        {slot && slotLevel ? (
+          <StatTile icon="time-outline" label="Ton créneau">
+            <Text style={styles.statValue} numberOfLines={1}>{slot[0]}h – {slot[1]}h</Text>
+            <Text style={styles.statSub}>souvent {LEVEL_LABEL[slotLevel].toLowerCase()}</Text>
+          </StatTile>
+        ) : (
+          <Pressable
+            onPress={onToggleAlert}
+            accessibilityRole="button"
+            accessibilityState={{ selected: alertOn }}
+            style={({ pressed }) => [styles.stat, alertOn && styles.tileOn, pressed && { opacity: 0.85 }]}
+          >
+            <View style={styles.statHead}>
+              <View style={[styles.statIc, alertOn && { backgroundColor: colors.green.soft }]}>
+                <Icon name={alertOn ? 'notifications' : 'notifications-outline'} size={20} color={alertOn ? colors.green.text : colors.brandText} />
+              </View>
+              <Text style={styles.statLabel}>Alerte</Text>
+            </View>
+            <Text style={[styles.tileAction, alertOn && { color: colors.green.text }]}>{alertOn ? 'Alerte activée' : "M'alerter si calme"}</Text>
+          </Pressable>
+        )}
+      </View>
 
       {checkedIn && (
         <Pressable onPress={onScanOut} accessibilityRole="button" style={({ pressed }) => [styles.scanOut, pressed && { opacity: 0.85 }]}>
@@ -291,72 +221,180 @@ export const FloorLive: React.FC<Props> = ({ snapshot, week, alertOn, onToggleAl
         </Pressable>
       )}
 
-      <View>
-        <Title variant="section">{isToday ? 'Aujourd’hui' : DAY_FULL[selDay]}</Title>
-        <Text style={styles.secSub}>Habituellement vs maintenant</Text>
+      {/* "Habituellement" + day dropdown */}
+      <View style={[styles.chartHead, { zIndex: 5 }]}>
+        <Title variant="section" style={{ flexShrink: 1 }}>Habituellement</Title>
+        <View>
+          <Pressable onPress={() => setMenu(m => !m)} accessibilityRole="button" accessibilityLabel={`Jour : ${isToday ? 'aujourd’hui' : DAY_FULL[selDay]}`} style={styles.dayPick}>
+            <Text style={styles.dayPickText}>{isToday ? 'Aujourd’hui' : DAY_FULL[selDay]}</Text>
+            <Icon name={menu ? 'chevron-up' : 'chevron-down'} size={16} color={colors.textSecondary} />
+          </Pressable>
+          {menu && (
+            <View style={styles.menu}>
+              {DAY_LABELS.map((label, i) => {
+                const on = selDay === i;
+                return (
+                  <Pressable
+                    key={i}
+                    onPress={() => { haptics.select(); setSelDay(i); setSelHour(null); setMenu(false); }}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: on }}
+                    style={[styles.menuItem, on && styles.menuItemOn]}
+                  >
+                    <Text style={[styles.menuText, on && { color: colors.brandText }]}>{i === todayIndex ? 'Aujourd’hui' : DAY_FULL[i]}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          )}
+        </View>
       </View>
 
-      {/* Day selector */}
-      <ScrollView horizontal onTouchStart={claimSwipe} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.days}>
-        {DAY_LABELS.map((label, i) => {
-          const on = selDay === i;
-          return (
-            <Pressable
-              key={i}
-              onPress={() => { haptics.select(); setSelDay(i); setSelHour(null); }}
-              accessibilityRole="button"
-              accessibilityState={{ selected: on }}
-              style={[styles.dayChip, on && styles.dayChipOn]}
-            >
-              <Text style={[styles.dayChipText, on && styles.dayChipTextOn]}>{i === todayIndex ? 'Auj.' : label}</Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
+      {/* Smooth area chart: the usual crowd hour by hour, a dot for now; touch an hour to read it */}
+      <AreaChart
+        hourly={hourly}
+        maxCount={maxCount}
+        nowHour={isToday ? nowHour : null}
+        live={live}
+        showCounts={showCounts}
+        selHour={selHour}
+        onHour={h => setSelHour(selHour === h ? null : h)}
+      />
+      <View style={styles.readoutWrap}>{readout}</View>
 
-      {/* Readout: a tapped bar, or another day */}
-      {(!!selEntry || !isToday) && <View style={styles.readoutWrap}>{readout}</View>}
+      {/* Repères */}
+      <Title variant="section">Repères</Title>
+      {peak ? (
+        <Insight icon="trending-up-outline" label={`Pic habituel · ${isToday ? 'aujourd’hui' : DAY_FULL[selDay].toLowerCase()}`} value={`Vers ${peak.hour}h${showCounts ? ` · ~${peak.count} membres` : ''}`} />
+      ) : null}
+      {isToday && (
+        <Insight
+          icon="people-outline"
+          label="Maintenant"
+          value={showCounts ? `${live} membre${live > 1 ? 's' : ''} · d’habitude ~${snapshot.usualNow}` : cmp ? `${cmp.strong}${cmp.rest}` : LEVEL_LABEL[snapshot.level]}
+        />
+      )}
 
-      {/* Chart */}
-      <View style={styles.chartCard}>
-      <View style={styles.chart}>
-        {hourly.map(h => {
-          const sel = selHour === h.hour;
-          const past = isToday && h.hour < nowHour;
-          const isNow = isToday && h.hour === nowHour;
-          return (
-            <Pressable
-              key={h.hour}
-              onPress={() => setSelHour(sel ? null : h.hour)}
-              accessibilityRole="button"
-              accessibilityLabel={showCounts ? `${h.hour}h, habituellement ${h.count} membres` : `${h.hour}h, habituellement ${LEVEL_LABEL[h.level].toLowerCase()}`}
-              style={[styles.barSlot, isNow && { zIndex: 2 }]}
-            >
-              <View style={styles.barTrack}>
-                <View style={[styles.barUsual, { height: `${Math.max(2, (h.count / maxCount) * 100)}%` }, sel && { backgroundColor: colors.textMuted }]}>
-                  {!sel && <FadeBar id={`bar-${selDay}-${h.hour}`} opacity={past ? 0.55 : 1} />}
-                </View>
-                {isNow && (
-                  <View style={[styles.barNow, { height: `${Math.max(2, (live / maxCount) * 100)}%`, backgroundColor: colors.brand }]} />
-                )}
-                {isNow && showCounts && (
-                  <Text style={[styles.barNowLabel, { bottom: `${Math.max(2, (live / maxCount) * 100)}%` }]}>{live}</Text>
-                )}
-              </View>
-            </Pressable>
-          );
-        })}
+      {footer}
+    </View>
+  );
+};
+
+/** One dashboard tile: icon in a small square + label, then the value and its caption. */
+const StatTile: React.FC<{ icon: string; label: string; live?: boolean; children: React.ReactNode }> = ({ icon, label, live, children }) => (
+  <View style={styles.stat} accessible>
+    <View style={styles.statHead}>
+      <View style={styles.statIc}>
+        {live ? <PulseDot color={colors.brand} /> : <Icon name={icon as any} size={20} color={colors.brandText} />}
       </View>
-      <View style={styles.axis}>
+      <Text style={styles.statLabel} numberOfLines={1}>{label}</Text>
+    </View>
+    {children}
+  </View>
+);
+
+/** A "Repères" row: icon square, small caption, bold value. */
+const Insight: React.FC<{ icon: string; label: string; value: string }> = ({ icon, label, value }) => (
+  <View style={styles.insight} accessible accessibilityLabel={`${label} : ${value}`}>
+    <View style={styles.insightIc}>
+      <Icon name={icon as any} size={22} color={colors.brandText} />
+    </View>
+    <View style={{ flex: 1, gap: 2 }}>
+      <Text style={styles.insightLabel}>{label}</Text>
+      <Text style={styles.insightValue}>{value}</Text>
+    </View>
+  </View>
+);
+
+const CHART_H = 200;
+/** Smooth line through the points (Catmull-Rom turned into cubic curves). */
+const smoothPath = (pts: { x: number; y: number }[]) => {
+  if (pts.length < 2) return '';
+  let d = `M ${pts[0].x} ${pts[0].y}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] ?? pts[i];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2] ?? p2;
+    d += ` C ${p1.x + (p2.x - p0.x) / 6} ${p1.y + (p2.y - p0.y) / 6}, ${p2.x - (p3.x - p1.x) / 6} ${p2.y - (p3.y - p1.y) / 6}, ${p2.x} ${p2.y}`;
+  }
+  return d;
+};
+
+const AreaChart: React.FC<{
+  hourly: { hour: number; count: number; level: CrowdLevel }[];
+  maxCount: number;
+  nowHour: number | null;
+  live: number;
+  showCounts: boolean;
+  selHour: number | null;
+  onHour: (h: number) => void;
+}> = ({ hourly, maxCount, nowHour, live, showCounts, selHour, onHour }) => {
+  const [w, setW] = useState(0);
+  const left = showCounts ? 28 : 6;
+  const top = 26;
+  const plotW = Math.max(1, w - left - 8);
+  const n = hourly.length;
+  const xAt = (i: number) => left + (n <= 1 ? plotW / 2 : (i / (n - 1)) * plotW);
+  const yAt = (v: number) => top + (1 - Math.min(1, v / maxCount)) * (CHART_H - top - 6);
+  const pts = hourly.map((h, i) => ({ x: xAt(i), y: yAt(h.count) }));
+  const line = smoothPath(pts);
+  const area = pts.length > 1 ? `${line} L ${pts[pts.length - 1].x} ${CHART_H} L ${pts[0].x} ${CHART_H} Z` : '';
+  const nowIdx = nowHour != null ? hourly.findIndex(h => h.hour === nowHour) : -1;
+  const selIdx = selHour != null ? hourly.findIndex(h => h.hour === selHour) : -1;
+  const ticks = [0, 0.5, 1].map(f => Math.round((maxCount / 1.05) * f));
+
+  return (
+    <View style={styles.chartCard} onLayout={e => setW(e.nativeEvent.layout.width - 32)}>
+      {n === 0 ? (
+        <Text style={styles.readout}>Fermé ce jour-là.</Text>
+      ) : w > 0 ? (
+        <View style={{ height: CHART_H }}>
+          <Svg width={w} height={CHART_H}>
+            <Defs>
+              <LinearGradient id="crowdFill" x1="0" y1="0" x2="0" y2="1">
+                <Stop offset="0" stopColor={colors.brand} stopOpacity={0.28} />
+                <Stop offset="1" stopColor={colors.brand} stopOpacity={0.04} />
+              </LinearGradient>
+            </Defs>
+            {showCounts && ticks.map(t => (
+              <Line key={t} x1={left} x2={left + plotW} y1={yAt(t)} y2={yAt(t)} stroke={colors.divider} strokeWidth={1} />
+            ))}
+            {showCounts && ticks.map(t => (
+              <SvgText key={`l${t}`} x={0} y={yAt(t) + 4} fontSize={11} fill={colors.textMuted}>{String(t)}</SvgText>
+            ))}
+            <Path d={area} fill="url(#crowdFill)" />
+            <Path d={line} stroke={colors.brand} strokeWidth={3} fill="none" strokeLinecap="round" />
+            {selIdx >= 0 && <Line x1={xAt(selIdx)} x2={xAt(selIdx)} y1={top} y2={CHART_H} stroke={colors.textMuted} strokeWidth={1} strokeDasharray="4 4" />}
+            {selIdx >= 0 && <Circle cx={xAt(selIdx)} cy={pts[selIdx].y} r={6} fill={colors.card} stroke={colors.text} strokeWidth={2.5} />}
+            {nowIdx >= 0 && <Circle cx={xAt(nowIdx)} cy={yAt(live)} r={7} fill={colors.card} stroke={colors.brand} strokeWidth={3} />}
+            {nowIdx >= 0 && showCounts && (
+              <SvgText x={xAt(nowIdx)} y={yAt(live) - 13} fontSize={13} fontWeight="800" fill={colors.brandText} textAnchor="middle">{String(live)}</SvgText>
+            )}
+          </Svg>
+          {/* Touch areas: one column per hour */}
+          <View style={[StyleSheet.absoluteFill, { flexDirection: 'row', left: left - plotW / Math.max(1, n - 1) / 2, right: 8 - plotW / Math.max(1, n - 1) / 2 }]}>
+            {hourly.map(h => (
+              <Pressable
+                key={h.hour}
+                onPress={() => onHour(h.hour)}
+                accessibilityRole="button"
+                accessibilityLabel={showCounts ? `${h.hour}h, habituellement ${h.count} membres` : `${h.hour}h, habituellement ${LEVEL_LABEL[h.level].toLowerCase()}`}
+                style={{ flex: 1 }}
+              />
+            ))}
+          </View>
+        </View>
+      ) : (
+        <View style={{ height: CHART_H }} />
+      )}
+      <View style={[styles.axis, { paddingLeft: left - 6 }]}>
         <Text style={styles.axisText}>6h</Text>
         <Text style={styles.axisText}>10h</Text>
         <Text style={styles.axisText}>14h</Text>
         <Text style={styles.axisText}>18h</Text>
         <Text style={styles.axisText}>22h</Text>
       </View>
-      </View>
-
-      {footer}
     </View>
   );
 };
@@ -409,7 +447,7 @@ const styles = StyleSheet.create({
   readoutWrap: { minHeight: 20 },
   readout: { fontSize: 13, color: colors.textSecondary, lineHeight: 19 },
 
-  chartCard: { padding: 16, paddingTop: 22, borderRadius: radius.cardLg, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
+  chartCard: { padding: 16, paddingTop: 12, borderRadius: radius.cardLg, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
   chart: { flexDirection: 'row', alignItems: 'flex-end', gap: 6, height: 230, paddingTop: 22 },
   barSlot: { flex: 1, height: '100%', justifyContent: 'flex-end' },
   barTrack: { height: '100%', justifyContent: 'flex-end', position: 'relative' },
@@ -423,6 +461,27 @@ const styles = StyleSheet.create({
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   legendDot: { width: 10, height: 10, borderRadius: 5 },
   legendText: { fontSize: 12, color: colors.textSecondary },
+
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  stat: { width: '47.8%', flexGrow: 1, gap: 6, padding: 16, borderRadius: radius.cardLg, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
+  statHead: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 6 },
+  statIc: { width: 38, height: 38, borderRadius: 12, backgroundColor: colors.page, alignItems: 'center', justifyContent: 'center' },
+  statLabel: { flex: 1, fontSize: 13, fontWeight: '700', color: colors.textSecondary },
+  statValue: { fontFamily: fonts.heading, fontWeight: 'normal', fontSize: 30, lineHeight: 32, color: colors.text },
+  statSub: { fontSize: 12, fontWeight: '500', lineHeight: 16, color: colors.textMuted },
+
+  chartHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginTop: 6 },
+  dayPick: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 38, paddingHorizontal: 14, borderRadius: 999, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
+  dayPickText: { fontSize: 14, fontWeight: '700', color: colors.text },
+  menu: { position: 'absolute', top: 44, right: 0, width: 170, paddingVertical: 6, borderRadius: 16, backgroundColor: colors.page, borderWidth: 1, borderColor: colors.divider, shadowColor: colors.black, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.12, shadowRadius: 20, elevation: 8 },
+  menuItem: { paddingVertical: 10, paddingHorizontal: 16 },
+  menuItemOn: { backgroundColor: colors.brandSoft },
+  menuText: { fontSize: 14, fontWeight: '700', color: colors.text },
+
+  insight: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16, borderRadius: radius.cardLg, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
+  insightIc: { width: 48, height: 48, borderRadius: 14, backgroundColor: colors.page, alignItems: 'center', justifyContent: 'center' },
+  insightLabel: { fontSize: 13, fontWeight: '500', color: colors.textSecondary },
+  insightValue: { fontSize: 16, fontWeight: '800', color: colors.text },
 
   tiles: { flexDirection: 'row', gap: 12 },
   tile: { flex: 1, gap: 8, padding: 16, borderRadius: radius.cardLg, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
